@@ -1,0 +1,16 @@
+%ol#breadcrums
+
+  - if @projects || @project
+    %li
+      %a{:href => "/projects"} Projects
+    - if @project
+      %li >
+      %li
+        %a{:href => "/projects/#{@project.name}"}= @project.name
+      - if @test_runs || @test_run
+        %li >
+        %li
+          %a{:href => "/projects/#{@project.name}/test_runs"} Test Runs
+        - if @test_run
+          %li >
+          %li= @test_run.id

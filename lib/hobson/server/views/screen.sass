@@ -1,0 +1,133 @@
+body
+  font-family: monaco
+  font-size: 9pt
+  background: white
+
+  > h1
+    padding: 0.25em 1em
+    border-bottom: 1px solid grey
+    text-align: center
+    font-size: 200%
+    background: black
+    color: white
+
+  &.loading
+    > h1
+      background: black url(/spinner-onblack.gif) no-repeat scroll top right
+
+#breadcrums
+  margin: 0 0 0.25em 0
+  padding: 0.25em 1em
+  background: lightgrey
+  > li
+    display: inline-block
+    padding: 0.25em
+    font-weight: bold
+    > a
+      text-decoration: none
+      &, &:visited
+        color: blue
+
+#background-image
+  z-index: -1
+  position: fixed
+  bottom: 0
+  right: 0
+  opacity: 0.5
+  height: 40%
+
+
+#content
+  padding: 1em
+
+ol
+  padding-left: 1em
+  list-style-type: none
+  > li
+    margin-bottom: 0.25em
+
+table
+  th, td
+    padding: 0.25em
+
+  th
+    font-weight: bold
+
+.test_run
+  > h2
+    margin-bottom: 1em
+    font-size: 120%
+    font-weight: bold
+
+  .jobs.status > *
+    position: relative
+    padding: 0.25em 0
+
+    h3
+      font-weight: bold
+
+    .icon
+      position: absolute
+      bottom: 6px
+      left: 0
+      height: 16px
+      width: 16px
+      background: white url(/spinner-onwhite.gif) no-repeat scroll top right
+
+    .timeline
+      position: relative
+      margin: 0.5em 0 0 25px
+      padding: 0
+      min-height: 1em
+      // border: 1px dotted #B4B4B4
+      background-color: lightgrey
+      overflow: hidden
+      cursor: default
+
+      &, > *
+        height: 22px
+      > *
+        // float: left
+        position: absolute
+        top: 0
+        bottom: 0
+        overflow: hidden
+        margin: 0
+        padding: 0.5em 0
+        text-indent: 0.5em
+        white-space: nowrap
+        font-size: 90%
+        background-color: rgb(68, 35, 255)
+
+        &.landmark-enqueued
+          background-color: lighten(#F00, 20%)
+        &.landmark-checking-out-code
+          background-color: lighten(#FFA500, 20%)
+        &.landmark-preparing
+          background-color: lighten(#00F, 20%)
+        &.landmark-running-tests
+          background-color: lighten(#800080, 40%)
+        &.landmark-saving-artifacts
+          background-color: lighten(#A52A2A, 20%)
+        &.landmark-tearing-down
+          background-color: lighten(#000, 20%)
+
+    &.status-complete
+      .icon
+        background-image: none
+
+  table.tests
+    margin-bottom: 1.5em
+    tr
+      &.waiting
+        color: grey
+      &.running
+        color: blue
+      &.pass
+        color: green
+      &.fail
+        color: red
+      &.pending
+        color: orange
+
+

@@ -1,0 +1,16 @@
+!!!
+%html
+  %head
+    %meta{:charset => "utf-8"}
+    %title "Test Cluster"
+    %link{:href => "/reset.css", :media => "screen", :rel => "stylesheet", :type => "text/css"}
+    %link{:href => "/screen.css", :media => "screen", :rel => "stylesheet", :type => "text/css"}
+    %script{:src => "http://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js", :type => "text/javascript"}
+    %script{:src => "/application.js", :type => "text/javascript"}
+  %body
+    %h1 Hobson
+
+    = partial :breadcrum
+
+    #content= yield
+    %img#background-image{:src => '/hobson.jpg'}

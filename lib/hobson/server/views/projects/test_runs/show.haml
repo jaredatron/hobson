@@ -1,0 +1,56 @@
+%section.test_run{:class => "status-#{classname(test_run.status)}"}
+  %h2 Status: #{test_run.status}
+
+  %h2 #{test_run.complete? ? 'completed in' : 'running for'} #{test_run_duration} seconds
+
+
+  - if test_run.jobs.present?
+
+    %h2 Jobs
+    %ol.jobs.status
+      - test_run.jobs.each do |job|
+        %li.job{:class => "status-#{classname(job.status)}"}
+          %h3
+            %a{:href => "ssh://#{job['hostname']}"} Job #{job.index} - #{job.status}
+          .icon
+          %ol.timeline
+            - job_timeline(job)
+
+    %h2 Tests
+    %table.tests
+      %thead
+        %tr
+          %th job
+          %th file
+          %th est.runtime
+          %th status
+          %th runtime
+          %th result
+      %tbody
+        - test_run.jobs.each do |job|
+          - job.tests.each do |test|
+            - result = test.result || ''
+            %tr{:class => [result.downcase, test.status]}
+              %td
+                %a{:href => "ssh://#{job['hostname']}"} Job #{job.index}
+              %td= test.name
+              %td= test.est_runtime.presence || 'unknown'
+              %td= test.status
+              %td= test.runtime
+              %td= test.result
+
+    %h2 Artifacts
+    %ol.jobs
+      - @test_run.jobs.each do |job|
+        %li
+          %h3 Job #{job.index}
+          %ol.artifacts
+            - job.artifacts.each do |artifact|
+              - relative_path, public_link = artifact
+              %li
+                %a{:href => public_link}= relative_path
+
+
+- if @test_run.complete?
+  :javascript
+    $(function(){ Hobson.autoRefresh.stop(); });

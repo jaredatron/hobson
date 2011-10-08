@@ -2,3 +2,8 @@
 .bundle
 Gemfile.lock
 pkg/*
+.DS_Store
+.sass-cache
+.gems
+.bin
+tmp/*

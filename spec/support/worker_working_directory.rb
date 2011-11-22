@@ -26,6 +26,11 @@ module WorkerWorkingDirectory
     write_config! DEFAULT_CONFIG
 
     sh "git clone #{ExampleProject::GIT_URL} #{example_project_path}" unless example_project_path.exist?
+    git("config --get remote.origin.url").chomp.should == ExampleProject::GIT_URL
+  end
+
+  def git cmd
+    sh %[cd "#{example_project_path}" && git --git-dir="#{example_project_path+'.git'}" #{cmd}]
   end
 
 end

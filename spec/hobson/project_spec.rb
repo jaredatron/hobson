@@ -35,9 +35,22 @@ describe Hobson::Project do
 
     end
 
+    describe "#workspace" do
+      it "should raise an error" do
+        lambda{ project.workspace }.should raise_error
+      end
+    end
+
   end
 
   worker_context do
+
+    describe "#workspace" do
+      subject{ Hobson::Project.new.workspace }
+      alias_method :workspace, :subject
+
+      it { should be_a Hobson::Project::Workspace }
+    end
 
   end
 

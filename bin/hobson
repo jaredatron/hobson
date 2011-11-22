@@ -30,7 +30,6 @@ Class.new Thor do
 
   desc "work", "become a test running worker"
   def work
-    ENV['HOBSON_CONFIG'] ||= File.expand_path('~/hobson/config.rb')
     Hobson.start_logging_to_stdout!
     Hobson.redis #setsup resque's redis
     queues = (ENV['QUEUES'] || ENV['QUEUE'] || '*').to_s.split(',')

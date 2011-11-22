@@ -5,15 +5,6 @@ describe Hobson::Project::Workspace do
   subject{ Factory.workspace }
   alias_method :workspace, :subject
 
-  client_context do
-
-    # describe "#root" do
-    #   subject { Factory.workspace.root }
-    #   it { should == ClientWorkingDirectory.path }
-    # end
-
-  end
-
   worker_context do
 
     describe "#root" do
@@ -21,9 +12,22 @@ describe Hobson::Project::Workspace do
       it { should == WorkerWorkingDirectory.example_project_path }
     end
 
-  end
+    describe "#tests" do
+      subject { Factory.workspace.tests.sort }
+      it {
+        should == %w[
+          features/a.feature
+          features/b.feature
+          features/c.feature
+          features/d.feature
+          spec/a_spec.rb
+          spec/b_spec.rb
+          spec/c_spec.rb
+          spec/d_spec.rb
+        ].sort
+      }
 
-  either_context do
+    end
 
   end
 

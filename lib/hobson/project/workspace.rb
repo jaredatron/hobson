@@ -9,6 +9,7 @@ class Hobson::Project::Workspace
 
   def initialize project
     @project = project
+    raise "workspace doesn't exist" unless root.exist?
   end
 
   def root
@@ -17,7 +18,6 @@ class Hobson::Project::Workspace
 
   def checkout! sha
     logger.info "checking out #{sha}"
-    raise "WHOA!!! was going to git reset inside of #{root}" if defined?(RSpec)
     execute! "git fetch && git reset --hard #{sha} && git clean -df"
   end
 
@@ -25,15 +25,9 @@ class Hobson::Project::Workspace
     @tests ||= begin
       logger.info "detecting tests"
       tests = []
-      tests += Dir[root.join('spec/**/*_spec.rb')    ].first(2)
-      tests += Dir[root.join('features/**/*.feature')].first(2)
+      tests += Dir[root.join('spec/**/*_spec.rb')    ]
+      tests += Dir[root.join('features/**/*.feature')]
       tests.map{ |path| Pathname.new(path).relative_path_from(root).to_s }.sort
-
-      # # TEMP WHILE DEVELOPING
-      # [
-      #   'features/bulk_supporter_message.feature',
-      #   'spec/views/widgets/legos/action_header_spec.rb',
-      # ]
     end
   end
 

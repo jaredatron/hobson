@@ -1,6 +1,7 @@
 require 'active_support/core_ext/array'
 require 'active_support/core_ext/module/delegation'
 require 'active_support/core_ext/object/try'
+require 'active_support/inflections'
 
 require 'pathname'
 require 'resque'

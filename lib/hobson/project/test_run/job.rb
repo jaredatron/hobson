@@ -1,7 +1,5 @@
 class Hobson::Project::TestRun::Job
 
-  autoload :Tests, 'hobson/project/test_run/job/tests'
-
   attr_reader :test_run, :index
   delegate :logger, :workspace, :to => :test_run
 

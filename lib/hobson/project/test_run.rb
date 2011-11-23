@@ -2,7 +2,8 @@ require 'uuid'
 
 class Hobson::Project::TestRun
 
-  autoload :Job, 'hobson/project/test_run/job'
+  autoload :Tests, 'hobson/project/test_run/tests'
+  autoload :Job,   'hobson/project/test_run/job'
 
   delegate :workspace, :to => :project
   attr_reader :project
@@ -13,6 +14,10 @@ class Hobson::Project::TestRun
 
   def id
     @id ||= UUID.generate
+  end
+
+  def tests
+    @tests ||= Tests.new(self)
   end
 
   def jobs

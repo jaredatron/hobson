@@ -22,6 +22,7 @@ module Hobson::Landmarks
       class_eval <<-RUBY, __FILE__, __LINE__
 
         def #{landmark}!
+          logger.info "#{landmark}!"
           self["#{landmark}_at"] ||= Time.now
         end
 

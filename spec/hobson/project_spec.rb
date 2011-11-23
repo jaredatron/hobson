@@ -35,6 +35,8 @@ describe Hobson::Project do
     end
 
     describe "#workspace" do
+      subject{ Factory.project.workspace }
+      alias_method :workspace, :subject
       it { should_not be_ready }
     end
 

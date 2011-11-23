@@ -26,7 +26,9 @@ describe Hobson::Project::TestRun::Tests do
 
       before{ tests.detect! }
 
-      it "should have 8 tests" do
+      it { length.should == 8 }
+
+      it "should have a leng" do
         tests.length.should == 8
       end
 

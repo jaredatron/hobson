@@ -9,7 +9,8 @@ describe Hobson::Project::TestRun::Tests do
 
     it { should be_an Enumerable }
 
-    it "should" do
+    it "should contain only Test objects" do
+      tests.each{|test| test.should be_a Hobson::Project::TestRun::Tests::Test }
     end
 
     describe "#types" do

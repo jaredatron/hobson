@@ -34,7 +34,10 @@ class Hobson::Project::TestRun::Tests::Test
 
   def calculate_estimated_runtime!
     runtimes = tests.other_tests.map{|tests| tests[name].runtime }.compact
-    self.est_runtime = runtimes.find_all(&:present?).inject(&:+).to_f / runtimes.size
+    return nil if runtimes.blank?
+    sum = runtimes.find_all(&:present?).inject(&:+).to_f
+    return nil if sum =< 0
+    self.est_runtime = sum / runtimes.size
   end
 
   def inspect

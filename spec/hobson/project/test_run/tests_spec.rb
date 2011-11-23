@@ -34,11 +34,11 @@ describe Hobson::Project::TestRun::Tests do
         tests.each{|test| test.status.should == 'waiting'}
       end
 
-      # describe "#types" do
-      #   subject{ Factory.tests.types.sort }
-      #   it { should be_an Enumerable }
-      #   it { should == %w{feature spec}.sort }
-      # end
+      describe "#types" do
+        subject{ Factory.tests.types.sort }
+        it { should be_an Enumerable }
+        it { should == %w{feature spec}.sort }
+      end
 
     end
 

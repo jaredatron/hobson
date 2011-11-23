@@ -27,7 +27,7 @@ class Hobson::Project::TestRun
   end
 
   def logger
-    @logger ||= Log4r::Logger.new("#{project.logger.name}.test_runs(#{id})")
+    @logger ||= Log4r::Logger.new("#{project.logger.name}::TestRun[#{id}]")
   end
 
   def inspect

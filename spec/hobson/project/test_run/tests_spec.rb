@@ -9,10 +9,6 @@ describe Hobson::Project::TestRun::Tests do
 
     it { should be_an Enumerable }
 
-    it "should contain only Test objects" do
-      tests.each{|test| test.should be_a Hobson::Project::TestRun::Tests::Test }
-    end
-
     context "before detecting" do
 
       describe "#types" do
@@ -26,10 +22,16 @@ describe Hobson::Project::TestRun::Tests do
 
       before{ tests.detect! }
 
-      it { length.should == 8 }
-
-      it "should have a leng" do
+      it "should have a length of 8" do
         tests.length.should == 8
+      end
+
+      it "should contain only Test objects" do
+        tests.each{|test| test.should be_a Hobson::Project::TestRun::Tests::Test }
+      end
+
+      it "should only contain waiting tests" do
+        tests.each{|test| test.status.should == 'waiting'}
       end
 
       # describe "#types" do

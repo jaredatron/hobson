@@ -19,7 +19,7 @@ class Hobson::Project::TestRun::Job
     eval_hook :prepare
 
     running_tests!
-    workspace.run_tests tests.map(&:name).sort do |name, status, result, runtime|
+    workspace.run_tests tests.sort do |name, status, result, runtime|
       test = tests[name]
       test.status  = status
       test.result  = result  if result.present?

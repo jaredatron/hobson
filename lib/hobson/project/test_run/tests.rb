@@ -40,7 +40,7 @@ class Hobson::Project::TestRun::Tests
   private
 
   def tests
-    @tests ||= test_run.workspace.tests.map{|name| Test.new(self, name) }
+    @tests ||= test_run.workspace.tests.map{|name| Hobson::Project::TestRun::Tests::Test.new(self, name) }
   end
 
 end

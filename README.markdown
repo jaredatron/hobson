@@ -94,31 +94,35 @@ A distributed test run framework built on resque
 
 
 
-# Data Stored in Redis
-TestRun
-  - id                String
-  - sha               String
-  - scheduled_build   Datetime
-  - started_building  Datetime
-  - scheduled_jobs    Datetime
-  - tests
-    - name     String
-    - state    String (waiting|started|complete)
-    - result   String (pass|fail|pending)
-    - duration Float  (seconds)
-  - jobs
-    - index                 Integer
-    - scheduled_at          Datetime
-    - checking_out_code     Datetime
-    - preparing_environment Datetime
-    - running_tests         Datetime
-    - saving_artifacts      Datetime
-    - tearing_down          Datetime
-    - completed_at          Datetime
+# Data
+Project
+  - name
+  - git url
+  TestRun
+    - id                String
+    - sha               String
+    - scheduled_build   Datetime
+    - started_building  Datetime
+    - scheduled_jobs    Datetime
+    - tests
+      - name        String
+      - state       String (waiting|started|complete)
+      - result      String (pass|fail|pending)
+      - est_runtime Float  (seconds)
+      - runtime     Float  (seconds)
+    - jobs
+      - index                 Integer
+      - scheduled_at          Datetime
+      - checking_out_code     Datetime
+      - preparing_environment Datetime
+      - running_tests         Datetime
+      - saving_artifacts      Datetime
+      - tearing_down          Datetime
+      - completed_at          Datetime
 
 
 
-# Single Redis Hash
+# TestRun Redis Hash
   {
     sha                               =>
     scheduled_build_at                => "Fri Nov 18 10:15:03 -0800 2011"
@@ -133,7 +137,8 @@ TestRun
     jon:#{n}:completed_at             => "Fri Nov 18 10:15:03 -0800 2011"
     test:#{test_name}:status          => ("waiting"|"started"|"complete")
     test:#{test_name}:result          => ("pass"|"fail"|"pending")
-    test:#{test_name}:duration        => 23.854
+    test:#{test_name}:est_runtime     => 23.854
+    test:#{test_name}:runtime         => 23.854
   }
 
 

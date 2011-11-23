@@ -45,7 +45,8 @@ module Hobson
       return nil unless config.present?
       options = config[:redis] || {}
       @redis = Redis.new(options)
-      @redis = Redis::Namespace.new(options[:namespace], :redis => redis) if options[:namespace]
+      @redis = Redis::Namespace.new('Hobson', :redis => @redis)
+      @redis = Redis::Namespace.new(options[:namespace], :redis => @redis) if options[:namespace]
       Resque.redis = Redis::Namespace.new(:resque, :redis => @redis)
       @redis
     end

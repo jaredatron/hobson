@@ -4,12 +4,31 @@ class Hobson::Project
   autoload :TestRun,   'hobson/project/test_run'
 
   class << self
+
     alias_method :[], :new
+
+    def current
+      url = `git config --get remote.origin.url`.chomp
+      name = url.scan(%r{/([^/]+)\.git}).try(:first).try(:first) or
+        raise "unable to parse name from url #{url.inspect}"
+      project = new(name)
+      project.url ||= url
+      project
+    end
+
   end
 
   attr_reader :name
-  def initialize name = Hobson::Project.current_project_name
-    @name = name
+  def initialize name
+    @name ||= name
+  end
+
+  def url
+    redis['url']
+  end
+
+  def url= url
+    redis['url'] = url
   end
 
   def workspace
@@ -23,7 +42,7 @@ class Hobson::Project
       .sort.map{|id| TestRun.new(self, id) }
   end
 
-  def run_tests! sha = Hobson::Project.current_sha
+  def run_tests! sha = current_sha
     test_run = TestRun.new(self)
     test_run.sha = sha
     test_run.enqueue!
@@ -49,14 +68,7 @@ class Hobson::Project
 
   private
 
-  def self.current_project_name
-    @current_project_name ||= begin
-      `git config --get remote.origin.url`.scan(%r{/([^/]+)\.git}).try(:first).try(:first) or
-        raise "unable to parse project name from remote origin url"
-    end
-  end
-
-  def self.current_sha
+  def current_sha
     @current_sha ||= begin
       `git rev-parse HEAD`.chomp or raise "unable to get current sha"
       # TODO make sure the current sha is pushed to origin

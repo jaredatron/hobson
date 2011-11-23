@@ -5,7 +5,6 @@ class Hobson::Project::TestRun::Tests
   include Enumerable
 
   attr_reader :test_run
-  delegate :data, :to => :test_run
 
   def initialize test_run
     @test_run = test_run

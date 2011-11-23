@@ -10,10 +10,10 @@ class Hobson::Project::TestRun::Tests::Test
   %w{job status result runtime est_runtime}.each do |attr|
     class_eval <<-RUBY, __FILE__, __LINE__
       def #{attr}
-        tests.job["test:\#{name}:#{attr}"]
+        tests.test_run["test:\#{name}:#{attr}"]
       end
       def #{attr}= value
-        tests.job["test:\#{name}:#{attr}"] = value
+        tests.test_run["test:\#{name}:#{attr}"] = value
       end
     RUBY
   end

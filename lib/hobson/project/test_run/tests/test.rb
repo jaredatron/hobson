@@ -20,8 +20,8 @@ class Hobson::Project::TestRun::Tests::Test
 
   def type
     case name
-      when /.feature$/: :feature
-      when /_spec.rb$/: :spec
+      when /.feature$/: 'feature'
+      when /_spec.rb$/: 'spec'
       # when /_test.rb$/: :test_unit
       else
         :unknown

@@ -12,6 +12,16 @@ describe Hobson::Project::TestRun::Tests::Test do
       it { should respond_to :"#{attr}=" }
     end
 
+    describe "calculate_estimated_runtime!" do
+
+      it "should calculate nil" do
+        test.est_runtime.should be_nil
+        test.calculate_estimated_runtime!
+        test.est_runtime.should be_nil
+      end
+
+    end
+
   end
 
 end

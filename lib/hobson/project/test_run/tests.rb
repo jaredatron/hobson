@@ -24,13 +24,13 @@ class Hobson::Project::TestRun::Tests
   #   Test.new(self, name.to_s)
   # end
 
-  # def calculate_estimated_runtimes!
-  #   tests.each(&:calculate_estimated_runtime!)
-  # end
+  def calculate_estimated_runtimes!
+    tests.each(&:calculate_estimated_runtime!)
+  end
 
-  # def other_tests
-  #   @other_tests ||= (test_run.project.test_runs - test_run).map(&:tests)
-  # end
+  def other_tests
+    @other_tests ||= (test_run.project.test_runs - test_run).map(&:tests)
+  end
 
   def types
     tests.map(&:type).uniq

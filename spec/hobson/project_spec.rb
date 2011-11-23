@@ -57,7 +57,7 @@ describe Hobson::Project do
 
     describe "#redis" do
 
-      subject{ Hobson::Project.current.redis }
+      subject{ Hobson::Project[ExampleProject::NAME].redis }
       alias_method :redis, :subject
 
       it "should be a namespace" do

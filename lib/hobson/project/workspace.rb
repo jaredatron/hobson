@@ -11,6 +11,7 @@ class Hobson::Project::Workspace
     @project = project
   end
 
+  # TODO rename root to path
   def root
     @root ||= Hobson.root + 'projects' + project.name
   end

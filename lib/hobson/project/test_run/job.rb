@@ -17,7 +17,7 @@ class Hobson::Project::TestRun::Job
   alias_method :to_s, :inspect
 
   def logger
-    @logger ||= Log4r::Logger.new("Hobson::Project::TestRun(#{test_run.id})::Job(#{index})")
+    @logger ||= Log4r::Logger.new("#{test_run.logger.name}.jobs[#{index}]")
   end
 
 end

@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe Hobson::Project do
 
-  subject { Hobson::Project.current }
+  subject { Factory.project }
   alias_method :project, :subject
 
   client_context do

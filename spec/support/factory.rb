@@ -3,7 +3,7 @@ module Factory
   extend self
 
   def project name=ExampleProject::NAME
-    Hobson::Project.new(name)
+    Hobson::Project[name]
   end
 
   def workspace

@@ -31,7 +31,6 @@ describe Hobson::Project::TestRun::Tests::Test do
           test.est_runtime.should be_nil
           test.calculate_estimated_runtime!
           test.est_runtime.should == @runtimes.inject(&:+) / @runtimes.size
-          debugger;1
         end
       end
 

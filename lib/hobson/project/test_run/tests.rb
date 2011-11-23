@@ -33,6 +33,10 @@ class Hobson::Project::TestRun::Tests
   #   @other_tests ||= (test_run.project.test_runs - test_run).map(&:tests)
   # end
 
+  def types
+    tests.map(&:type).uniq
+  end
+
   private
 
   def tests

@@ -49,6 +49,7 @@ class Hobson::Project::TestRun::Tests
       flatten.
       map{ |path| Pathname.new(path).relative_path_from(test_run.workspace.root).to_s }.
       each{ |name| self[name].status = "waiting" }
+    self
   end
 
   private

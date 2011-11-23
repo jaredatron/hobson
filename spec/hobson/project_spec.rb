@@ -45,7 +45,7 @@ describe Hobson::Project do
   worker_context do
 
     describe "#workspace" do
-      subject{ Hobson::Project.current.workspace }
+      subject{ Factory.project.workspace }
       alias_method :workspace, :subject
 
       it { should be_a Hobson::Project::Workspace }

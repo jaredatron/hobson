@@ -3,7 +3,7 @@ require 'rspec/core/formatters/base_formatter'
 RSpec.configure do |config|
 
   get_spec = proc{ |this|
-    this.class.file_path.split(':').first.split("#{::Rails.root}/").last
+    this.class.file_path.split(':').first #.split("#{::Rails.root}/").last
   }
 
   started_at = nil

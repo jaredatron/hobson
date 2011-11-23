@@ -2,6 +2,7 @@
 #
 # cucumber -r Hobson::Cucumber::Formatter
 #
+require 'cucumber/formatter/io'
 class Hobson::Cucumber
     class Formatter
 

@@ -45,7 +45,7 @@ describe Hobson::Project do
   worker_context do
 
     describe "#workspace" do
-      subject{ Hobson::Project.new.workspace }
+      subject{ Hobson::Project.current.workspace }
       alias_method :workspace, :subject
 
       it { should be_a Hobson::Project::Workspace }
@@ -57,7 +57,7 @@ describe Hobson::Project do
 
     describe "#redis" do
 
-      subject{ Hobson::Project.new.redis }
+      subject{ Hobson::Project.current.redis }
       alias_method :redis, :subject
 
       it "should be in a namespace" do

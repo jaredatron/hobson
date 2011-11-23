@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Hobson::Project::TestRun::Job::Tests do
+describe Hobson::Project::TestRun::Tests do
 
   subject{ Factory.tests }
   alias_method :tests, :subject

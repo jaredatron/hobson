@@ -75,9 +75,6 @@ describe Hobson::Project::TestRun do
       subject { Factory.test_run.tests }
       alias_method :tests, :subject
       it { should be_a Hobson::Project::TestRun::Tests }
-      it "should contain all the tests in the example project" do
-        tests.length.should == 8
-      end
     end
 
     describe "build!" do
@@ -98,13 +95,13 @@ describe Hobson::Project::TestRun do
 
         it "should balance specs and features evenly across 2 jobs" do
           test_run.build!
-          test_run.jobs.first.tests.map(&:name).sort.should == %w[
+          test_run.jobs.first.tests.sort.should == %w[
             features/a.feature
             features/b.feature
             features/c.feature
             features/d.feature
           ].sort
-          test_run.jobs.last.tests.map(&:name).sort.should == %w[
+          test_run.jobs.last.tests.sort.should == %w[
             spec/a_spec.rb
             spec/b_spec.rb
             spec/c_spec.rb

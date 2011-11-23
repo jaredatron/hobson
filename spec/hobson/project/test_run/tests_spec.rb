@@ -24,11 +24,17 @@ describe Hobson::Project::TestRun::Tests do
 
     context "after detecting" do
 
-      describe "#types" do
-        subject{ Factory.tests.types.sort }
-        it { should be_an Enumerable }
-        it { should == %w{feature spec}.sort }
+      before{ tests.detect! }
+
+      it "should have 8 tests" do
+        tests.length.should == 8
       end
+
+      # describe "#types" do
+      #   subject{ Factory.tests.types.sort }
+      #   it { should be_an Enumerable }
+      #   it { should == %w{feature spec}.sort }
+      # end
 
     end
 

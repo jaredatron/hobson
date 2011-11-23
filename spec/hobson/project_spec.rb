@@ -57,7 +57,7 @@ describe Hobson::Project do
 
     describe "#redis" do
 
-      subject{ Hobson::Project[ExampleProject::NAME].redis }
+      subject{ Factory.project.redis }
       alias_method :redis, :subject
 
       it "should be a namespace" do
@@ -71,12 +71,12 @@ describe Hobson::Project do
     describe "#test_runs" do
 
       it "should return an array of Hobson::Project::TestRun objects" do
-        Hobson::Project.current.test_runs.should be_an Array
+        Factory.project.test_runs.should be_an Array
         test_runs = []
         test_runs << project.run_tests!
-        Hobson::Project.current.test_runs.should == test_runs.sort_by(&:id)
+        Factory.project.test_runs.should == test_runs.sort_by(&:id)
         test_runs << project.run_tests!
-        Hobson::Project.current.test_runs.should == test_runs.sort_by(&:id)
+        Factory.project.test_runs.should == test_runs.sort_by(&:id)
       end
 
       it "should return a test run when given an id" do

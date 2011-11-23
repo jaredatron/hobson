@@ -20,10 +20,8 @@ module Factory
     test_run.tests
   end
 
-  def test tests=self.tests
-    test = Hobson::Project::TestRun::Tests::Test.new(tests, 'factories.feature')
-    test.status = 'waiting'
-    test
+  def test name, tests=self.tests
+    tests[name]
   end
 
   def job test_run=self.test_run

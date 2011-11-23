@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe Hobson::Project::TestRun::Tests::Test do
 
-  subject{ Factory.test }
+  subject{ Factory.test('factoried.feature') }
   alias_method :test, :subject
 
   worker_context do
@@ -19,6 +19,8 @@ describe Hobson::Project::TestRun::Tests::Test do
         test.calculate_estimated_runtime!
         test.est_runtime.should be_nil
       end
+
+
 
     end
 

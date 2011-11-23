@@ -20,6 +20,10 @@ module Factory
     test_run.tests
   end
 
+  def tests tests=self.tests
+    tests.first
+  end
+
   def job test_run=self.test_run
     Hobson::Project::TestRun::Job.new(test_run, 0)
   end

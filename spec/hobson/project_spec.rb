@@ -60,7 +60,7 @@ describe Hobson::Project do
       subject{ Hobson::Project.current.redis }
       alias_method :redis, :subject
 
-      it "should be in a namespace" do
+      it "should be a namespace" do
         redis.should be_a Redis::Namespace
         redis.should_not == Hobson.redis
         redis.namespace.should == "Project:#{ExampleProject::NAME}"

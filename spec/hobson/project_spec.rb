@@ -2,15 +2,14 @@ require 'spec_helper'
 
 describe Hobson::Project do
 
+  subject { Hobson::Project.current }
   alias_method :project, :subject
 
   client_context do
 
-    describe "new" do
+    describe "current" do
 
       context "when given no arguments" do
-
-        subject { Hobson::Project.current }
 
         it "should default to the name of the given git repo" do
           project.name.should == ExampleProject::NAME

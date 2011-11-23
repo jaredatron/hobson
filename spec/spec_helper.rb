@@ -1,3 +1,4 @@
+debugger;1
 require 'hobson'
 require 'resque_unit'
 

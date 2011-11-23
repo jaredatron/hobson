@@ -53,6 +53,13 @@ class Hobson::Project::TestRun::Tests
     self
   end
 
+  def balance_for! number_of_jobs
+    # NOTES ON TEST BALANCING
+    # sum up the total expected execution time of each test type
+    # devide up the number of workers purpotionally
+    # then devide up the tests among those workers
+  end
+
   def [] name
     Test.new(self, name.to_s)
   end

@@ -21,23 +21,13 @@ class Hobson::Project::TestRun
     logger.info "detecting tests"
     tests.detect!
 
+    logger.info "balancing tests"
+    tests.balance_for! number_of_jobs
+
     logger.info "enqueuing #{number_of_jobs} jobs to run #{tests.length} tests"
+    (0..(number_of_jobs-1)).zip(tests_groups).map{|index, tests| Job.new(self, index).enqueue! }
 
-    tests_groups = tests.in_groups(number_of_jobs)
-
-    # NOTES ON TEST BALANCING
-    # sum up the total expected execution time of each test type
-    # devide up the number of workers purpotionally
-    # then devide up the tests among those workers
-
-    (0..(number_of_jobs-1)).zip(tests_groups).map{|index, tests|
-      job = Job.new(self, index)
-      job.tests << tests
-      job.tests.calculate_estimated_runtimes!
-      job.enqueue!
-    }
-
-    enqueued_jobs!
+    enqueued_jobs! # done
   end
 
 end

@@ -35,9 +35,9 @@ describe Hobson::Project::TestRun::Tests do
       end
 
       describe "#types" do
-        subject{ Factory.tests.types.sort }
-        it { should be_an Enumerable }
-        it { should == %w{feature spec}.sort }
+        it "should return ['feature', 'spec']" do
+          tests.types.should == %w{feature spec}.sort
+        end
       end
 
     end

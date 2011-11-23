@@ -95,7 +95,6 @@ describe Hobson::Project::TestRun do
 
         it "should balance specs and features evenly across 2 jobs" do
           test_run.build!
-          debugger;1
           test_run.jobs.first.tests.sort.should == %w[
             features/a.feature
             features/b.feature

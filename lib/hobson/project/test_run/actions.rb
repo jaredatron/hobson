@@ -25,7 +25,7 @@ class Hobson::Project::TestRun
     tests.balance_for! number_of_jobs
 
     logger.info "enqueuing #{number_of_jobs} jobs to run #{tests.length} tests"
-    (0..(number_of_jobs-1)).zip(tests_groups).map{|index, tests| Job.new(self, index).enqueue! }
+    (1..number_of_jobs).map{|index| Job.new(self, index - 1).enqueue! }
 
     enqueued_jobs! # done
   end

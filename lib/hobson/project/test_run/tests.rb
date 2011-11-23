@@ -44,6 +44,7 @@ class Hobson::Project::TestRun::Tests
   # scans the workspace
   def detect!
     # logger.info "detecting tests"
+
     TYPES.values.
       map{ |path| Dir[test_run.workspace.root.join(path)] }.
       flatten.

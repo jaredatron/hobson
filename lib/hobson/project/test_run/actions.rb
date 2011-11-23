@@ -15,8 +15,11 @@ class Hobson::Project::TestRun
     # TEMP while testing
     # number_of_jobs = 2
 
+    logger.info "checking out #{sha}"
     workspace.checkout! sha
-    tests = workspace.tests
+
+    logger.info "detecting tests"
+    tests.detect!
 
     logger.info "enqueuing #{number_of_jobs} jobs to run #{tests.length} tests"
 

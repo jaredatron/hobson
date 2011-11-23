@@ -12,8 +12,7 @@ class Hobson::Project::TestRun
   def build!
     started_building!
     number_of_jobs = Resque.workers.length
-    # TEMP while testing
-    # number_of_jobs = 2
+    number_of_jobs = 2 if number_of_jobs < 2 # TODO move to project setting
 
     logger.info "checking out #{sha}"
     workspace.checkout! sha

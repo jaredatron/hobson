@@ -29,7 +29,7 @@ class Hobson::Project::TestRun::Tests
   end
 
   def other_tests
-    @other_tests ||= (test_run.project.test_runs - test_run).map(&:tests)
+    @other_tests ||= (test_run.project.test_runs - [test_run]).map(&:tests)
   end
 
   def types

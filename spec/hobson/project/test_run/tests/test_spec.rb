@@ -30,7 +30,7 @@ describe Hobson::Project::TestRun::Tests::Test do
         it "should calculate the average runtime" do
           test.est_runtime.should be_nil
           test.calculate_estimated_runtime!
-          test.est_runtime.should == (@runtimes.inject(&:+) / @runtimes.size)
+          test.est_runtime.should == @runtimes.inject(&:+) / @runtimes.size
         end
       end
 

@@ -21,7 +21,9 @@ module Factory
   end
 
   def test tests=self.tests
-    tests.first
+    test = Hobson::Project::TestRun::Tests::Test.new(tests, 'factories.feature')
+    test.status = 'waiting'
+    test
   end
 
   def job test_run=self.test_run

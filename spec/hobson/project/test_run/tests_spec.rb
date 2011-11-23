@@ -7,40 +7,36 @@ describe Hobson::Project::TestRun::Tests do
 
   worker_context do
 
-    it "" do
-      debugger;1
+    it { should be_an Enumerable }
+
+    it "should contain only Test objects" do
+      tests.each{|test| test.should be_a Hobson::Project::TestRun::Tests::Test }
     end
 
-    # it { should be_an Enumerable }
+    context "before detecting" do
 
-    # it "should contain only Test objects" do
-    #   tests.each{|test| test.should be_a Hobson::Project::TestRun::Tests::Test }
-    # end
+      describe "#types" do
+        subject{ Factory.tests.types.sort }
+        it { should == [] }
+      end
 
-    # context "before detecting" do
+    end
 
-    #   describe "#types" do
-    #     subject{ Factory.tests.types.sort }
-    #     it { should == [] }
-    #   end
+    context "after detecting" do
 
-    # end
+      before{ tests.detect! }
 
-    # context "after detecting" do
+      it "should have 8 tests" do
+        tests.length.should == 8
+      end
 
-    #   before{ tests.detect! }
+      # describe "#types" do
+      #   subject{ Factory.tests.types.sort }
+      #   it { should be_an Enumerable }
+      #   it { should == %w{feature spec}.sort }
+      # end
 
-    #   it "should have 8 tests" do
-    #     tests.length.should == 8
-    #   end
-
-    #   # describe "#types" do
-    #   #   subject{ Factory.tests.types.sort }
-    #   #   it { should be_an Enumerable }
-    #   #   it { should == %w{feature spec}.sort }
-    #   # end
-
-    # end
+    end
 
   end
 

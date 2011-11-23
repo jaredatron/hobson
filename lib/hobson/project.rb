@@ -55,7 +55,7 @@ class Hobson::Project
   end
 
   def logger
-    @logger ||= Log4r::Logger.new("#{Hobson.logger.name}::Project[#{name}]")
+    @logger ||= Log4r::Logger.new("#{Hobson.logger.name}::Project(#{name})")
   end
 
   def inspect

@@ -23,7 +23,8 @@ class Hobson::Project::TestRun::Tests::Test
       when /.feature$/: :feature
       when /_spec.rb$/: :spec
       # when /_test.rb$/: :test_unit
-      else: :unknown
+      else
+        :unknown
     end
   end
 

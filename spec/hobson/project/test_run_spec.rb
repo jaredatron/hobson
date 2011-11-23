@@ -10,8 +10,11 @@ describe Hobson::Project::TestRun do
     describe "#data" do
       it "should return a hash" do
         test_run.data.should be_a Hash
+      end
+      it "should be a clone of the data at the time" do
+        data1 = test_run.data
         test_run[:a] = :b
-        test_run.data.should == {'a' => :b}
+        test_run.data.should == data1.merge('a' => :b)
       end
     end
 

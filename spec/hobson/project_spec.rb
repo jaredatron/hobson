@@ -35,9 +35,7 @@ describe Hobson::Project do
     end
 
     describe "#workspace" do
-      it "should raise an error" do
-        lambda{ project.workspace }.should raise_error
-      end
+      it { should_not be ready }
     end
 
   end

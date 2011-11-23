@@ -5,7 +5,6 @@
 
 
   - if test_run.jobs.present?
-
     %h2 Jobs
     %ol.jobs.status
       - test_run.jobs.each do |job|
@@ -16,6 +15,7 @@
           %ol.timeline
             - job_timeline(job)
 
+  - if test_run.tests.present?
     %h2 Tests
     %table.tests
       %thead
@@ -27,7 +27,7 @@
           %th runtime
           %th result
       %tbody
-        - test_run.tests.each do |test|
+        - test_run.tests.sort_by(&:job).each do |test|
           - job = test_run.jobs[test.job]
           - result = test.result || ''
           %tr{:class => [result.downcase, test.status]}
@@ -39,6 +39,7 @@
             %td= test.runtime
             %td= test.result
 
+  - if test_run.jobs.present?
     %h2 Artifacts
     %ol.jobs
       - @test_run.jobs.each do |job|

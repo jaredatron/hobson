@@ -49,8 +49,6 @@ class Hobson::Project::TestRun::Tests
     self
   end
 
-  # MINIMUM_ESTIMATED_RUNTIME = 0.1
-
   Group = Struct.new(:tests, :runtime, :jobs)
   def balance_for! number_of_jobs
     jobs = (0...number_of_jobs).map{|index| index}
@@ -88,29 +86,6 @@ class Hobson::Project::TestRun::Tests
         test.job = job # assign this test to that job
       }
     }
-
-    # grouped_percentages = grouped_runtimes.inject({}){ |hash, (type, runtime)|
-    #   hash.update(type => (runtime / total_runtime) * number_of_jobs)
-    # }
-
-
-    # grouped_runtimes = grouped_tests.inject({}){ |hash, (type, tests)|
-    #   runtime = tests.each(&:calculate_estimated_runtime!).map(&:est_runtime).find_all(&:present?).inject(&:+)
-    #   hash.update(type => runtime || MINIMUM_ESTIMATED_RUNTIME)
-    # }
-
-    # total_runtime = grouped_runtimes.values.inject(&:+)
-
-    # grouped_percentages = grouped_runtimes.inject({}){ |hash, (type, runtime)|
-    #   hash.update(type => (runtime / total_runtime) * number_of_jobs)
-    # }
-
-
-
-    # NOTES ON TEST BALANCING
-    # sum up the total expected execution time of each test type
-    # devide up the number of workers purpotionally
-    # then devide up the tests among those workers
   end
 
   def [] name

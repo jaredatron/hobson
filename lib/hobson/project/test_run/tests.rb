@@ -51,6 +51,12 @@ class Hobson::Project::TestRun::Tests
 
   Group = Struct.new(:tests, :runtime, :jobs)
   def balance_for! number_of_jobs
+    raise "number of jobs must be an integer" unless number_of_jobs.is_a? Integer
+    raise "there must be at least 1 job" if number_of_jobs < 1
+
+    # one job is easy
+    return each{|test| test.job = 0 } if number_of_jobs == 1
+
     jobs = (0...number_of_jobs).map{|index| index}
 
     # group tests by their type

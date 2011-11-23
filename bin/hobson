@@ -23,7 +23,7 @@ Class.new Thor do
 
   desc "test", "tell Hobson to run the tests for the current sha"
   def test
-    test_run = Hobson::Project.new.run_tests!
+    test_run = Hobson::Project.current.run_tests!
     puts "starting test run #{test_run.id} for #{test_run.sha}"
     Hobson::Server.start! :launch_path => "/projects/#{test_run.project.name}/test_runs/#{test_run.id}"
   end

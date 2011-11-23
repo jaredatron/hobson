@@ -9,7 +9,6 @@ class Hobson::Project::Workspace
 
   def initialize project
     @project = project
-    raise "workspace doesn't exist" unless root.exist?
   end
 
   def root
@@ -21,15 +20,14 @@ class Hobson::Project::Workspace
     execute! "git fetch && git reset --hard #{sha} && git clean -df"
   end
 
-  # def tests
-  #   @tests ||= begin
-  #     logger.info "detecting tests"
-  #     tests = []
-  #     tests += Dir[root.join('spec/**/*_spec.rb')    ]
-  #     tests += Dir[root.join('features/**/*.feature')]
-  #     tests.map{ |path| Pathname.new(path).relative_path_from(root).to_s }.sort
-  #   end
-  # end
+  def ready?
+    root.exist? && root.join('.git').directory?
+  end
+
+  def prepare!
+    root.parent.mkpath
+    `git clone "#{project.url}" "#{root}"` or raise "unable to create workspace"
+  end
 
   def bundler?
     root.join('Gemfile').exist?
@@ -99,6 +97,7 @@ class Hobson::Project::Workspace
   end
 
   def execute *args, &block
+    prepare! unless ready?
     cmd = args.join(' ')
     logger.info "executing: #{cmd.inspect}"
     process = ChildProcess.new "cd #{root} && #{cmd}"

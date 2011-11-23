@@ -35,7 +35,7 @@ describe Hobson::Project do
     end
 
     describe "#workspace" do
-      it { should_not be ready }
+      it { should_not be_ready }
     end
 
   end

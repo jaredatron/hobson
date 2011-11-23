@@ -20,7 +20,7 @@ module Factory
     test_run.tests
   end
 
-  def tests tests=self.tests
+  def test tests=self.tests
     tests.first
   end
 

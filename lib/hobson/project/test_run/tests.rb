@@ -49,7 +49,7 @@ class Hobson::Project::TestRun::Tests
     self
   end
 
-  MINIMUM_ESTIMATED_RUNTIME = 0.1
+  # MINIMUM_ESTIMATED_RUNTIME = 0.1
 
   Group = Struct.new(:tests, :runtime, :jobs)
   def balance_for! number_of_jobs
@@ -60,8 +60,8 @@ class Hobson::Project::TestRun::Tests
 
     # calculate the total runtime of each group
     groups.each{|type, group|
-      runtime = group.tests.each(&:calculate_estimated_runtime!).map(&:est_runtime).find_all(&:present?).inject(&:+)
-      group.runtime = runtime || MINIMUM_ESTIMATED_RUNTIME
+      runtime = group.tests.each(&:calculate_estimated_runtime!).map(&:est_runtime).inject(&:+)
+      group.runtime = runtime
     }
 
     # calculate the total runtime of the entire test set
@@ -78,11 +78,14 @@ class Hobson::Project::TestRun::Tests
     groups.values.sort_by{|group| group.jobs.length}.first.jobs << jobs.shift while jobs.present?
 
     # balance tests across their given number of jobs
-    groups.each{|group|
-      job_runtimes = group.jobs.map{0}
+    groups.each{|type, group|
+      jobs = {}
+      group.jobs.each{|job| jobs[job] = 0}
+
       group.tests.each{|test|
-        index = job_runtimes.index(job_runtimes.min)
-        job_runtimes
+        job = jobs.sort_by(&:last).first.first # find the job with the smallest est runtime
+        jobs[job] += test.est_runtime # add this jobs runtime
+        test.job = job # assign this test to that job
       }
     }
 

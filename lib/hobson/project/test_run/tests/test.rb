@@ -36,7 +36,7 @@ class Hobson::Project::TestRun::Tests::Test
     runtimes = tests.other_tests.map{|tests| tests[name].runtime }.compact
     return nil if runtimes.blank?
     sum = runtimes.find_all(&:present?).inject(&:+).to_f
-    return nil if sum =< 0
+    return nil if sum <= 0
     self.est_runtime = sum / runtimes.size
   end
 

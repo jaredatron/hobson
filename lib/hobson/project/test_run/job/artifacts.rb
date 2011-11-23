@@ -23,14 +23,16 @@ class Hobson::Project::TestRun::Job
   end
 
   def files
-    path = s3_namespace.sub(%r{^/}, '')
-    Hobson.s3_bucket.keys.find_all{|key| key.name.match(%r[^#{path}]) }
+    [] # TEMP FAKE FILES
+    # path = s3_namespace.sub(%r{^/}, '')
+    # Hobson.s3_bucket.keys.find_all{|key| key.name.match(%r[^#{path}]) }
   end
 
   def save_file name, content
-    file = RightAws::S3::Key.create(Hobson.s3_bucket, name.to_s, content)
-    file.put(content, 'public-read', {})
-    file
+    Struct.new(:public_link).new('http://ihavenointer.net') # TEMP FAKE FILE
+    # file = RightAws::S3::Key.create(Hobson.s3_bucket, name.to_s, content)
+    # file.put(content, 'public-read', {})
+    # file
   end
 
 end

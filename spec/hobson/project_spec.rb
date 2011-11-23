@@ -10,7 +10,7 @@ describe Hobson::Project do
 
       context "when given no arguments" do
 
-        subject { Hobson::Project.new }
+        subject { Hobson::Project.current }
 
         it "should default to the name of the given git repo" do
           project.name.should == ExampleProject::NAME
@@ -72,12 +72,12 @@ describe Hobson::Project do
     describe "#test_runs" do
 
       it "should return an array of Hobson::Project::TestRun objects" do
-        Hobson::Project.new.test_runs.should be_an Array
+        Hobson::Project.current.test_runs.should be_an Array
         test_runs = []
         test_runs << project.run_tests!
-        Hobson::Project.new.test_runs.should == test_runs.sort_by(&:id)
+        Hobson::Project.current.test_runs.should == test_runs.sort_by(&:id)
         test_runs << project.run_tests!
-        Hobson::Project.new.test_runs.should == test_runs.sort_by(&:id)
+        Hobson::Project.current.test_runs.should == test_runs.sort_by(&:id)
       end
 
       it "should return a test run when given an id" do

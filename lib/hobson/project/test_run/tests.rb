@@ -24,10 +24,10 @@ class Hobson::Project::TestRun::Tests
     tests.map(&:type).uniq
   end
 
-  # TYPES = {
-  #   'spec'    => 'spec/**/*_spec.rb',
-  #   'feature' => 'features/**/*.feature',
-  # }
+  TYPES = {
+    'spec'    => 'spec/**/*_spec.rb',
+    'feature' => 'features/**/*.feature',
+  }
 
   # TYPES.keys.each do |type|
   #   define_method type.pluralize do

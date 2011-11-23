@@ -1,0 +1,12 @@
+%table.projects
+  %thead
+    %tr
+      %th Name
+      %th URL
+  %tbody
+    - @projects.each do |project|
+      %tr
+        %td
+          %a{:href => "/projects/#{project.name}/test_runs"}= project.name
+        %td
+          %a{:href => project.url}= project.url

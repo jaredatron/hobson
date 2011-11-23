@@ -27,17 +27,17 @@
           %th runtime
           %th result
       %tbody
-        - test_run.jobs.each do |job|
-          - job.tests.each do |test|
-            - result = test.result || ''
-            %tr{:class => [result.downcase, test.status]}
-              %td
-                %a{:href => "ssh://#{job['hostname']}"} Job #{job.index}
-              %td= test.name
-              %td= test.est_runtime.presence || 'unknown'
-              %td= test.status
-              %td= test.runtime
-              %td= test.result
+        - test_run.tests.each do |test|
+          - job = test_run.jobs[test.job]
+          - result = test.result || ''
+          %tr{:class => [result.downcase, test.status]}
+            %td
+              %a{:href => "ssh://#{job['hostname']}"} Job #{job.index}
+            %td= test.name
+            %td= test.est_runtime.presence || 'unknown'
+            %td= test.status
+            %td= test.runtime
+            %td= test.result
 
     %h2 Artifacts
     %ol.jobs

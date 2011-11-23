@@ -17,6 +17,13 @@ class Hobson::Project
       project
     end
 
+    def all
+      Hobson.redis.keys.inject([]){ |projects, key|
+        key =~ /^Project:(.*):url$/ and projects << self[$1]
+        projects
+      }
+    end
+
   end
 
   attr_reader :name

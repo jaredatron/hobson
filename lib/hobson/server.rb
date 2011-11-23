@@ -27,8 +27,17 @@ class Hobson::Server < Sinatra::Base
   end
 
   get "/" do
-    redirect '/test_runs'
+    redirect '/projects'
   end
+
+  get "/projects" do
+    @projects = Hobson::Project.all
+    haml :'projects', :layout => !request.xhr?
+  end
+
+  # get "/projects/:project_name" do |project_name|
+  #   @project   = Hobson::Project[project_name]
+  # end
 
   get "/projects/:project_name/test_runs" do |project_name|
     @project   = Hobson::Project[project_name]

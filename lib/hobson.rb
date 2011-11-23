@@ -22,7 +22,7 @@ module Hobson
   autoload :Server,       'hobson/server'
 
   def root
-    @root ||= Pathname.new(Dir.pwd)
+    @root ||= Pathname.new ENV['HOBSON_ROOT'] ||= Dir.pwd
   end
 
   def config_path

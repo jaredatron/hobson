@@ -48,6 +48,7 @@ class Hobson::Project::Workspace
     'features' => %W[
       cucumber
       --quiet
+      --require features
       --require #{Hobson.lib.join('hobson/cucumber/formatter')}
       --format Hobson::Cucumber::Formatter
       --format pretty --out log/cucumber

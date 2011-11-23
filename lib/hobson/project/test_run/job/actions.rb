@@ -16,7 +16,7 @@ class Hobson::Project::TestRun::Job
 
     preparing!
     workspace.prepare
-    eval_hook :prepare
+    eval_hook :setup
 
     running_tests!
     workspace.run_tests self.tests.sort do |name, status, result, runtime|

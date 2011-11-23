@@ -54,7 +54,7 @@ class Hobson::Project::TestRun::Tests
   private
 
   def tests
-    data.
+    test_run.data.
       inject([]){ |tests, (key, value)| key =~ /^test:(.*):(.*)$/ and tests << $1; tests }.
       uniq.
       sort.

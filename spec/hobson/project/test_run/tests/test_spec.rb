@@ -16,9 +16,8 @@ describe Hobson::Project::TestRun::Tests::Test do
 
       context "when this test has never been run before" do
         it "should calculate nil" do
-          test.est_runtime.should be_nil
           test.calculate_estimated_runtime!
-          test.est_runtime.should be_nil
+          test.est_runtime.should Hobson::Project::TestRun::Tests::Test::MINIMUM_ESTIMATED_RUNTIME
         end
       end
 

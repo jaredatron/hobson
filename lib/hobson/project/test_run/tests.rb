@@ -12,18 +12,6 @@ class Hobson::Project::TestRun::Tests
 
   delegate :each, :inspect, :to_s, :==, '<=>', :size, :length, :count, :to => :tests
 
-  # def push *names
-  #   names.find_all(&:present?).each{|name| self[name] }
-  # end
-
-  # def << *tests
-  #   tests.flatten.each{|test| push test }
-  # end
-
-  # def [] name
-  #   Test.new(self, name.to_s)
-  # end
-
   def calculate_estimated_runtimes!
     tests.each(&:calculate_estimated_runtime!)
   end
@@ -37,9 +25,15 @@ class Hobson::Project::TestRun::Tests
   end
 
   TYPES = {
-    :spec    => 'spec/**/*_spec.rb',
-    :feature => 'features/**/*.feature',
+    'spec'    => 'spec/**/*_spec.rb',
+    'feature' => 'features/**/*.feature',
   }
+
+  TYPES.keys.each do |type|
+    define_method type.pluralize do
+      tests.find_all{|test| test.type == type}
+    end
+  end
 
   # scans the workspace
   def detect!

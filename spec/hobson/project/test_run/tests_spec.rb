@@ -40,6 +40,16 @@ describe Hobson::Project::TestRun::Tests do
         end
       end
 
+      Hobson::Project::TestRun::Tests::TYPES.keys.each do |type|
+        describe "##{type.pluralize}" do
+          it "should return onle #{type.pluralize}" do
+            subset = tests.send(type.pluralize)
+            subset.map(&:type).uniq.should == [type]
+          end
+        end
+      end
+
+
     end
 
   end

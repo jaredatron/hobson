@@ -41,30 +41,6 @@ describe Hobson::Project::TestRun::Job do
       job.keys.should == ['x', 'y']
     end
 
-    # describe "#tests=" do
-
-    #   it "should test all tests to status waiting" do
-    #     job.tests = %w{a b c d}
-    #     job.tests.should == {
-    #       "a" => {"status"=>"waiting"},
-    #       "b" => {"status"=>"waiting"},
-    #       "c" => {"status"=>"waiting"},
-    #       "d" => {"status"=>"waiting"},
-    #     }
-    #   end
-
-    # end
-
-    # %w{status result duration}.each do |attr|
-    #   describe "#test_#{attr}" do
-    #     it "should set and get the #{attr} of the given test" do
-    #       job.send(:"test_#{attr}", "something.feature").should be_nil
-    #       job.send(:"test_#{attr}", "something.feature", "awesome")
-    #       job.send(:"test_#{attr}", "something.feature").should == "awesome"
-    #     end
-    #   end
-    # end
-
     describe "#enqueue!" do
       it "should enqueue 1 Hobson::BuildTestRun resque job" do
         Resque.should_receive(:enqueue).with(Hobson::RunTests, job.test_run.project.name, job.test_run.id, job.index).once

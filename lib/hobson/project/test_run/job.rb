@@ -8,7 +8,7 @@ class Hobson::Project::TestRun::Job
   end
 
   def tests
-    @tests ||= Tests.new(self)
+    test_run.tests.find_all{|test| test.job == index }.map(&:name)
   end
 
   def inspect

@@ -24,21 +24,23 @@ class Hobson::Project::TestRun::Tests
     tests.map(&:type).uniq
   end
 
-  TYPES = {
-    'spec'    => 'spec/**/*_spec.rb',
-    'feature' => 'features/**/*.feature',
-  }
+  # TYPES = {
+  #   'spec'    => 'spec/**/*_spec.rb',
+  #   'feature' => 'features/**/*.feature',
+  # }
 
-  TYPES.keys.each do |type|
-    define_method type.pluralize do
-      tests.find_all{|test| test.type == type}
-    end
-  end
+  # TYPES.keys.each do |type|
+  #   define_method type.pluralize do
+  #     tests.find_all{|test| test.type == type}
+  #   end
+  # end
+
+  # def by_type
+  #   group_by(&:type)
+  # end
 
   # scans the workspace
   def detect!
-    # logger.info "detecting tests"
-
     TYPES.values.
       map{ |path| Dir[test_run.workspace.root.join(path)] }.
       flatten.
@@ -47,7 +49,61 @@ class Hobson::Project::TestRun::Tests
     self
   end
 
+  MINIMUM_ESTIMATED_RUNTIME = 0.1
+
+  Group = Struct.new(:tests, :runtime, :jobs)
   def balance_for! number_of_jobs
+    jobs = (0...number_of_jobs).map{|index| index}
+
+    # group tests by their type
+    groups = group_by(&:type).inject({}){ |hash, (type, tests)| hash.update(type => Group.new(tests)) }
+
+    # calculate the total runtime of each group
+    groups.each{|type, group|
+      runtime = group.tests.each(&:calculate_estimated_runtime!).map(&:est_runtime).find_all(&:present?).inject(&:+)
+      group.runtime = runtime || MINIMUM_ESTIMATED_RUNTIME
+    }
+
+    # calculate the total runtime of the entire test set
+    total_runtime = groups.values.map(&:runtime).inject(&:+)
+
+    # calculate the number of jobs for each group
+    groups.each{|type, group|
+      number_of_jobs = ((group.runtime / total_runtime) * number_of_jobs).to_i
+      group.jobs = []
+      number_of_jobs.times{ group.jobs << jobs.shift }
+    }
+
+    # assign unalocated jobs to the group with the least jobs
+    groups.values.sort_by{|group| group.jobs.length}.first.jobs << jobs.shift while jobs.present?
+
+    # balance tests across their given number of jobs
+    groups.each{|group|
+      job_runtimes = group.jobs.map{0}
+      group.tests.each{|test|
+        index = job_runtimes.index(job_runtimes.min)
+        job_runtimes
+      }
+    }
+
+    # grouped_percentages = grouped_runtimes.inject({}){ |hash, (type, runtime)|
+    #   hash.update(type => (runtime / total_runtime) * number_of_jobs)
+    # }
+
+
+    # grouped_runtimes = grouped_tests.inject({}){ |hash, (type, tests)|
+    #   runtime = tests.each(&:calculate_estimated_runtime!).map(&:est_runtime).find_all(&:present?).inject(&:+)
+    #   hash.update(type => runtime || MINIMUM_ESTIMATED_RUNTIME)
+    # }
+
+    # total_runtime = grouped_runtimes.values.inject(&:+)
+
+    # grouped_percentages = grouped_runtimes.inject({}){ |hash, (type, runtime)|
+    #   hash.update(type => (runtime / total_runtime) * number_of_jobs)
+    # }
+
+
+
     # NOTES ON TEST BALANCING
     # sum up the total expected execution time of each test type
     # devide up the number of workers purpotionally

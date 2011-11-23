@@ -16,7 +16,7 @@ describe Hobson::Project::TestRun::Tests do
       subject{ Factory.tests.types.sort }
       alias_method :types, :subject
       it { should be_an Enumerable }
-      it { should == %w{featrures specs}.sort }
+      it { should == %w{feature spec}.sort }
     end
 
   end

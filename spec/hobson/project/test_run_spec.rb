@@ -9,7 +9,7 @@ describe Hobson::Project::TestRun do
 
     describe "#data" do
       it "should return a hash" do
-        test_run = Hobson::Project::TestRun.new(Hobson::Project.new)
+        test_run = Hobson::Project::TestRun.new(Hobson::Project.current)
         test_run.data.should be_a Hash
         test_run[:a] = :b
         test_run.data.should == {'a' => :b}

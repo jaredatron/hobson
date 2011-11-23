@@ -48,7 +48,7 @@ class Hobson::Project::TestRun::Tests
       map{ |path| Dir[test_run.workspace.root.join(path)] }.
       flatten.
       map{ |path| Pathname.new(path).relative_path_from(test_run.workspace.root).to_s }.
-      each{ |name| Test.new(self, name) }
+      each{ |name| self[name].status = "waiting" }
   end
 
   private
@@ -59,6 +59,10 @@ class Hobson::Project::TestRun::Tests
       uniq.
       sort.
       map{|name| self[name] }
+  end
+
+  def [] name
+    Test.new(self, name.to_s)
   end
 
 end

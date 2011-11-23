@@ -52,6 +52,10 @@ class Hobson::Project::TestRun::Tests
     self
   end
 
+  def [] name
+    Test.new(self, name.to_s)
+  end
+
   private
 
   def tests
@@ -61,10 +65,5 @@ class Hobson::Project::TestRun::Tests
       sort.
       map{|name| self[name] }
   end
-
-  def [] name
-    Test.new(self, name.to_s)
-  end
-
 end
 

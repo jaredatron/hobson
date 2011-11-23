@@ -21,15 +21,15 @@ class Hobson::Project::Workspace
     execute! "git fetch && git reset --hard #{sha} && git clean -df"
   end
 
-  def tests
-    @tests ||= begin
-      logger.info "detecting tests"
-      tests = []
-      tests += Dir[root.join('spec/**/*_spec.rb')    ]
-      tests += Dir[root.join('features/**/*.feature')]
-      tests.map{ |path| Pathname.new(path).relative_path_from(root).to_s }.sort
-    end
-  end
+  # def tests
+  #   @tests ||= begin
+  #     logger.info "detecting tests"
+  #     tests = []
+  #     tests += Dir[root.join('spec/**/*_spec.rb')    ]
+  #     tests += Dir[root.join('features/**/*.feature')]
+  #     tests.map{ |path| Pathname.new(path).relative_path_from(root).to_s }.sort
+  #   end
+  # end
 
   def bundler?
     root.join('Gemfile').exist?

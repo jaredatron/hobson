@@ -36,10 +36,29 @@ class Hobson::Project::TestRun::Tests
     tests.map(&:type).uniq
   end
 
+  TYPES = {
+    :spec    => 'spec/**/*_spec.rb',
+    :feature => 'features/**/*.feature',
+  }
+
+  # scans the workspace
+  def detect!
+    logger.info "detecting tests"
+    TYPES.values.
+      map{ |path| Dir[test_run.workspace.root.join(path)] }.
+      flatten.
+      map{ |path| Pathname.new(path).relative_path_from(root).to_s }.
+      each{ |name| Test.new(self, name) }
+  end
+
   private
 
   def tests
-    @tests ||= test_run.workspace.tests.map{|name| Test.new(self, name) }
+    data.
+      inject([]){ |tests, (key, value)| key =~ /^test:(.*):(.*)$/ and tests << $1; tests }.
+      uniq.
+      sort.
+      map{|name| self[name] }
   end
 
 end

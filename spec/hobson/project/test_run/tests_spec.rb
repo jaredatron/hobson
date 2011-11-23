@@ -13,11 +13,23 @@ describe Hobson::Project::TestRun::Tests do
       tests.each{|test| test.should be_a Hobson::Project::TestRun::Tests::Test }
     end
 
-    describe "#types" do
-      subject{ Factory.tests.types.sort }
-      alias_method :types, :subject
-      it { should be_an Enumerable }
-      it { should == %w{feature spec}.sort }
+    context "before detecting" do
+
+      describe "#types" do
+        subject{ Factory.tests.types.sort }
+        it { should == [] }
+      end
+
+    end
+
+    context "after detecting" do
+
+      describe "#types" do
+        subject{ Factory.tests.types.sort }
+        it { should be_an Enumerable }
+        it { should == %w{feature spec}.sort }
+      end
+
     end
 
   end

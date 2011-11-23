@@ -47,7 +47,7 @@ class Hobson::Project::TestRun::Tests
     TYPES.values.
       map{ |path| Dir[test_run.workspace.root.join(path)] }.
       flatten.
-      map{ |path| Pathname.new(path).relative_path_from(root).to_s }.
+      map{ |path| Pathname.new(path).relative_path_from(test_run.workspace.root).to_s }.
       each{ |name| Test.new(self, name) }
   end
 

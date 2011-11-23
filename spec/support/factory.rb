@@ -16,12 +16,12 @@ module Factory
     test_run
   end
 
-  def job test_run=self.test_run
-    Hobson::Project::TestRun::Job.new(test_run, 0)
+  def tests test_run=self.test_run
+    test_run.tests
   end
 
-  def tests job=self.job
-    job.tests
+  def job test_run=self.test_run
+    Hobson::Project::TestRun::Job.new(test_run, 0)
   end
 
 end

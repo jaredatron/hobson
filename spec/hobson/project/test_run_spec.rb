@@ -71,6 +71,15 @@ describe Hobson::Project::TestRun do
 
   worker_context do
 
+    describe "tests" do
+      subject { Factory.test_run.tests }
+      alias_method :tests, :subject
+      it { should be_a Hobson::Project::TestRun::Tests }
+      it "should contain all the tests in the example project" do
+        tests.length.should == 8
+      end
+    end
+
     describe "build!" do
 
       context "when there are only 2 workers" do

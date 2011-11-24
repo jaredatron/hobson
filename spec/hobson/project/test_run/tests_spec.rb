@@ -13,11 +13,11 @@ describe Hobson::Project::TestRun::Tests do
 
     context "when we have never run these tests before" do
       it "should give each job an equal number of tests" do
-        tests.map(&:job).should = [nil,nil,nil,nil,nil,nil,nil,nil,nil,nil]
+        tests.map(&:job).should == [nil,nil,nil,nil,nil,nil,nil,nil,nil,nil]
         tests.balance_for! 1
-        tests.map(&:job).should = [0,0,0,0,0,0,0,0,0,0]
+        tests.map(&:job).should == [0,0,0,0,0,0,0,0,0,0]
         tests.balance_for! 2
-        tests.map(&:job).sort.should = [0,0,0,0,0,1,1,1,1,1]
+        tests.map(&:job).sort.should == [0,0,0,0,0,1,1,1,1,1]
       end
     end
 

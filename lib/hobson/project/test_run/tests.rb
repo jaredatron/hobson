@@ -10,7 +10,7 @@ class Hobson::Project::TestRun::Tests
     @test_run = test_run
   end
 
-  delegate :each, :inspect, :to_s, :==, '<=>', :size, :length, :count, :to => :tests
+  # delegate :each, :inspect, :to_s, :==, '<=>', :size, :length, :count, :to => :tests
 
   def calculate_estimated_runtimes!
     tests.each(&:calculate_estimated_runtime!)
@@ -106,6 +106,10 @@ class Hobson::Project::TestRun::Tests
       uniq.
       sort.
       map{|name| self[name] }
+  end
+
+  def method_missing method, *args, &block
+    tests.send method, *args, &block
   end
 end
 

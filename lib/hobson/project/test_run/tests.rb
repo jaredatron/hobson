@@ -56,6 +56,8 @@ class Hobson::Project::TestRun::Tests
     # one job is easy
     return each{|test| test.job = 0 } if number_of_jobs == 1
 
+    calculate_estimated_runtimes!
+
     jobs = (0...number_of_jobs).map{|index| index}
 
     # group tests by their type
@@ -88,8 +90,7 @@ class Hobson::Project::TestRun::Tests
       jobs = {}
       group.jobs.each{|job| jobs[job] = 0}
 
-
-      group.tests.each{|test|
+      group.tests.sort_by(&:est_runtime).each{|test|
         puts "jobs: #{jobs.inspect}"
         job = jobs.sort_by(&:last).first.first # find the job with the smallest est runtime
         puts "smallest job: #{job.inspect} @ #{jobs[job]}"
@@ -97,6 +98,8 @@ class Hobson::Project::TestRun::Tests
         puts "to: #{jobs[job]}"
         test.job = job # assign this test to that job
       }
+
+      puts "BALANCED #{type}: #{jobs.inspect}"
     }
   ensure
     test_run.logger.debug "balancing complete #{map(&:job).inspect}"

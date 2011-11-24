@@ -18,6 +18,8 @@ describe Hobson::Project::TestRun::Tests do
         tests.map(&:job).should == [0,0,0,0,0,0,0,0,0,0]
         tests.balance_for! 2
         tests.map(&:job).sort.should == [0,0,0,0,0,1,1,1,1,1]
+        tests.balance_for! 3
+        tests.map(&:job).sort.should == [0,0,0,0,1,1,1,2,2,2]
       end
     end
 
@@ -31,8 +33,6 @@ describe Hobson::Project::TestRun::Tests do
 
       end
     end
-
-      it "should evenly distribute the load"
   end
 
   worker_context do

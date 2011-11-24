@@ -24,7 +24,7 @@ describe Hobson::Project::TestRun::Tests do
     context "when we have run these tests before" do
       before{
         [1,1,1,1,1,5,10].each_with_index{|est_runtime, index|
-          tests.to_a[i].est_runtime = est_runtime
+          tests.to_a[index].est_runtime = est_runtime
         }
       }
       it "should give each job a balanced number of tests" do

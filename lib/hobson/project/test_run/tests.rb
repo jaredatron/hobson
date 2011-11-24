@@ -84,22 +84,22 @@ class Hobson::Project::TestRun::Tests
 
     # balance tests across their given number of jobs
     groups.each{|type, group|
-      puts "type: #{type}"
-      puts "group: #{group.inspect}"
+      # puts "type: #{type}"
+      # puts "group: #{group.inspect}"
 
       jobs = {}
       group.jobs.each{|job| jobs[job] = 0}
 
       group.tests.sort_by(&:est_runtime).each{|test|
-        puts "jobs: #{jobs.inspect}"
+        # puts "jobs: #{jobs.inspect}"
         job = jobs.sort_by(&:last).first.first # find the job with the smallest est runtime
-        puts "smallest job: #{job.inspect} @ #{jobs[job]}"
+        # puts "smallest job: #{job.inspect} @ #{jobs[job]}"
         jobs[job] += test.est_runtime # add this jobs runtime
-        puts "to: #{jobs[job]}"
+        # puts "to: #{jobs[job]}"
         test.job = job # assign this test to that job
       }
 
-      puts "BALANCED #{type}: #{jobs.inspect}"
+      # puts "BALANCED #{type}: #{jobs.inspect}"
     }
   ensure
     test_run.logger.debug "balancing complete #{map(&:job).inspect}"

@@ -10,7 +10,9 @@
       - test_run.jobs.each do |job|
         %li.job{:class => "status-#{classname(job.status)}"}
           %h3
-            %a{:href => "ssh://#{job['hostname']}"} Job #{job.index} - #{job.status}
+            %a{:href => "ssh://#{job['hostname']}"} Job #{job.index}
+            \- #{job.status}
+            (#{job.est_runtime})
           .icon
           %ol.timeline
             - job_timeline(job)

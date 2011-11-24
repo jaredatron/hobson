@@ -46,45 +46,70 @@ describe Hobson::Project::TestRun::Tests do
 
   describe "balance_for!" do
 
+    def balance_for! est_runtimes, number_of_jobs
+      tests = Factory.tests
+      est_runtimes.each_with_index{|est_runtime, index|
+        tests["features/#{i}.feature"].est_runtime = est_runtime
+      }
+      est_runtimes.balance_for! number_of_jobs
+      est_runtimes.map(&:job).sort
+    end
+
+    context "when we have never run these tests before" do
+      it "should give each job an equal number of tests" do
+        balance_for!([nil,nil,nil,nil,nil,nil,nil,nil,nil,nil], 1).should == [0,0,0,0,0,0,0,0,0,0]
+        balance_for!([nil,nil,nil,nil,nil,nil,nil,nil,nil,nil], 2).should == [0,0,0,0,0,1,1,1,1,1]
+        balance_for!([nil,nil,nil,nil,nil,nil,nil,nil,nil,nil], 3).should == [0,0,0,0,1,1,1,2,2,2]
+        balance_for!([nil,nil,nil,nil,nil,nil,nil,nil,nil,nil], 4).should == [0,0,0,1,1,1,2,2,3,3]
+      end
+    end
+
+    context "when we have run these tests before" do
+      it "should give each job a balanced number of tests" do
+        balance_for!([ 1, 1, 1, 1, 1, 1, 1, 1, 1,10], 1).should == [0,0,0,0,0,0,0,0,0,0]
+        balance_for!([ 1, 1, 1, 1, 1, 1, 1, 1, 1,10], 2).should == [0,0,0,0,0,0,0,0,0,1]
+      end
+    end
+
     # subject{
     #   Hobson::Project::TestRun::Tests.new(stub(
     #     :[] => nil, :[]= => nil, :data => {}
     #   ))
     # }
 
-    before{
-      10.times{|i| tests["features/#{i}.feature"].status = "waiting" }
-    }
+    # before{
+    #   10.times{|i| tests["features/#{i}.feature"].status = "waiting" }
+    # }
 
-    context "when we have never run these tests before" do
-      it "should give each job an equal number of tests" do
-        tests.map(&:job).should == [nil,nil,nil,nil,nil,nil,nil,nil,nil,nil]
-        tests.balance_for! 1
-        tests.map(&:job).should == [0,0,0,0,0,0,0,0,0,0]
-        tests.balance_for! 2
-        tests.map(&:job).sort.should == [0,0,0,0,0,1,1,1,1,1]
-        tests.balance_for! 3
-        tests.map(&:job).sort.should == [0,0,0,0,1,1,1,2,2,2]
-      end
-    end
+    # context "when we have never run these tests before" do
+    #   it "should give each job an equal number of tests" do
+    #     tests.map(&:job).should == [nil,nil,nil,nil,nil,nil,nil,nil,nil,nil]
+    #     tests.balance_for! 1
+    #     tests.map(&:job).should == [0,0,0,0,0,0,0,0,0,0]
+    #     tests.balance_for! 2
+    #     tests.map(&:job).sort.should == [0,0,0,0,0,1,1,1,1,1]
+    #     tests.balance_for! 3
+    #     tests.map(&:job).sort.should == [0,0,0,0,1,1,1,2,2,2]
+    #   end
+    # end
 
-    context "when we have run these tests before" do
-      before{
-        [1,1,1,1,1,5,10].each_with_index{|est_runtime, index|
-          tests.to_a[index].est_runtime = est_runtime
-        }
-      }
-      it "should give each job a balanced number of tests" do
-        debugger;1
-        tests.map(&:job).should == [nil,nil,nil,nil,nil,nil,nil,nil,nil,nil]
-        tests.balance_for! 1
-        tests.map(&:job).should == [0,0,0,0,0,0,0,0,0,0]
-        tests.balance_for! 2
-        tests.map(&:job).sort.should == [0,0,0,0,0,0,0,0,0,1]
-        # tests.balance_for! 3
-        # tests.map(&:job).sort.should == [0,0,0,0,1,1,1,2,2,2]
-      end
-    end
+    # context "when we have run these tests before" do
+    #   before{
+    #     [1,1,1,1,1,5,10].each_with_index{|est_runtime, index|
+    #       tests.to_a[index].est_runtime = est_runtime
+    #     }
+    #   }
+    #   it "should give each job a balanced number of tests" do
+    #     debugger;1
+    #     tests.map(&:job).should == [nil,nil,nil,nil,nil,nil,nil,nil,nil,nil]
+    #     tests.balance_for! 1
+    #     tests.map(&:job).should == [0,0,0,0,0,0,0,0,0,0]
+    #     tests.balance_for! 2
+    #     tests.map(&:job).sort.should == [0,0,0,0,0,0,0,0,0,1]
+    #     # tests.balance_for! 3
+    #     # tests.map(&:job).sort.should == [0,0,0,0,1,1,1,2,2,2]
+    #   end
+    # end
   end
 
 end

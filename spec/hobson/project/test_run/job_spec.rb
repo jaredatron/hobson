@@ -52,6 +52,17 @@ describe Hobson::Project::TestRun::Job do
 
   worker_context do
 
+    describe "#tests" do
+      subject{ super.tests }
+      context "before being assigned tests" do
+        it { should == [] }
+      end
+      context "after being assigned tests" do
+        before{}
+        it { should == [] }
+      end
+    end
+
     describe "#save_artifact" do
 
       it "should store a key in the redis hash and write a file to S3" do

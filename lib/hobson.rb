@@ -1,4 +1,5 @@
 require 'active_support/core_ext/array'
+require 'active_support/core_ext/enumerable'
 require 'active_support/core_ext/module/delegation'
 require 'active_support/core_ext/object/try'
 require 'active_support/inflections'

@@ -20,12 +20,12 @@
     %table.tests
       %thead
         %tr
-          %th job
-          %th file
-          %th est.runtime
-          %th status
-          %th runtime
-          %th result
+          %th Job
+          %th File
+          %th Status
+          %th Est.Runtime
+          %th Runtime
+          %th Result
       %tbody
         - test_run.tests.sort_by(&:job).each do |test|
           - job = test_run.jobs[test.job]
@@ -34,8 +34,8 @@
             %td
               %a{:href => "ssh://#{job['hostname']}"} Job #{job.index}
             %td= test.name
-            %td= test.est_runtime.presence || 'unknown'
             %td= test.status
+            %td= test.est_runtime.presence || 'unknown'
             %td= test.runtime
             %td= test.result
 

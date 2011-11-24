@@ -8,7 +8,11 @@ class Hobson::Project::TestRun::Job
   end
 
   def tests
-    test_run.tests.find_all{|test| test.job == index }.map(&:name)
+    test_run.tests.find_all{|test| test.job == index }
+  end
+
+  def est_runtime
+    tests.map(&:est_runtime).sum
   end
 
   def inspect

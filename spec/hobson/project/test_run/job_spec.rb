@@ -53,14 +53,22 @@ describe Hobson::Project::TestRun::Job do
   worker_context do
 
     describe "#tests" do
-      subject{ super.tests }
-      context "before being assigned tests" do
-        it { should == [] }
-      end
-      context "after being assigned tests" do
-        before{}
-        it { should == [] }
-      end
+
+      # context "before being assigned tests" do
+      #   it "should be an empty array" do
+      #     job.test.should == []
+      #   end
+      # end
+      # context "after being assigned tests" do
+      #   before{
+      #     @tests = (0...4).map{|i| Hobson::Project::Tests::Test.new(job.test_run, "features/#{i}.feature") }
+      #     job.test_run.tests.mock(:tests).and_return(@tests)
+      #   }
+      #   it "should be an array a subject of test_run.tests" do
+      #     job.test_run.tests.length.should == 4
+      #     job.test.should == []
+      #   end
+      # end
     end
 
     describe "#save_artifact" do

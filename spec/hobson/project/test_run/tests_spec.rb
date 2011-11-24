@@ -48,7 +48,7 @@ describe Hobson::Project::TestRun::Tests do
 
     subject{
       Hobson::Project::TestRun::Tests.new(stub(
-        :[], nil
+        :[] => nil
       ))
     }
 

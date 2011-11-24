@@ -43,7 +43,13 @@ class Hobson::Project::TestRun::Tests::Test
   end
 
   def inspect
-    "#<#{self.class} #{name}>"
+    "#<#{self.class} "\
+    "name:#{name.inspect} "\
+    "est_runtime:#{est_runtime.inspect} "\
+    "job:#{job.inspect} "\
+    "status:#{status.inspect} "\
+    "result:#{result.inspect} "\
+    "runtime:#{runtime.inspect}>"
   end
   alias_method :to_s, :inspect
 

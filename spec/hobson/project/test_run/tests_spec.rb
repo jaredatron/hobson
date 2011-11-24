@@ -51,8 +51,8 @@ describe Hobson::Project::TestRun::Tests do
       est_runtimes.each_with_index{|est_runtime, index|
         tests["features/#{index}.feature"].est_runtime = est_runtime
       }
-      est_runtimes.balance_for! number_of_jobs
-      est_runtimes.map(&:job).sort
+      tests.balance_for! number_of_jobs
+      tests.map(&:job).sort
     end
 
     context "when we have never run these tests before" do

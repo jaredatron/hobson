@@ -46,11 +46,11 @@ describe Hobson::Project::TestRun::Tests do
 
   describe "balance_for!" do
 
-    subject{
-      Hobson::Project::TestRun::Tests.new(stub(
-        :[] => nil, :[]= => nil, :data => {}
-      ))
-    }
+    # subject{
+    #   Hobson::Project::TestRun::Tests.new(stub(
+    #     :[] => nil, :[]= => nil, :data => {}
+    #   ))
+    # }
 
     before{
       10.times{|i| tests["features/#{i}.feature"].status = "waiting" }

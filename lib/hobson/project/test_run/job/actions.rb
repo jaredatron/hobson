@@ -8,7 +8,7 @@ class Hobson::Project::TestRun::Job
 
   def run_tests!
     Hobson.start_logging_to_a_file!
-    self['hostname'] = `curl -s http://169.254.169.254/latest/meta-data/public-hostname`.chomp
+    # self['hostname'] = `curl -s http://169.254.169.254/latest/meta-data/public-hostname`.chomp
     self['hostname'] = `hostname`.chomp if self['hostname'].empty?
 
     checking_out_code!

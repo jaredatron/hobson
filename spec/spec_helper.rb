@@ -37,6 +37,7 @@ RSpec.configure do |config|
     Resque.reset!
     Redis.new.flushall
     Hobson.instance_variables.each{|i| Hobson.send :remove_instance_variable, i }
+    Hobson.instance_variables.should == []
   end
 
 end

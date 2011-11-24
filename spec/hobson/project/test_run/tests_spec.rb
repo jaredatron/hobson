@@ -47,7 +47,9 @@ describe Hobson::Project::TestRun::Tests do
   describe "balance_for!" do
 
     subject{
-      Hobson::Project::TestRun::Tests.new(stub)
+      Hobson::Project::TestRun::Tests.new(stub(
+        :[], nil
+      ))
     }
 
     before{

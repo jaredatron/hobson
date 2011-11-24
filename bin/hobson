@@ -17,6 +17,7 @@ Class.new Thor do
 
   desc "console", "start an interactive ruby console"
   def console
+    require 'ruby-debug'
     require 'irb'
     IRB.start
   end

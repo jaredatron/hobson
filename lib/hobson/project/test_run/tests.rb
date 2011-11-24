@@ -10,8 +10,6 @@ class Hobson::Project::TestRun::Tests
     @test_run = test_run
   end
 
-  # delegate :each, :inspect, :to_s, :==, '<=>', :size, :length, :count, :to => :tests
-
   def calculate_estimated_runtimes!
     tests.each(&:calculate_estimated_runtime!)
   end
@@ -51,6 +49,7 @@ class Hobson::Project::TestRun::Tests
 
   Group = Struct.new(:tests, :runtime, :jobs)
   def balance_for! number_of_jobs
+    test_run.logger.debug "balancing #{length} tests for #{number_of_jobs} jobs"
     raise "number of jobs must be an integer" unless number_of_jobs.is_a? Integer
     raise "there must be at least 1 job" if number_of_jobs < 1
 
@@ -83,15 +82,24 @@ class Hobson::Project::TestRun::Tests
 
     # balance tests across their given number of jobs
     groups.each{|type, group|
+      puts "type: #{type}"
+      puts "group: #{group.inspect}"
+
       jobs = {}
       group.jobs.each{|job| jobs[job] = 0}
 
+
       group.tests.each{|test|
+        puts "jobs: #{jobs.inspect}"
         job = jobs.sort_by(&:last).first.first # find the job with the smallest est runtime
+        puts "smallest job: #{job.inspect} @ #{jobs[job]}"
         jobs[job] += test.est_runtime # add this jobs runtime
+        puts "to: #{jobs[job]}"
         test.job = job # assign this test to that job
       }
     }
+  ensure
+    test_run.logger.debug "balancing complete #{map(&:job).inspect}"
   end
 
   def [] name
@@ -108,6 +116,7 @@ class Hobson::Project::TestRun::Tests
       map{|name| self[name] }
   end
 
+  delegate :each, :inspect, :to_s, :==, '<=>', :size, :length, :count, :to => :tests
   def method_missing method, *args, &block
     tests.send method, *args, &block
   end

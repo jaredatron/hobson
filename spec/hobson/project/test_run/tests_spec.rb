@@ -67,7 +67,7 @@ describe Hobson::Project::TestRun::Tests do
     context "when we have run these tests before" do
       it "should give each job a balanced number of tests" do
         balance_for!([ 1, 1, 1, 1, 1, 1, 1, 1, 1,10], 1).should == [0,0,0,0,0,0,0,0,0,0]
-        balance_for!([ 1, 1, 1, 1, 1, 1, 1, 1, 1,10], 2).should == [0,0,0,0,0,0,0,0,0,1]
+        balance_for!([ 1, 1, 1, 1, 1, 1, 1, 1, 1,10], 2).should == [0,1,1,1,1,1,1,1,1,1]
       end
     end
 

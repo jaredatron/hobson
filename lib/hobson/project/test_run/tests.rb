@@ -85,12 +85,12 @@ class Hobson::Project::TestRun::Tests
     # balance tests across their given number of jobs
     groups.each{|type, group|
       puts "type: #{type}"
-      puts "group: #{group.inspect}"
+      puts "group: #{group.tests.map(&:est_runtime).inspect}"
 
       jobs = {}
       group.jobs.each{|job| jobs[job] = 0}
 
-      group.tests.sort_by(&:est_runtime).each{|test|
+      group.tests.sort_by(&:est_runtime).reverse.each{|test|
         puts "jobs: #{jobs.inspect}"
         job = jobs.sort_by(&:last).first.first # find the job with the smallest est runtime
         puts "smallest job: #{job.inspect} @ #{jobs[job]}"

@@ -102,12 +102,14 @@ describe Hobson::Project::TestRun do
             features/b.feature
             features/c.feature
             features/d.feature
+            features/e.feature
           ].sort
           test_run.jobs.last.tests.map(&:name).sort.should == %w[
             spec/a_spec.rb
             spec/b_spec.rb
             spec/c_spec.rb
             spec/d_spec.rb
+            spec/e_spec.rb
           ].sort
         end
 

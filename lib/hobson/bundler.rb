@@ -1,3 +1,5 @@
+require 'bundler'
+
 module Hobson::Bundler
 
   def self.with_clean_env

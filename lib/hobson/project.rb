@@ -9,11 +9,14 @@ class Hobson::Project
 
     def current
       raise "this doesnt look like a git project" unless Pathname.new('.git').directory?
-      url = `git config --get remote.origin.url`.chomp
-      name = url.scan(%r{/([^/]+)(?:/|\.git)?$}).try(:first).try(:first) or
-        raise "unable to parse name from url #{url.inspect}"
+      from_origin_url `git config --get remote.origin.url`.chomp
+    end
+
+    def from_origin_url origin_url
+      name = origin_url.scan(%r{/([^/]+?)(?:/|\.git)?$}).try(:first).try(:first) or
+        raise "unable to parse name from origin url #{origin_url.inspect}"
       project = new(name)
-      project.url ||= url
+      project.url = origin_url
       project
     end
 

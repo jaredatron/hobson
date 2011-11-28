@@ -5,7 +5,8 @@ class Hobson::RedisHash
     reload!
   end
 
-  delegate :keys,   :to => :cache
+  attr_reader :redis, :key
+  delegate :keys, :to => :cache
 
   def [] field
     cache[field.to_s]
@@ -14,6 +15,11 @@ class Hobson::RedisHash
   def []= field, value
     cache[field.to_s] = value
     @redis.hset(@key, field.to_s, Marshal.dump(value))
+  end
+
+  def delete key
+    @redis.hdel(@key, key)
+    @cache.delete(key)
   end
 
   def cache
@@ -29,5 +35,10 @@ class Hobson::RedisHash
   def reload!
     @cache = nil
   end
+
+  def inspect
+    "#<#{self.class} #{key} #{cache.inspect}>"
+  end
+  alias_method :to_s, :inspect
 
 end

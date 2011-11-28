@@ -11,16 +11,28 @@ class Hobson::Project::TestRun
     'waiting…'
   end
 
+  def started?
+    enqueued_jobs?
+  end
+
+  def started_at
+    enqueued_jobs_at
+  end
+
   def complete?
     jobs.present? && jobs.all?(&:complete?)
   end
 
-  def started_at
-    enqueued_build_at
-  end
-
   def complete_at
     jobs.map(&:complete_at).compact.sort.last if complete?
+  end
+
+  def green?
+    complete? && tests.map(&:result).all?{|result| result == 'PASS'}
+  end
+
+  def red?
+    complete? && !green?
   end
 
 end

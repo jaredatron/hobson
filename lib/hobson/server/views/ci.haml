@@ -1,0 +1,28 @@
+%a{:href => '/ci/new'} new
+%ul.project_refs
+  - @project_refs.sort_by(&:key).each do |project_ref|
+    %li.project_ref{:class => project_ref.status}
+      %h1= project_ref.project.name
+      %h2= project_ref.ref
+      %dl
+        %dt Status
+        %dd= project_ref.status
+
+        %dt Current Test Run
+        %dd
+          %a{:href => "/projects/#{project_ref.project.name}/test_runs/#{project_ref.last_test_run.id}"}= project_ref.last_test_run.id
+
+        %dt Origin Url
+        %dd= project_ref.origin_url
+
+        %dt Git Ref
+        %dd= project_ref.ref
+
+        %dt Last Sha
+        %dd= project_ref.last_sha
+
+        %dt Total Test Runs
+        %dd= project_ref.project.test_runs.size
+
+:javascript
+  Hobson.pollForChanges();

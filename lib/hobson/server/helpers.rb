@@ -26,7 +26,7 @@ module Hobson::Server::Helpers
   end
 
   def test_run_duration
-    @test_run_duration ||= (test_run.complete_at || now) - test_run.started_at
+    @test_run_duration ||= (test_run.complete_at || now) - (test_run.started_at || now)
   end
 
   def job_timeline job

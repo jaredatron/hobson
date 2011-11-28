@@ -21,6 +21,7 @@ module Hobson
   autoload :Project,      'hobson/project'
   autoload :RunTests,     'hobson/run_tests'
   autoload :Server,       'hobson/server'
+  autoload :CI,           'hobson/ci'
 
   def root
     @root ||= Pathname.new ENV['HOBSON_ROOT'] ||= Dir.pwd

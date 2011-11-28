@@ -130,4 +130,40 @@ table
       &.pending
         color: orange
 
+.project_refs
+  > .project_ref
+    float: left
+    margin: 10px
+    padding: 10px
+    border-radius: 10px
+    border: 2px solid black
+    > a
+      text-decoration: none
+      color: black
+    h1
+      font-size: 150%
+    h2
+      font-size: 130%
+    h1, h2
+      text-align: center
+    &.running
+      background-color: lightblue
+    &.red
+      background-color: lighten(red, 10%)
+    &.green
+      background-color: green
 
+    dl
+      dt
+        font-weight: bold
+        &:after
+          content: ':'
+      dd
+        margin-bottom: 1em
+
+#new_project_ref
+  label
+    display: block
+  input[type=text]
+    margin: 1em
+    width: 500px

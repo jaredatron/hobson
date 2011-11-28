@@ -16,6 +16,8 @@ class Hobson::Server < Sinatra::Base
 
   use Rack::MethodOverride
 
+  # register Sinatra::Namespace
+
   set :views,         root + "views"
   set :public_folder, root + "public"
   set :static,        true
@@ -27,7 +29,38 @@ class Hobson::Server < Sinatra::Base
   end
 
   get "/" do
-    redirect '/projects'
+    redirect '/ci'
+  end
+
+  get '/ci' do
+    @project_refs = Hobson::CI::ProjectRef.all
+    if @project_refs.present?
+      haml :ci, :layout => !request.xhr?
+    else
+      redirect '/ci/new'
+    end
+  end
+
+  get '/ci/check-for-changes' do
+    project_refs = Hobson::CI::ProjectRef.all.find_all(&:needs_test_run?)
+    project_refs.each(&:run_tests!)
+    {:success => true, :changes => project_refs.size}.to_json
+  end
+
+  get "/ci/new" do
+    haml :'ci/new'
+  end
+
+  post "/ci/new" do
+    origin_url, ref = params.values_at("origin_url", "ref")
+    project_ref = Hobson::CI::ProjectRef.new(origin_url, ref)
+    project_ref.run_tests! if project_ref.needs_test_run?
+    redirect '/ci'
+  end
+
+  delete "/ci/new" do
+    Hobson::CI::ProjectRef.new(params).delete
+    redirect '/ci'
   end
 
   get "/projects" do

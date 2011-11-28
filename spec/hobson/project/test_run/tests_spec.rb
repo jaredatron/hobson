@@ -22,8 +22,8 @@ describe Hobson::Project::TestRun::Tests do
 
       before{ tests.detect! }
 
-      it "should have a length of 8" do
-        tests.length.should == 8
+      it "should have a length of 10" do
+        tests.length.should == 10
       end
 
       it "should contain only Test objects" do
@@ -60,7 +60,7 @@ describe Hobson::Project::TestRun::Tests do
         balance_for!([nil,nil,nil,nil,nil,nil,nil,nil,nil,nil], 1).should == [0,0,0,0,0,0,0,0,0,0]
         balance_for!([nil,nil,nil,nil,nil,nil,nil,nil,nil,nil], 2).should == [0,0,0,0,0,1,1,1,1,1]
         balance_for!([nil,nil,nil,nil,nil,nil,nil,nil,nil,nil], 3).should == [0,0,0,0,1,1,1,2,2,2]
-        balance_for!([nil,nil,nil,nil,nil,nil,nil,nil,nil,nil], 4).should == [0,0,0,1,1,1,2,2,3,3]
+        balance_for!([nil,nil,nil,nil,nil,nil,nil,nil,nil,nil], 4).should == [0,0,0,1,1,2,2,3,3,3]
       end
     end
 

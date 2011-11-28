@@ -33,29 +33,17 @@ A distributed test run framework built on resque
 
 # TODO
 
-  0. WHY ARE THERE EMPTY TESTS?
-  0. CONFIRM YOU'RE RUNNING ALL TESTS!!!!!
+  0. fix links to worker hosts (somehow detect S3)
+  0. update ets. runtime logic to no longer need a minumum est runtime.
+    * you can enable 0 est runtimes by collecting a set of 0 runtimes and pushing on the smallest or shortest job set
+  0. add detection of unpushed sha
+  0. find a way to confirm we're running all tests
+  0. add a Hobson & Project settings page for the following settings
+    * min / max jobs per test_run
+    * min / max tests per job
+    * auto re-run failed tests
 
-  0. add test balancing
-    0. append test duration times (if passed) to a global store
-    0. make it easy to get the duration estimate for a given test
-    0. balance tests across workers with respect to test type & est. test duration
-    0. add tuning configurations for things like
-      0. min / max jobs per test_run
-      0. min / max tests per job
-
-  0. add multiple projects
-    Hobson
-      Project
-        Workspace
-        TestRun
-          Tests
-          Job
-
-  0. add branch monitoring
-    0. add a TV monitoring page
-
-  0. show test runtime estimation on status page
+  0. add test_run runtime estimation taking into account avg. setup & teardown
   0. add custom formatters that dump failures to individual files and upload those artifacts immediately
   0. add rerun failed tests functionality &|| add auto rerun of failed tests
   0. rename test_run/job/application etc.

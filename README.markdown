@@ -82,33 +82,44 @@ A distributed test run framework built on resque
 
 
 
-# Data
-Project
-  - name
-  - git url
-  TestRun
-    - id                String
-    - sha               String
-    - scheduled_build   Datetime
-    - started_building  Datetime
-    - scheduled_jobs    Datetime
-    - tests
-      - name        String
-      - state       String (waiting|started|complete)
-      - result      String (pass|fail|pending)
-      - est_runtime Float  (seconds)
-      - runtime     Float  (seconds)
-    - jobs
-      - index                 Integer
-      - scheduled_at          Datetime
-      - checking_out_code     Datetime
-      - preparing_environment Datetime
-      - running_tests         Datetime
-      - saving_artifacts      Datetime
-      - tearing_down          Datetime
-      - completed_at          Datetime
+# Objects
 
 
+### Hobson::Project
+  * name       (String)
+  * git url    (String)
+  * test runs  (Hobson::Project::TestRun)
+
+
+### Hobson::Project::TestRun
+  * id                (String)
+  * sha               (String)
+  * scheduled_build   (Datetime)
+  * started_building  (Datetime)
+  * scheduled_jobs    (Datetime)
+  * tests             (Hobson::Project::TestRun::Tests)
+
+
+### Hobson::Project::TestRun::Tests
+  * tests (Hobson::Project::TestRun::Tests::Test)
+
+### Hobson::Project::TestRun::Tests::Test
+  * name        (String)
+  * state       (String)  [waiting|started|complete]
+  * result      (String)  [PASS|FAIL|PENDING]
+  * est_runtime (Float)   [seconds]
+  * runtime     (Float)   [seconds]
+  * job         (Integer) [job index]
+
+### Hobson::Project::TestRun::Job
+  * index                 (Integer)
+  * scheduled_at          (Datetime)
+  * checking\_out_code    (Datetime)
+  * preparing_environment (Datetime)
+  * running_tests         (Datetime)
+  * saving_artifacts      (Datetime)
+  * tearing_down          (Datetime)
+  * completed_at          (Datetime)
 
 # TestRun Redis Hash
   {

@@ -11,13 +11,9 @@ class Hobson::Project::TestRun
     'waiting…'
   end
 
-  def started?
-    enqueued_jobs?
-  end
-
-  def started_at
-    enqueued_jobs_at
-  end
+  alias_method :created_at, :enqueued_build_at
+  alias_method :started?,   :enqueued_jobs?
+  alias_method :started_at, :enqueued_jobs_at
 
   def complete?
     jobs.present? && jobs.all?(&:complete?)

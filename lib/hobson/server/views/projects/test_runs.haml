@@ -6,8 +6,10 @@
       %th
       %th Status
       %th Id
+      %th SHA
+      %th Created At
   %tbody
-    - @test_runs.each do |test_run|
+    - @test_runs.sort_by(&:created_at).reverse.each do |test_run|
       %tr
         %td
           %form{:id => "delete#{test_run.id}", :action => test_run_path(test_run), :method => 'post'}
@@ -16,3 +18,6 @@
         %td= test_run.status
         %td
           %a{:href => test_run_path(test_run)}= test_run.id
+        %td
+          %a{:href => sha_url(test_run.project.url, test_run.sha)}= test_run.sha
+        %td= test_run.created_at

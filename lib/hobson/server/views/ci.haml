@@ -6,20 +6,30 @@
       %h2= project_ref.ref
       %dl
         %dt Status
-        %dd= project_ref.status
+        %dd
+          - if project_ref.last_test_run.present?
+            %a{:href => test_run_path(project_ref.last_test_run)}= project_ref.status
+          - else
+            = project_ref.status
 
         %dt Current Test Run
         %dd
-          %a{:href => "/projects/#{project_ref.project.name}/test_runs/#{project_ref.last_test_run.id}"}= project_ref.last_test_run.id
+          - if project_ref.last_test_run.present?
+            %a{:href => test_run_path(project_ref.last_test_run)}= project_ref.last_test_run.id
+          - else
+            = project_ref.last_test_run.id
 
-        %dt Origin Url
-        %dd= project_ref.origin_url
+        %dt Repo Url
+        %dd
+          %a{:href => repo_url(project_ref.origin_url)}= project_ref.origin_url
 
         %dt Git Ref
-        %dd= project_ref.ref
+        %dd
+          %a{:href => ref_url(project_ref.origin_url, project_ref.ref)}= project_ref.ref
 
         %dt Last Sha
-        %dd= project_ref.last_sha
+        %dd
+          %a{:href => sha_url(project_ref.origin_url, project_ref.last_sha)}= project_ref.last_sha
 
         %dt Total Test Runs
         %dd= project_ref.project.test_runs.size

@@ -14,3 +14,7 @@
         - if @test_run
           %li >
           %li= @test_run.id
+
+  - elsif @project_refs
+    %li
+      %a{:href => "/ci"} CI

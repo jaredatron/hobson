@@ -12,7 +12,6 @@ module Hobson
 
   extend self
 
-  autoload :Logger,       'hobson/logger'
   autoload :RedisHash,    'hobson/redis_hash'
   autoload :Bundler,      'hobson/bundler'
   autoload :Landmarks,    'hobson/landmarks'
@@ -22,6 +21,19 @@ module Hobson
   autoload :RunTests,     'hobson/run_tests'
   autoload :Server,       'hobson/server'
   autoload :CI,           'hobson/ci'
+
+  # become a resque-worker and handle hobson resque jobs
+  def work!
+    queues = (ENV['QUEUES'] || ENV['QUEUE'] || '*').to_s.split(',')
+
+    worker = Resque::Worker.new(*queues)
+    worker.verbose = ENV['LOGGING'] || ENV['VERBOSE']
+    worker.very_verbose = ENV['VVERBOSE']
+
+    puts "*** Waiting for builds #{worker}"
+
+    worker.work(ENV['INTERVAL'] || 5) # interval, will block
+  end
 
   def root
     @root ||= Pathname.new ENV['HOBSON_ROOT'] ||= Dir.pwd
@@ -49,7 +61,6 @@ module Hobson
       @redis = Redis.new(options)
       @redis = Redis::Namespace.new('Hobson', :redis => @redis)
       @redis = Redis::Namespace.new(options[:namespace], :redis => @redis) if options[:namespace]
-      Resque.redis = Redis::Namespace.new(:resque, :redis => @redis)
       @redis
     end
   end
@@ -71,6 +82,4 @@ module Hobson
 end
 
 require 'hobson/logger'
-require 'hobson/work'
-
-
+require 'hobson/resque'

@@ -5,6 +5,29 @@ module Hobson::Server::Helpers
 
   alias_method :h, :escape_html
 
+  # URL Helpers
+
+  def project_path project=@project
+    "/projects/#{project.name}"
+  end
+
+  def test_run_path test_run=@test_run
+    "/projects/#{test_run.project.name}/test_runs/#{test_run.id}"
+  end
+
+  def repo_url origin_url
+    host, path = origin_url.scan(/(?:https?:\/\/)?(?:.*@)?(.+?)[:\/]+(.+?)(?:\.git)?$/).first
+    "http://#{host}/#{path}"
+  end
+
+  def sha_url origin_url, sha
+    "#{repo_url(origin_url)}/commit/#{sha}"
+  end
+
+  def ref_url origin_url, ref
+    "#{repo_url(origin_url)}/tree/#{ref}"
+  end
+
   def test_run
     @test_run
   end

@@ -1,7 +1,7 @@
 class Hobson::Project::TestRun
 
   def enqueue!
-    Resque.enqueue(Hobson::BuildTestRun, project.name, id)
+    Resque.enqueue(Hobson::Project::TestRun::Builder, project.name, id)
     enqueued_build!
   end
 
@@ -28,6 +28,8 @@ class Hobson::Project::TestRun
     (0...number_of_jobs).map{|index| Job.new(self, index).enqueue! }
 
     enqueued_jobs! # done
+
+    # TODO upload Hobson.temp_logfile as a test_run artifact
   end
 
 end

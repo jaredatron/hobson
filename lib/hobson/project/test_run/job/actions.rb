@@ -1,15 +1,13 @@
 class Hobson::Project::TestRun::Job
 
   def enqueue!
-    # Resque::Job.create(:run_tests, Hobson::RunTests, test_run.id, index)
-    Resque.enqueue(Hobson::RunTests, test_run.project.name, test_run.id, index)
+    Resque.enqueue(Hobson::Project::TestRun::Runner, test_run.project.name, test_run.id, index)
     enqueued!
   end
 
   def run_tests!
-    Hobson.start_logging_to_a_file!
-    # self['hostname'] = `curl -s http://169.254.169.254/latest/meta-data/public-hostname`.chomp
-    self['hostname'] = `hostname`.chomp if self['hostname'].blank?
+    self['hostname'] = `curl -s http://169.254.169.254/latest/meta-data/public-hostname`.chomp
+    self['hostname'] = `hostname`.chomp if self['hostname'].blank? || !$?.success?
 
     checking_out_code!
     workspace.checkout! test_run.sha
@@ -38,7 +36,7 @@ class Hobson::Project::TestRun::Job
     self['backtrace'] = e.backtrace.join("\n")
   ensure
     complete!
-    save_artifact(Hobson.logfile_path, 'test_run.log') if Hobson.logfile_path.present?
+    save_artifact(Hobson.temp_logfile.tap(&:flush).path, 'test_run.log') if Hobson.temp_logfile.present?
   end
 
 end

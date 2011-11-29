@@ -68,9 +68,9 @@ class Hobson::Server < Sinatra::Base
     haml :'projects', :layout => !request.xhr?
   end
 
-  # get "/projects/:project_name" do |project_name|
-  #   @project   = Hobson::Project[project_name]
-  # end
+  get "/projects/:project_name" do |project_name|
+    redirect "/projects/#{project_name}/test_runs"
+  end
 
   get "/projects/:project_name/test_runs" do |project_name|
     @project   = Hobson::Project[project_name]
@@ -86,7 +86,7 @@ class Hobson::Server < Sinatra::Base
 
   delete "/projects/:project_name/test_runs/:id" do |project_name, id|
     Hobson::Project[project_name].test_runs(id).delete!
-    redirect '/test_runs'
+    redirect "/projects/#{project_name}/test_runs"
   end
 
 end

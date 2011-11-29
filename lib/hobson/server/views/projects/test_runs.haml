@@ -8,9 +8,9 @@
     - @test_runs.each do |test_run|
       %tr
         %td
-          %form{:id => "delete#{test_run.id}", :action => "/test_runs/#{test_run.id}", :method => 'post'}
+          %form{:id => "delete#{test_run.id}", :action => test_run_path(test_run), :method => 'post'}
             %input{:type=>:hidden, :name=>'_method', :value=>'delete'}
             %a{:href => "javascript: $('#delete#{test_run.id}').submit()"} X
         %td= test_run.status
         %td
-          %a{:href => "/projects/#{@project.name}/test_runs/#{test_run.id}"}= test_run.id
+          %a{:href => test_run_path(test_run)}= test_run.id

@@ -1,21 +1,33 @@
 - @page_title = "Test Run #{test_run.id}"
 
 %section.test_run{:class => "status-#{classname(test_run.status)}"}
-  %h2 Status: #{test_run.status}
+  %dl.details
+    %dt Project
+    %dd= test_run.project.name
 
-  %h2 #{test_run.complete? ? 'completed in' : 'running for'} #{test_run_duration} seconds
+    %dt SHA
+    %dd= test_run.sha
 
+    %dt Status
+    %dd= test_run.status
+
+    %dt Duration
+    %dd #{test_run_duration.to_i} seconds
 
   - if test_run.jobs.present?
     %h2 Jobs
     %ol.jobs.status
       - test_run.jobs.each do |job|
         %li.job{:class => "status-#{classname(job.status)}"}
+
           %h3
             %a{:href => "ssh://#{job['hostname']}"} Job #{job.index}
             \- #{job.status}
-            (#{job.est_runtime})
+
+          %h2 #{job.est_runtime.to_i} seconds est. runtime
+
           .icon
+
           %ol.timeline
             - job_timeline(job)
 

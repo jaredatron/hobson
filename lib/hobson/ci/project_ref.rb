@@ -50,7 +50,7 @@ class Hobson::CI::ProjectRef
   end
 
   def needs_test_run?
-    last_sha != current_sha
+    last_sha != current_sha && project.test_runs.map(&:sha).exclude? current_sha
   end
 
   def run_tests!

@@ -22,15 +22,11 @@ module Hobson
 
   # become a resque-worker and handle hobson resque jobs
   def work!
-    queues = (ENV['QUEUES'] || ENV['QUEUE'] || '*').to_s.split(',')
-
-    worker = Resque::Worker.new(*queues)
-    worker.verbose = ENV['LOGGING'] || ENV['VERBOSE']
-    worker.very_verbose = ENV['VVERBOSE']
-
-    puts "*** Waiting for builds #{worker}"
-
-    worker.work(ENV['INTERVAL'] || 5) # interval, will block
+    worker = resque::Worker.new('*')
+    worker.verbose = true
+    worker.very_verbose = false
+    logger.info "*** Waiting for builds #{worker}"
+    worker.work(5) # interval, will block
   end
 
   def root

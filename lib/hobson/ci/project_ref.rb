@@ -42,9 +42,10 @@ class Hobson::CI::ProjectRef
 
   def current_sha
     @current_sha ||= begin
-      ls = `git ls-remote #{origin_url.inspect} #{ref.inspect}`
-      raise "failed getting remote sha for #{origin_url.inspect} #{ref.inspect}" unless $?.success?
-      ls.scan(/^(\w+)/).try(:first).try(:first)
+      cmd    = %(git ls-remote #{origin_url.inspect} #{ref.inspect})
+      result = `#{cmd}`
+      raise "failed getting remote sha for #{origin_url.inspect} #{ref.inspect}\n#{cmd.inspect} failed" unless $?.success?
+      result.scan(/^(\w+)/).try(:first).try(:first)
     end
   end
 

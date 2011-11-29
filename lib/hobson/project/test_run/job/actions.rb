@@ -1,7 +1,7 @@
 class Hobson::Project::TestRun::Job
 
   def enqueue!
-    Resque.enqueue(Hobson::Project::TestRun::Runner, test_run.project.name, test_run.id, index)
+    Hobson.resque.enqueue(Hobson::Project::TestRun::Runner, test_run.project.name, test_run.id, index)
     enqueued!
   end
 

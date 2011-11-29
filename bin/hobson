@@ -41,11 +41,10 @@ Class.new Thor do
 
   desc "resque-web", "start resque-web"
   def resque_web
-    config = File.expand_path('../../lib/hobson/resque.rb', __FILE__)
-    # todo --app-dir ~/vegas/hobson/resque_web -r Resque.redis.… -N #{Resque.redis.namespace}
-    cmd = %[bundle exec resque-web #{ARGV.join(' ')} "#{config}"]
-    puts cmd
-    system cmd
+    require 'vegas'
+    require 'resque/server'
+    Resque::Server.set :protection, :except => :frame_options
+    Vegas::Runner.new(Hobson.resque::Server, 'hobson-resque-web')
   end
 
 end.start

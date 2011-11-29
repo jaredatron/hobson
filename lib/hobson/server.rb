@@ -16,8 +16,7 @@ class Hobson::Server < Sinatra::Base
 
   use Rack::MethodOverride
 
-  # register Sinatra::Namespace
-
+  set :protection,    :except => :frame_options
   set :views,         root + "views"
   set :public_folder, root + "public"
   set :static,        true

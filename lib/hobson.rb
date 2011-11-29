@@ -68,6 +68,13 @@ module Hobson
     end
   end
 
+  def resque
+    @resque ||= begin
+      Resque.redis = Redis::Namespace.new(:resque, :redis => redis)
+      Resque
+    end
+  end
+
   def s3
     @s3 ||= begin
       return nil unless config.present?
@@ -85,4 +92,3 @@ module Hobson
 end
 
 require 'hobson/logger'
-require 'hobson/resque'

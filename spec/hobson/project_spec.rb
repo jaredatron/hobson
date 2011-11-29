@@ -27,8 +27,8 @@ describe Hobson::Project do
         test_run.sha.should == ClientWorkingDirectory.current_sha
       end
 
-      it "should enqueue 1 Hobson::BuildTestRun resque job" do
-        Resque.should_receive(:enqueue).with(Hobson::BuildTestRun, ExampleProject::NAME, anything).once
+      it "should enqueue 1 Hobson::Project::TestRun::Builder resque job" do
+        Resque.should_receive(:enqueue).with(Hobson::Project::TestRun::Builder, ExampleProject::NAME, anything).once
         project.run_tests!
       end
 

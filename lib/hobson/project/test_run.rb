@@ -2,8 +2,10 @@ require 'uuid'
 
 class Hobson::Project::TestRun
 
-  autoload :Tests, 'hobson/project/test_run/tests'
-  autoload :Job,   'hobson/project/test_run/job'
+  autoload :Builder, 'hobson/project/test_run/builder'
+  autoload :Runner,  'hobson/project/test_run/runner'
+  autoload :Tests,   'hobson/project/test_run/tests'
+  autoload :Job,     'hobson/project/test_run/job'
 
   delegate :workspace, :to => :project
   attr_reader :project

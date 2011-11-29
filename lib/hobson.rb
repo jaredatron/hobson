@@ -16,9 +16,7 @@ module Hobson
   autoload :Bundler,      'hobson/bundler'
   autoload :Landmarks,    'hobson/landmarks'
   autoload :Artifacts,    'hobson/artifacts'
-  autoload :BuildTestRun, 'hobson/build_test_run'
   autoload :Project,      'hobson/project'
-  autoload :RunTests,     'hobson/run_tests'
   autoload :Server,       'hobson/server'
   autoload :CI,           'hobson/ci'
 

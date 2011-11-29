@@ -42,8 +42,8 @@ describe Hobson::Project::TestRun::Job do
     end
 
     describe "#enqueue!" do
-      it "should enqueue 1 Hobson::BuildTestRun resque job" do
-        Resque.should_receive(:enqueue).with(Hobson::RunTests, job.test_run.project.name, job.test_run.id, job.index).once
+      it "should enqueue 1 Hobson::Project::TestRun::Runner resque job" do
+        Resque.should_receive(:enqueue).with(Hobson::Project::TestRun::Runner, job.test_run.project.name, job.test_run.id, job.index).once
         job.enqueue!
       end
     end

@@ -46,9 +46,9 @@ describe Hobson::Project::TestRun do
     end
 
     describe "enqueue!" do
-      it "should enqueue a Hobson::BuildTestRun in resque" do
+      it "should enqueue a Hobson::Project::TestRun::Builder in resque" do
         test_run.sha = "6841b60af66264906dc8c9fe0569aa1348e4bec2"
-        Resque.should_receive(:enqueue).with(Hobson::BuildTestRun, test_run.project.name, test_run.id)
+        Resque.should_receive(:enqueue).with(Hobson::Project::TestRun::Builder, test_run.project.name, test_run.id)
         test_run.enqueue!
       end
     end
@@ -89,8 +89,8 @@ describe Hobson::Project::TestRun do
         it "should schedule schedule 2 jobs" do
           # test_run.workspace.should_receive(:checkout!).with(test_run.sha)
           # test_run.workspace.should_receive(:tests)
-          Resque.should_receive(:enqueue).with(Hobson::RunTests, test_run.project.name, test_run.id, 0).once
-          Resque.should_receive(:enqueue).with(Hobson::RunTests, test_run.project.name, test_run.id, 1).once
+          Resque.should_receive(:enqueue).with(Hobson::Project::TestRun::Runner, test_run.project.name, test_run.id, 0).once
+          Resque.should_receive(:enqueue).with(Hobson::Project::TestRun::Runner, test_run.project.name, test_run.id, 1).once
           test_run.build!
           test_run.jobs.length.should == 2
         end

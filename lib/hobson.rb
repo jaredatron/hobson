@@ -72,7 +72,9 @@ module Hobson
   def s3
     @s3 ||= begin
       return nil unless config.present?
-      RightAws::S3.new *config[:s3].values_at(:access_key_id, :secret_access_key)
+      @s3 = RightAws::S3.new *config[:s3].values_at(:access_key_id, :secret_access_key)
+      @s3.interface.logger= Hobson.logger
+      @s3
     end
   end
 
@@ -81,6 +83,8 @@ module Hobson
       return nil unless config.present?
       s3.bucket(config[:s3][:bucket], true, 'public-read')
     end
+  rescue RightAws::AwsError => e
+    raise "unable to connect to S3 bucket because: #{e.inspect}"
   end
 
 end

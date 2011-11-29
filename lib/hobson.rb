@@ -40,7 +40,10 @@ module Hobson
   end
 
   def config_path
-    Pathname.new ENV['HOBSON_CONFIG'] ||= [root+'config/hobson.yml', root+'config.yml'].find{|path| File.exist? path.to_s }
+    @config_path ||= begin
+      ENV['HOBSON_CONFIG'] ||= [root+'config/hobson.yml', root+'config.yml'].find{|path| File.exist? path.to_s }
+      ENV['HOBSON_CONFIG'].present? ? Pathname.new(ENV['HOBSON_CONFIG']) : nil
+    end
   end
 
   def config

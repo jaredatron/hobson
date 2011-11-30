@@ -18,7 +18,7 @@ HOBSON_CONFIG=/home/change/hobson/config.yml
 DAEMON=/home/change/hobson_gem/bin/hobson
 NAME=hobson
 DESC=hobson
-PIDFILE=/var/run/hobson.pid
+PIDFILE=/home/change/hobson/hobson.pid
 
 export HOBSON_ROOT
 export HOBSON_CONFIG
@@ -57,7 +57,7 @@ case "$1" in
 
   status)
         echo -n "$DESC is "
-        if start-stop-daemon --stop --quiet --signal 0 --name ${NAME} --pidfile ${PIDFILE}
+        if start-stop-daemon --stop --quiet --signal 0 --pidfile ${PIDFILE}
         then
                 echo "running"
         else

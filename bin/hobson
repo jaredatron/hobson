@@ -38,7 +38,7 @@ Class.new Thor do
         :dir_mode   => :script,
         :dir        => Hobson.root,
         :ontop      => false,
-        :app_name   => 'hobson-resque-worker',
+        :app_name   => 'hobson',
         :log_output => true,
         :log_dir    => Hobson.log.parent
       )

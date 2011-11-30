@@ -35,6 +35,8 @@ Class.new Thor do
     if options.demonize?
       require 'daemons'
       Daemons.daemonize(
+        :dir_mode   => :script,
+        :dir        => Hobson.root,
         :ontop      => false,
         :app_name   => 'hobson-resque-worker',
         :log_output => true,

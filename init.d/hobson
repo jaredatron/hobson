@@ -16,7 +16,6 @@ PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 HOBSON_ROOT=/home/change/hobson
 HOBSON_CONFIG=/home/change/hobson/config.yml
 DAEMON=/home/change/hobson_gem/bin/hobson
-DAEMON_ARGS=work
 NAME=hobson
 DESC=hobson
 PIDFILE=/var/run/hobson.pid
@@ -33,7 +32,7 @@ case "$1" in
         echo -n "Starting $DESC: "
         touch $PIDFILE
         chown change:change $PIDFILE
-        if start-stop-daemon --background --make-pidfile --start --quiet --umask 007 --pidfile $PIDFILE --chuid change:change --exec $DAEMON -- $DAEMON_ARGS
+        if start-stop-daemon --start --quiet --umask 007 --pidfile $PIDFILE --chuid change:change --exec $DAEMON -- work --demonize
         then
                 echo "$NAME."
         else

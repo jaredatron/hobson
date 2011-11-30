@@ -24,7 +24,11 @@ describe Hobson::Project::TestRun::Tests::Test do
       context "when this test has been run before" do
         before{
           @runtimes = 10.times.map{ rand }
-          10.times{ |i| Factory.test('factoried.feature').runtime = @runtimes[i] }
+          10.times{ |i|
+            test = Factory.test('factoried.feature')
+            test.result  = 'PASS'
+            test.runtime = @runtimes[i]
+          }
         }
         it "should calculate the average runtime" do
           test.est_runtime.should be_nil

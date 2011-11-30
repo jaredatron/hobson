@@ -17,7 +17,7 @@ class Hobson::Project::TestRun::Job
   # hook - evals hook files in this job instance
   def eval_hook hook
     logger.info "running #{hook} hook"
-    path = workspace.root.join("test/cluster/#{hook}.rb")
+    path = workspace.root.join("config/hobson/#{hook}.rb")
     if path.exist?
       logger.info "instance evaling #{path}"
       hook_environment.instance_eval(path.read)

@@ -28,6 +28,7 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency "i18n"
   s.add_runtime_dependency "redis-namespace", "~> 1"
   s.add_runtime_dependency "resque", "~> 1.19.0"
+  s.add_runtime_dependency "daemons"
   s.add_runtime_dependency "right_aws"
   s.add_runtime_dependency "SystemTimer"
   s.add_runtime_dependency "childprocess"

@@ -30,16 +30,29 @@ Class.new Thor do
   end
 
   desc "work", "become a test running worker"
+  method_options %w( demonize -d ) => false, :banner => 'deamonize before becoming a resque worker'
   def work
+    if options.demonize?
+      require 'daemons'
+      Daemons.daemonize(
+        :ontop      => false,
+        :app_name   => 'hobson-resque-worker',
+        :log_output => true,
+        :log_dir    => Hobson.log.parent
+      )
+      puts "daemonized PID: #{Process.pid} AT: #{Time.now}"
+    end
     Hobson.work!
   end
 
-  desc "web", "start hobson web server"
+  desc "web", "start hobson web server (see vegas options)"
+  method_options %w( help -h ) => false, :banner => 'show vegas help for more options'
   def web
     Hobson::Server.start!
   end
 
   desc "resque-web", "start resque-web"
+  method_options %w( help -h ) => false, :banner => 'show vegas help for more options'
   def resque_web
     require 'vegas'
     require 'resque/server'

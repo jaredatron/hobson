@@ -9,7 +9,7 @@
       %th SHA
       %th Created At
   %tbody
-    - @test_runs.sort_by(&:created_at).reverse.each do |test_run|
+    - @test_runs.sort_by{|t| t.created_at || Time.now }.reverse.each do |test_run|
       %tr
         %td
           %form{:id => "delete#{test_run.id}", :action => test_run_path(test_run), :method => 'post'}

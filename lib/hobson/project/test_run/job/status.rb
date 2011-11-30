@@ -3,12 +3,12 @@ class Hobson::Project::TestRun::Job
   extend Hobson::Landmarks
   landmark :enqueued, :checking_out_code, :preparing, :running_tests, :saving_artifacts, :tearing_down, :complete
 
-  def error?
+  def errored?
     self['exception'].present?
   end
 
   def status
-    error?             ? 'error'             :
+    errored?           ? 'errored'           :
     complete?          ? 'complete'          :
     tearing_down?      ? 'tearing down'      :
     saving_artifacts?  ? 'saving artifacts'  :

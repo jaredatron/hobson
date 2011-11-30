@@ -30,7 +30,7 @@ class Hobson::Project::TestRun::Job
     tearing_down!
     eval_hook :teardown
 
-  rescue Exception => e
+  rescue Object => e
     logger.info %(Exception:\n#{e}\n#{e.backtrace.join("\n")})
     self['exception'] = e.message
     self['backtrace'] = e.backtrace.join("\n")

@@ -4,8 +4,10 @@ class Hobson::Project::TestRun
   landmark :enqueued_build, :started_building, :enqueued_jobs
 
   def status
+    errored?          ? 'errored'             :
     complete?         ? 'complete'            :
-    enqueued_jobs?    ? 'running tests'       :
+    running?          ? 'running tests'       :
+    enqueued_jobs?    ? 'waiting to be run'   :
     started_building? ? 'building'            :
     enqueued_build?   ? 'waiting to be built' :
     'waiting…'
@@ -14,6 +16,14 @@ class Hobson::Project::TestRun
   alias_method :created_at, :enqueued_build_at
   alias_method :started?,   :enqueued_jobs?
   alias_method :started_at, :enqueued_jobs_at
+
+  def running?
+    jobs.any?{|job| job.checking_out_code_at.present? }
+  end
+
+  def errored?
+    jobs.any?(&:errored?)
+  end
 
   def complete?
     jobs.present? && jobs.all?(&:complete?)

@@ -18,11 +18,12 @@ describe Hobson::Project::TestRun do
       end
     end
 
-    context "landmarks" do
-      %w{enqueued_build started_building enqueued_jobs}.each do |landmark|
-        it { should respond_to "#{landmark}!" }
-        it { should respond_to "#{landmark}_at" }
-        it "should convert strings to times" do
+    %w{created enqueued_build started_building enqueued_jobs}.each do |landmark|
+      it { should respond_to "#{landmark}!" }
+      it { should respond_to "#{landmark}_at" }
+      context "#{landmark} landmark" do
+        before{ test_run['created_at'] = nil }
+        it "should return a Time" do
           test_run.send("#{landmark}_at").should == nil
           test_run.send("#{landmark}!")
           test_run.send("#{landmark}_at").should be_a Time
@@ -56,6 +57,8 @@ describe Hobson::Project::TestRun do
     describe "status" do
       it "should accurately reflect the test run's status" do
         test_run = Factory.test_run
+        Factory.job(test_run, 0)
+
         test_run.status.should == 'waiting…'
 
         test_run.enqueued_build!
@@ -65,6 +68,9 @@ describe Hobson::Project::TestRun do
         test_run.status.should == 'building'
 
         test_run.enqueued_jobs!
+        test_run.status.should == 'waiting to be run'
+
+        test_run.jobs.first.checking_out_code!
         test_run.status.should == 'running tests'
       end
     end

@@ -10,16 +10,18 @@ describe Hobson::Project::TestRun::Job do
     describe "#data" do
       it "should be a subset of test_run.data" do
         job.test_run['a'] = 'b'
+        job['a'].should be_nil
         job['c'] = 'd'
-        job.data.should == {'c' => 'd'}
+        job['c'].should == 'd'
       end
     end
 
-    context "landmarks" do
-      %w{enqueued checking_out_code preparing running_tests saving_artifacts tearing_down complete}.each do |landmark|
-        it { should respond_to "#{landmark}!" }
-        it { should respond_to "#{landmark}_at" }
-        it "should convert strings to times" do
+    %w{created enqueued checking_out_code preparing running_tests saving_artifacts tearing_down complete}.each do |landmark|
+      it { should respond_to "#{landmark}!" }
+      it { should respond_to "#{landmark}_at" }
+      context "#{landmark} landmark" do
+        before{ job['created_at'] = nil }
+        it "should return a Time" do
           job.send("#{landmark}_at").should == nil
           job.send("#{landmark}!")
           job.send("#{landmark}_at").should be_a Time
@@ -30,15 +32,16 @@ describe Hobson::Project::TestRun::Job do
     it "should presist" do
       test_run = Factory.test_run
       job = Hobson::Project::TestRun::Job.new(test_run, 1)
+      job.keys.should == ['created_at']
       job[:x] = 42
       job[:y] = 69
-      job.keys.should == ['x', 'y']
+      job.keys.should == ['created_at', 'x', 'y']
 
       test_run = test_run.project.test_runs(test_run.id)
       job = Hobson::Project::TestRun::Job.new(test_run, 1)
       job[:x].should == 42
       job[:y].should == 69
-      job.keys.should == ['x', 'y']
+      job.keys.should == ['created_at', 'x', 'y']
     end
 
     describe "#enqueue!" do

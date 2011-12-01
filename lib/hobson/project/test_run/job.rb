@@ -5,6 +5,7 @@ class Hobson::Project::TestRun::Job
 
   def initialize test_run, index
     @test_run, @index = test_run, index
+    created!
   end
 
   def tests

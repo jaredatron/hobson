@@ -24,8 +24,8 @@ module Factory
     tests[name]
   end
 
-  def job test_run=self.test_run
-    Hobson::Project::TestRun::Job.new(test_run, 0)
+  def job test_run=self.test_run, index=0
+    Hobson::Project::TestRun::Job.new(test_run, index)
   end
 
 end

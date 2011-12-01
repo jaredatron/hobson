@@ -58,6 +58,7 @@ class Hobson::Project
 
   def run_tests! sha = current_sha
     test_run = TestRun.new(self)
+    test_run.created!
     test_run.sha = sha
     test_run.enqueue!
     test_run

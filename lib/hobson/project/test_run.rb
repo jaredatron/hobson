@@ -12,7 +12,6 @@ class Hobson::Project::TestRun
 
   def initialize project, id=nil
     @project, @id = project, id
-    created!
   end
 
   def id

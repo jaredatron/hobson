@@ -32,16 +32,15 @@ describe Hobson::Project::TestRun::Job do
     it "should presist" do
       test_run = Factory.test_run
       job = Hobson::Project::TestRun::Job.new(test_run, 1)
-      job.keys.should == ['created_at']
       job[:x] = 42
       job[:y] = 69
-      job.keys.should == ['created_at', 'x', 'y']
+      job.keys.should == ['x', 'y']
 
       test_run = test_run.project.test_runs(test_run.id)
       job = Hobson::Project::TestRun::Job.new(test_run, 1)
       job[:x].should == 42
       job[:y].should == 69
-      job.keys.should == ['created_at', 'x', 'y']
+      job.keys.should == ['x', 'y']
     end
 
     describe "#enqueue!" do

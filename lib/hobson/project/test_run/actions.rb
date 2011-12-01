@@ -25,7 +25,11 @@ class Hobson::Project::TestRun
 
     logger.info "enqueuing #{number_of_jobs} jobs to run #{tests.length} tests"
     # jobs.each(&:enqueue!)
-    (0...number_of_jobs).map{|index| Job.new(self, index).enqueue! }
+    (0...number_of_jobs).map{|index|
+      job = Job.new(self, index)
+      job.created!
+      job.enqueue!
+    }
 
     enqueued_jobs! # done
 

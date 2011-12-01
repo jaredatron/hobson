@@ -47,7 +47,10 @@ class Hobson::Project
   end
 
   def test_runs id=nil
-    return TestRun.new(self, id) if id.present?
+    if id.present?
+      test_run = TestRun.new(self, id)
+      return test_run.data.keys.present? ? test_run : nil
+    end
     @test_runs ||= redis.keys \
       .inject([]){|ids, key| key =~ /^TestRun:([\w-]+)$/ and ids << $1; ids } \
       .sort.map{|id| TestRun.new(self, id) }

@@ -12,7 +12,7 @@
     %dd= test_run.status
 
     %dt Duration
-    %dd #{test_run_duration.to_i} seconds
+    %dd= distance_of_time_in_words test_run_duration, 0, true
 
   - if test_run.jobs.present?
     %h2 Jobs
@@ -27,13 +27,12 @@
 
             .est-runtime
               %dt Est. Runtime
-              %dd #{job.est_runtime.to_i} seconds
+              %dd= distance_of_time_in_words job.est_runtime
 
             - if job.complete?
               .runtime
                 %dt Actual Runtime
-                %dd 324234 Seconds
-                -# {job.runtime.to_i} seconds
+                %dd= distance_of_time_in_words job.runtime
 
             - if job.errored?
               .error

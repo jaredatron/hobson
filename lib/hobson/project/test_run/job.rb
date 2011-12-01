@@ -12,7 +12,11 @@ class Hobson::Project::TestRun::Job
   end
 
   def est_runtime
-    tests.map(&:est_runtime).sum
+    tests.map(&:est_runtime).compact.sum
+  end
+
+  def runtime
+    tests.map(&:runtime).compact.sum
   end
 
   def inspect

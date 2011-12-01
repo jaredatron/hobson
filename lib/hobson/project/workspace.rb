@@ -81,7 +81,7 @@ class Hobson::Project::Workspace
           when /^PROGRESS:STARTED:(.*)$/
             report_progress.call($1, :running, nil, nil)
           when /^PROGRESS:COMPLETED:(.*):(PASS|FAIL|PENDING):([\d\.]+)$/
-            report_progress.call($1, :complete, $2, $3)
+            report_progress.call($1, :complete, $2, $3.to_f)
           end
         }
       end

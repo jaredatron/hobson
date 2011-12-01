@@ -24,7 +24,8 @@ Gem::Specification.new do |s|
   s.add_development_dependency "rspec"
   s.add_development_dependency "resque_unit"
 
-  s.add_runtime_dependency "activesupport", "~> 3.0.10"
+  s.add_runtime_dependency "activesupport"
+  s.add_runtime_dependency "actionpack"
   s.add_runtime_dependency "i18n"
   s.add_runtime_dependency "redis-namespace", "~> 1"
   s.add_runtime_dependency "resque", "~> 1.19.0"

@@ -3,6 +3,14 @@ require 'vegas'
 require 'haml'
 require 'sass'
 
+require "active_support/dependencies/autoload"
+
+require 'action_view/helpers/capture_helper'
+require 'action_view/helpers/date_helper'
+
+# lolz
+I18n.load_path << $:.map{|path| File.join(path,'action_view/locale/en.yml') }.find{|path| File.exist?(path) }
+
 class Hobson::Server < Sinatra::Base
 
   def self.start! options={}
@@ -21,7 +29,9 @@ class Hobson::Server < Sinatra::Base
   set :public_folder, root + "public"
   set :static,        true
 
+  # helpers ActionView::Helpers
   helpers Hobson::Server::Helpers
+  helpers ActionView::Helpers::DateHelper
 
   get '/screen.css' do
     sass :screen

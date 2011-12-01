@@ -19,31 +19,4 @@ class Hobson::Project::TestRun::Job
     'waiting…'
   end
 
-  # alias_method :started?, :checking_out_code?
-  # alias_method :started_at, :checking_out_code_at
-  # alias_method :completed_at, :complete_at
-
-  # def status
-  #   case step
-  #   when "complete"
-  #     "complete: #{error? ? 'ERROR' : success? ? 'PASS' : 'FAIL'}"
-  #   when nil, ""
-  #     "unscheduled"
-  #   else
-  #     step
-  #   end
-  # end
-
-  # def success?
-  #   test_results.all?{|result| result == 'PASS'} if complete?
-  # end
-
-  # def failure?
-  #   test_results.any?{|result| result == 'FAIL'} if complete?
-  # end
-
-  # def error?
-  #   redis["exception"].present?
-  # end
-
 end

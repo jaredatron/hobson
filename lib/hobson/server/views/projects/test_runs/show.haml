@@ -43,22 +43,33 @@
         %tr
           %th Job
           %th File
-          %th Status
           %th Est.Runtime
           %th Runtime
+          %th Status
           %th Result
+          %th Log
       %tbody
-        - test_run.tests.sort_by(&:job).each do |test|
-          - job = test_run.jobs[test.job]
+        - test_run.tests.sort_by{|t| t.job || -1}.each do |test|
+          - job = test_run.jobs[test.job] if test.job.present?
           - result = test.result || ''
           %tr{:class => [result.downcase, test.status]}
             %td
-              %a{:href => "ssh://#{job['hostname']}"} Job #{job.index}
+              - if job.present?
+                %a{:href => "ssh://#{job['hostname']}"} Job #{job.index}
+              - else
+                WTF?!?
             %td= test.name
-            %td= test.status
             %td= test.est_runtime.presence || 'unknown'
             %td= test.runtime
+            %td= test.status
             %td= test.result
+            %td
+              - artifact_name = case test.type
+                - when "feature" : "cucumber"
+                - when "spec"    : "rspec"
+              - artifact_url = job.artifacts[artifact_name]
+              - if artifact_url.present?
+                %a{:href => artifact_url}= artifact_name
 
   - if test_run.jobs.present?
     %h2 Artifacts
@@ -67,10 +78,9 @@
         %li
           %h3 Job #{job.index}
           %ol.artifacts
-            - job.artifacts.each do |artifact|
-              - relative_path, public_link = artifact
+            - job.artifacts.each do |name, url|
               %li
-                %a{:href => public_link}= relative_path
+                %a{:href => url}= name
 
 
 - if @test_run.complete?

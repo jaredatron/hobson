@@ -20,16 +20,27 @@
       - test_run.jobs.each do |job|
         %li.job{:class => "status-#{classname(job.status)}"}
 
-          %h3.status
-            %a{:href => "ssh://#{job['hostname']}"} Job #{job.index}
-            \- #{job.status}
+          %dl.details
+            %a.name{:href => "ssh://#{job['hostname']}"}
+              %dt Job
+              %dd #{job.index}
 
-          %h2.runtime #{job.est_runtime.to_i} seconds est. runtime
+            .est-runtime
+              %dt Est. Runtime
+              %dd #{job.est_runtime.to_i} seconds
 
-          - if job.errored?
-            %h2.error
-              %strong.exception= job['exception']
-              %pre.backtrace= job['backtrace']
+            - if job.complete?
+              .runtime
+                %dt Actual Runtime
+                %dd 324234 Seconds
+                -# {job.runtime.to_i} seconds
+
+            - if job.errored?
+              .error
+                %dt Error
+                %dd
+                  %strong.exception= job['exception']
+                  %pre.backtrace= job['backtrace']
 
           .icon
 

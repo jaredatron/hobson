@@ -54,21 +54,30 @@ table
     font-weight: bold
 
 .test_run
-  > .details
+  .details
     overflow: hidden
     margin-bottom: 1em
     > *
+      display: block
       float: left
-      padding: 0.25em 0
-    > dt
-      clear: left
-      width: 100px
+    dt
+      text-align: right
       font-weight: bold
-      font-size: 120%
       &:after
         content: ':'
+
+  > .details
+    > *
+      padding: 0.25em 0
+    > dt
+      margin-right: 1em
+      width: 120px
+      clear: left
+      font-size: 120%
     > dd
       font-size: 110%
+
+
 
   > h2
     margin-bottom: 1em
@@ -78,6 +87,26 @@ table
   .jobs.status > *
     position: relative
     padding: 0.25em 0
+
+    > .details
+      > *
+        padding: 0.25em 0
+        overflow: hidden
+        white-space: nowrap
+        text-decoration: none
+      > *
+        float: left
+        margin-right: 1em
+        > *
+          display: inline-block
+        // > dt
+        // > dd
+
+      > .name
+        min-width: 60px
+      // > .est-runtime
+      // > .runtime
+      // > .error
 
     h3
       font-weight: bold

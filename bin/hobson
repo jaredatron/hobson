@@ -19,6 +19,15 @@ Class.new Thor do
   def console
     require 'ruby-debug'
     require 'irb'
+    # this is bs
+    IRB::Context.send(:define_method, :prompt_mode=){ |*args|
+      @prompt_i      = "Hobson > "
+      @prompt_s      = "Hobson * "
+      @prompt_c      = "Hobson > "
+      @prompt_n      = "Hobson ? "
+      @return_format = "=> %s\n"
+      @auto_indent_mode = IRB.conf[:AUTO_INDENT]
+    }
     IRB.start
   end
 

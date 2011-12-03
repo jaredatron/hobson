@@ -43,4 +43,6 @@ class Hobson::Project::TestRun
 
 end
 
-%w{class_methods persistence actions status}.each{|file| require "hobson/project/test_run/#{file}" }
+require "hobson/project/test_run/persistence"
+require "hobson/project/test_run/actions"
+require "hobson/project/test_run/status"

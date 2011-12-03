@@ -52,6 +52,10 @@ module Hobson
     @lib ||= Pathname.new File.expand_path('..', __FILE__)
   end
 
+  def git_version
+    @sha ||= `cd "#{Hobson.lib}" && git rev-parse HEAD`.chomp
+  end
+
   def redis
     @redis ||= begin
       return nil unless config.present?

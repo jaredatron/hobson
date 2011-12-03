@@ -3,13 +3,32 @@ body
   font-size: 9pt
   background: white
 
-  > h1
-    padding: 0.25em 1em
-    border-bottom: 1px solid grey
-    text-align: center
+
+#nav
+  position: relative
+  text-align: center
+  background: black
+  // font-size: 125%
+  user-select: none
+
+  > .title, > .links > a
+    padding: 5px
+
+  .title
+    height: 25px
     font-size: 200%
-    background: black
     color: white
+
+  .links
+    position: absolute
+    left: 20px
+    bottom: 0
+    > a
+      height: 20px
+      display: inline-block
+      text-decoration: none
+      color: #e4e2d3
+      font-weight: bold
 
   &.loading
     > h1

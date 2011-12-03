@@ -30,4 +30,8 @@ class Hobson::Project::TestRun::Job
 
 end
 
-%w{persistence status hooks artifacts actions}.each{|file| require "hobson/project/test_run/job/#{file}" }
+require "hobson/project/test_run/job/persistence"
+require "hobson/project/test_run/job/status"
+require "hobson/project/test_run/job/hooks"
+require "hobson/project/test_run/job/artifacts"
+require "hobson/project/test_run/job/actions"

@@ -7,10 +7,10 @@
       %th Status
       %th Id
       %th SHA
-      %th Created At
+      %th Created
   %tbody
     - @test_runs.sort_by{|t| t.created_at || Time.now }.reverse.each do |test_run|
-      %tr
+      %tr{:class => test_run.status.gsub(' ','-')}
         %td
           %form{:id => "delete#{test_run.id}", :action => test_run_path(test_run), :method => 'post'}
             %input{:type=>:hidden, :name=>'_method', :value=>'delete'}
@@ -20,4 +20,4 @@
           %a{:href => test_run_path(test_run)}= test_run.id
         %td
           %a{:href => sha_url(test_run.project.url, test_run.sha)}= test_run.sha
-        %td= test_run.created_at
+        %td= distance_of_time_in_words(Time.now - test_run.created_at) + ' ago'

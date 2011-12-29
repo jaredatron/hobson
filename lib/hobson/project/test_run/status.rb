@@ -5,6 +5,8 @@ class Hobson::Project::TestRun
 
   def status
     errored?          ? 'errored'             :
+    failed?           ? 'failed'              :
+    passed?           ? 'passed'              :
     complete?         ? 'complete'            :
     running?          ? 'running tests'       :
     enqueued_jobs?    ? 'waiting to be run'   :
@@ -32,12 +34,12 @@ class Hobson::Project::TestRun
     jobs.map(&:complete_at).compact.sort.last if complete?
   end
 
-  def green?
+  def passed?
     complete? && tests.map(&:result).all?{|result| result == 'PASS'}
   end
 
-  def red?
-    complete? && !green?
+  def failed?
+    complete? && !passed?
   end
 
 end

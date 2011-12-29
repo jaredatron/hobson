@@ -72,6 +72,16 @@ table
   th
     font-weight: bold
 
+.test-runs tbody tr
+  &.running-tests
+    background: lightblue
+  &.errored
+    background: orange
+  &.failed
+    background: lighten(#F00, 20%)
+  &.passed
+    background: lighten(#008000, 15%)
+
 .test_run
   .details
     overflow: hidden
@@ -216,9 +226,9 @@ table
       text-align: center
     &.running
       background-color: lightblue
-    &.red
+    &.failed
       background-color: lighten(red, 10%)
-    &.green
+    &.passed
       background-color: green
 
     dl

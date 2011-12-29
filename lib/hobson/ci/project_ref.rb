@@ -61,18 +61,18 @@ class Hobson::CI::ProjectRef
     last_test_run && !last_test_run.complete?
   end
 
-  def green?
-    last_test_run && last_test_run.green?
+  def passed?
+    last_test_run && last_test_run.passed?
   end
 
-  def red?
-    last_test_run && !green?
+  def failed?
+    last_test_run && !passed?
   end
 
   def status
     running? ? 'running' :
-    red?     ? 'red'     :
-    green?   ? 'green'   :
+    passed?  ? 'passed'    :
+    failed?  ? 'failed'    :
     'new'
   end
 

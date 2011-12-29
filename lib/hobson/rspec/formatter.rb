@@ -1,3 +1,4 @@
+require 'rspec'
 require 'rspec/core/formatters/base_formatter'
 
 RSpec.configure do |config|
@@ -34,10 +35,12 @@ RSpec.configure do |config|
 
 end
 
-module Hobson::RSpec
-  class Formatter < RSpec::Core::Formatters::BaseFormatter
-    def initialize output
-      super StringIO.new
+module Hobson
+  module RSpec
+    class Formatter < ::RSpec::Core::Formatters::BaseFormatter
+      def initialize output
+        super StringIO.new
+      end
     end
   end
 end

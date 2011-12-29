@@ -49,13 +49,13 @@ class Hobson::Project::Workspace
       cucumber
       --quiet
       --require features
-      --require #{Hobson.lib.join('hobson/cucumber/formatter')}
+      --require #{Hobson.lib.join('hobson/cucumber')}
       --format Hobson::Cucumber::Formatter
       --format pretty --out log/cucumber
     ],
     'specs' => %W[
       rspec
-      --require #{Hobson.lib.join('hobson/rspec/formatter')}
+      --require #{Hobson.lib.join('hobson/rspec')}
       --format Hobson::RSpec::Formatter
       --format documentation --out log/rspec
     ],

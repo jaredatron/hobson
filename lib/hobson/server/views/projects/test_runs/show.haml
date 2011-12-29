@@ -77,8 +77,7 @@
               - artifact_name = case test.type
                 - when "feature" : "cucumber"
                 - when "spec"    : "rspec"
-              - artifact_url = job.artifacts[artifact_name]
-              - if artifact_url.present?
+              - if job && artifact_url = job.artifacts[artifact_name]
                 %a{:href => artifact_url}= artifact_name
 
   - if test_run.jobs.present?

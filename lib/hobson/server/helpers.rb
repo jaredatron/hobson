@@ -67,7 +67,7 @@ module Hobson::Server::Helpers
       right = ((((to - test_run.started_at) / test_run_duration) * 100) - 100) * -1
 
       html_options = {}
-      html_options[:title] = "#{landmark} for #{duration.to_i} seconds"
+      html_options[:title] = "#{landmark} for #{distance_of_time_in_words(duration.to_i)}"
       html_options[:class] = "landmark-#{classname(landmark)}"
       html_options[:style] = "left: #{left}%; right: #{right}%;"
       haml_tag(:li, html_options[:title], html_options)

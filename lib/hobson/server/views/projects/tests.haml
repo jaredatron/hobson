@@ -1,0 +1,14 @@
+- @page_title = "Tests"
+
+%table
+  %thead
+    %tr
+      %th Name
+      %th Avg. Runtime
+      %th Runtimes (seconds)
+  %tbody
+    - @tests.sort_by{|name, data| data.avg_runtime}.reverse.each do |name, data|
+      %tr
+        %td= name
+        %td= distance_of_time_in_words(data.avg_runtime)
+        %td= data.runtimes.sort.reverse.inspect

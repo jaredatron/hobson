@@ -64,6 +64,27 @@ class Hobson::Project
     test_run
   end
 
+  class Tests
+    def runtimes
+      @runtimes ||= []
+    end
+    def avg_runtime
+      @avg_runtime ||= runtimes.present? ? runtimes.inject(:+) / runtimes.length : 0.0
+    end
+  end
+
+  def tests
+    tests = {}
+    test_runs.each{|test_run|
+      test_run.tests.each{|test|
+        tests[test.name] ||= Tests.new
+        runtime = test.runtime.to_f || 0.0
+        tests[test.name].runtimes << runtime if test.pass? && runtime > 0.0
+      }
+    }
+    tests
+  end
+
   def redis
     @redis ||= Redis::Namespace.new("Project:#{name}", :redis => Hobson.redis)
   end

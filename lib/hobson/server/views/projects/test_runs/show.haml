@@ -66,8 +66,6 @@
             %td
               - if job.present?
                 %a{:href => "ssh://#{job['hostname']}"} Job #{job.index}
-              - else
-                WTF?!?
             %td= test.name
             %td= test.est_runtime.presence || 'unknown'
             %td= test.runtime

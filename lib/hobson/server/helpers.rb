@@ -74,4 +74,10 @@ module Hobson::Server::Helpers
     end
   end
 
+  def action_button name, action, method = :post
+    haml_tag :form, :action => action, :method => method do
+      haml_tag :input, :type => :submit, :value => name
+    end
+  end
+
 end

@@ -99,6 +99,20 @@ class Hobson::Server < Sinatra::Base
     redirect "/projects/#{project_name}/test_runs"
   end
 
+  post "/projects/:project_name/test_runs/:id/rerun" do |project_name, id|
+    @project  = Hobson::Project[project_name]
+    @test_run = @project.test_runs(id)
+    @test_run = @project.run_tests!(@test_run.sha)
+    redirect test_run_path
+  end
+
+  post "/projects/:project_name/test_runs/:id/rerun-failed-tests" do |project_name, id|
+    @project  = Hobson::Project[project_name]
+    @test_run = @project.test_runs(id)
+    @test_run.rerun_failed_tests!
+    redirect test_run_path
+  end
+
   get "/projects/:project_name/tests" do |project_name|
     @project  = Hobson::Project[project_name]
     @tests = @project.tests

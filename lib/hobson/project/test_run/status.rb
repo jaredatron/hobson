@@ -19,7 +19,7 @@ class Hobson::Project::TestRun
   alias_method :started_at, :enqueued_jobs_at
 
   def running?
-    jobs.any?{|job| job.checking_out_code_at.present? }
+    jobs.any?{|job| job.checking_out_code_at.present? } && !complete?
   end
 
   def errored?

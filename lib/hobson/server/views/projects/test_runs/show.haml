@@ -1,6 +1,16 @@
 - @page_title = "Test Run #{test_run.id}"
 
 %section.test_run{:class => "status-#{classname(test_run.status)}"}
+  .actions
+    - if @test_run.complete?
+      - action_button 'Rerun', test_run_path+'/rerun'
+    - if @test_run.running?
+      - action_button 'Abort', test_run_path+'/abort'
+    - if @test_run.failed?
+      - action_button 'Rerun Failed Tests', test_run_path+'/rerun-failed-tests'
+
+    - action_button 'Delete', test_run_path, :delete
+
   %dl.details
     %dt Project
     %dd= test_run.project.name

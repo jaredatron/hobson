@@ -17,8 +17,8 @@ class Hobson::Project::TestRun::Job
     eval_hook :setup
 
     running_tests!
-    while self.tests.any(:waiting?)
-      tests = self.tests.find_all(:waiting?).map(&:name).sort
+    while self.tests.any?(&:waiting?)
+      tests = self.tests.find_all(&:waiting?).map(&:name).sort
 
       workspace.run_tests tests do |name, state, time, result|
         test = test_run.tests[name]

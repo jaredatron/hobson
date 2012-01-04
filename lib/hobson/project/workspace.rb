@@ -119,6 +119,9 @@ class Hobson::Project::Workspace
       out, err = stdout.read, stderr.read
       logger.debug out if out.present?
       logger.debug err if err.present?
+      if (out+err).include?('Segmentation fault')
+        raise ExecutionError, "#{cmd}\n\n#{out+err}"
+      end
       yield out, err if block_given?
     end
 

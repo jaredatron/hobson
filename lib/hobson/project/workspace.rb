@@ -43,7 +43,6 @@ class Hobson::Project::Workspace
     root.join('log').mkpath
   end
 
-  File.expand_path('../../')
   TEST_COMMANDS = {
     'features' => %W[
       cucumber
@@ -60,6 +59,7 @@ class Hobson::Project::Workspace
       --format documentation --out log/rspec
     ],
   }
+
   def run_tests tests, &report_progress
 
     # split up tests by type
@@ -77,11 +77,8 @@ class Hobson::Project::Workspace
       logger.info "running #{type} tests"
       execute(*(bundler + TEST_COMMANDS[type] + tests[type])) do |stdout, stderr|
         stdout.split("\n").each{|line|
-          case line
-          when /^PROGRESS:STARTED:(.*)$/
-            report_progress.call($1, :running, nil, nil)
-          when /^PROGRESS:COMPLETED:(.*):(PASS|FAIL|PENDING):([\d\.]+)$/
-            report_progress.call($1, :complete, $2, $3.to_f)
+          if line =~ /^TEST:([^:]+):(START|COMPLETE):(\d+)(?::(PASS|FAIL|PENDING))?$/
+            report_progress.call($1, $2.downcase.to_sym, Time.at($3.to_i), $4)
           end
         }
       end

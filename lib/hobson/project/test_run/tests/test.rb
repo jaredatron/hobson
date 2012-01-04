@@ -4,18 +4,10 @@ class Hobson::Project::TestRun::Tests::Test
 
   def initialize tests, name
     @tests, @name = tests, name
-    self.status ||= :waiting
+    self.created_at = Time.now
   end
 
-  %w{waiting running complete}.each do |status|
-    class_eval <<-RUBY, __FILE__, __LINE__
-      def #{status}?
-        self.status.to_s == "#{status}"
-      end
-    RUBY
-  end
-
-  %w{job status result runtime est_runtime}.each do |attr|
+  %w{job est_runtime created_at started_at completed_at result}.each do |attr|
     class_eval <<-RUBY, __FILE__, __LINE__
       def #{attr}
         tests.test_run["test:\#{name}:#{attr}"]
@@ -42,6 +34,28 @@ class Hobson::Project::TestRun::Tests::Test
       else
         :unknown
     end
+  end
+
+  def waiting?
+    started_at.blank?
+  end
+
+  def running?
+    !waiting? && !complete?
+  end
+
+  def complete?
+    completed_at.present?
+  end
+
+  def status
+    complete? ? 'complete' :
+    running?  ? 'running'  :
+    'waiting'
+  end
+
+  def runtime
+    (completed_at || Time.now) - started_at if started_at.present?
   end
 
   def <=> other

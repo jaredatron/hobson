@@ -7,7 +7,7 @@ describe Hobson::Project::TestRun::Tests::Test do
 
   worker_context do
 
-    %w{job status result runtime est_runtime}.each do |attr|
+    %w{job est_runtime started_at completed_at result}.each do |attr|
       it { should respond_to :"#{attr}"  }
       it { should respond_to :"#{attr}=" }
     end
@@ -23,11 +23,14 @@ describe Hobson::Project::TestRun::Tests::Test do
 
       context "when this test has been run before" do
         before{
-          @runtimes = 10.times.map{ rand }
+          now      = Time.now
+          @runtimes = 10.times.map{ (rand * 1000).to_i.to_f }
           10.times{ |i|
             test = Factory.test('factoried.feature')
-            test.result  = 'PASS'
-            test.runtime = @runtimes[i]
+            test.job          = 0
+            test.result       = 'PASS'
+            test.started_at   = now - @runtimes[i]
+            test.completed_at = now
           }
         }
         it "should calculate the average runtime" do

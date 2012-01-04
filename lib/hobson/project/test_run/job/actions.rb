@@ -20,11 +20,13 @@ class Hobson::Project::TestRun::Job
     while self.tests.any(:waiting?)
       tests = self.tests.find_all(:waiting?).map(&:name).sort
 
-      workspace.run_tests tests do |name, status, result, runtime|
+      workspace.run_tests tests do |name, state, time, result|
         test = test_run.tests[name]
-        test.status  = status
+        case state
+        when :start    : test.started_at   = time
+        when :complete : test.completed_at = time
+        end
         test.result  = result  if result.present?
-        test.runtime = runtime if runtime.present?
       end
     end
 

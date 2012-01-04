@@ -43,7 +43,7 @@ class Hobson::Project::TestRun::Tests
       map{ |path| Dir[test_run.workspace.root.join(path)] }.
       flatten.
       map{ |path| Pathname.new(path).relative_path_from(test_run.workspace.root).to_s }.
-      each{ |name| self[name].status = "waiting" }
+      each{ |name| self[name] }
     self
   end
 

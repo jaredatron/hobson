@@ -10,10 +10,8 @@ RSpec.configure do |config|
   started_at = nil
 
   config.before :all do
-    raise "started twice!" unless started_at.nil?
     spec = get_spec.call(self)
-    puts "PROGRESS:STARTED:#{spec}"
-    started_at = Time.now
+    puts "TEST:#{spec}:START:#{Time.now.to_i}"
   end
 
   config.after :all do
@@ -26,11 +24,7 @@ RSpec.configure do |config|
       'FAIL' : 'PASS'
     end
 
-    duration = Time.now - started_at
-
-    started_at = nil
-
-    puts "PROGRESS:COMPLETED:#{spec}:#{status}:#{duration}"
+    puts "TEST:#{spec}:COMPLETE:#{Time.now.to_i}:#{status}"
   end
 
 end

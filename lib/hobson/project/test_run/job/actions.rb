@@ -17,11 +17,15 @@ class Hobson::Project::TestRun::Job
     eval_hook :setup
 
     running_tests!
-    workspace.run_tests self.tests.map(&:name).sort do |name, status, result, runtime|
-      test = test_run.tests[name]
-      test.status  = status
-      test.result  = result  if result.present?
-      test.runtime = runtime if runtime.present?
+    while self.tests.any(:waiting?)
+      tests = self.tests.find_all(:waiting?).map(&:name).sort
+
+      workspace.run_tests tests do |name, status, result, runtime|
+        test = test_run.tests[name]
+        test.status  = status
+        test.result  = result  if result.present?
+        test.runtime = runtime if runtime.present?
+      end
     end
 
     saving_artifacts!

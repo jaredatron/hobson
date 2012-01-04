@@ -7,6 +7,14 @@ class Hobson::Project::TestRun::Tests::Test
     self.status ||= :waiting
   end
 
+  %w{waiting running complete}.each do |status|
+    class_eval <<-RUBY, __FILE__, __LINE__
+      def #{status}?
+        self.status.to_s == "#{status}"
+      end
+    RUBY
+  end
+
   %w{job status result runtime est_runtime}.each do |attr|
     class_eval <<-RUBY, __FILE__, __LINE__
       def #{attr}

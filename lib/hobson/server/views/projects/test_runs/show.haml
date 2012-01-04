@@ -8,8 +8,8 @@
       - action_button 'Abort', test_run_path+'/abort'
     - if @test_run.failed?
       - action_button 'Rerun Failed Tests', test_run_path+'/rerun-failed-tests'
-
-    - action_button 'Delete', test_run_path, :delete
+    - unless @test_run.running?
+      - action_button 'Delete', test_run_path, :delete
 
   %dl.details
     %dt Project
@@ -21,8 +21,19 @@
     %dt Status
     %dd= test_run.status
 
+    %dt Est. Duration
+    %dd= distance_of_time_in_words est_test_run_duration, 0, true
+
     %dt Duration
     %dd= distance_of_time_in_words test_run_duration, 0, true
+
+    %dt Progress
+    %dd
+      - if @test_run.complete?
+        %progress{:value => 1, :max => 1}
+      - else
+        - max = test_run_duration > est_test_run_duration ? (test_run_duration + 1) : est_test_run_duration
+        %progress{:value => test_run_duration, :max => max}
 
   - if test_run.jobs.present?
     %h2 Jobs
@@ -69,7 +80,7 @@
           %th Result
           %th Log
       %tbody
-        - test_run.tests.sort_by{|t| t.job || -1}.each do |test|
+        - sort_tests(test_run.tests).each do |test|
           - job = test_run.jobs[test.job] if test.job.present?
           - result = test.result || ''
           %tr{:class => [result.downcase, test.status]}

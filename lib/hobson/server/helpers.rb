@@ -48,6 +48,10 @@ module Hobson::Server::Helpers
     "step-#{classname(object.step)}"
   end
 
+  def est_test_run_duration
+    test_run.jobs.map{|j| j.est_runtime || 0}.sort.last
+  end
+
   def test_run_duration
     @test_run_duration ||= (test_run.complete_at || now) - (test_run.started_at || now)
   end
@@ -75,9 +79,24 @@ module Hobson::Server::Helpers
   end
 
   def action_button name, action, method = :post
+    delete = method == :delete
+    method = :post if delete
     haml_tag :form, :action => action, :method => method do
+      haml_tag :input, :type => :hidden, :name => :_method, :value => :delete if delete
       haml_tag :input, :type => :submit, :value => name
     end
+  end
+
+  def sort_tests tests
+    tests.sort_by{|test|
+      status = case test.status.to_sym
+        when :running  : 0
+        when :complete : test.pass? ? 2 : 1
+        when :waiting  : 3
+        else 4
+      end
+      [status, test.job || -1]
+    }
   end
 
 end

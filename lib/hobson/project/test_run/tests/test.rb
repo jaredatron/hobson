@@ -4,7 +4,7 @@ class Hobson::Project::TestRun::Tests::Test
 
   def initialize tests, name
     @tests, @name = tests, name
-    self.status ||= "waiting"
+    self.status ||= :waiting
   end
 
   %w{job status result runtime est_runtime}.each do |attr|

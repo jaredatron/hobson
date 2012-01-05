@@ -38,7 +38,7 @@ class Hobson::Project::TestRun::Job
 
   rescue Object => e
     logger.info %(Exception:\n#{e}\n#{e.backtrace.join("\n")})
-    self['exception'] = e.message
+    self['exception'] = "#{e.class}: #{e.message}"
     self['backtrace'] = e.backtrace.join("\n")
   ensure
     complete!

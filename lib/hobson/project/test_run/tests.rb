@@ -96,17 +96,22 @@ class Hobson::Project::TestRun::Tests
   end
 
   def [] name
-    Test.new(self, name.to_s)
+    test = Test.new(self, name.to_s)
+    tests << test
+    test
   end
 
   private
 
   def tests
-    test_run.data.
-      inject([]){ |tests, (key, value)| key =~ /^test:(.*):(.*)$/ and tests << $1; tests }.
-      uniq.
-      sort.
-      map{|name| self[name] }
+    @tests or begin
+      @tests = []
+      test_run.data.
+        inject([]){ |tests, (key, value)| key =~ /^test:(.*):(.*)$/ and tests << $1; tests }.
+        uniq.
+        sort.
+        map{|name| self[name] }
+    end
   end
 
   delegate :each, :inspect, :to_s, :==, '<=>', :size, :length, :count, :to => :tests

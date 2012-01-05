@@ -4,7 +4,7 @@ class Hobson::Project::TestRun::Tests::Test
 
   def initialize tests, name
     @tests, @name = tests, name
-    self.created_at = Time.now
+    self.created_at ||= Time.now
   end
 
   %w{job est_runtime created_at started_at completed_at result}.each do |attr|

@@ -80,7 +80,8 @@ class Hobson::Project::Workspace
     %w{features specs}.each{|type|
       next if tests[type].blank?
       logger.info "running #{type} tests"
-      execute(*(bundler + TEST_COMMANDS[type] + tests[type])) do |stdout, stderr|
+      commands = bundler + TEST_COMMANDS[type] + tests[type]
+      execute! *commands do |stdout, stderr|
         stdout.split("\n").each{|line|
           if line =~ /^TEST:([^:]+):(START|COMPLETE):(\d+)(?::(PASS|FAIL|PENDING))?$/
             report_progress.call($1, $2.downcase.to_sym, Time.at($3.to_i), $4)

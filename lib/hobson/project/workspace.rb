@@ -30,6 +30,10 @@ class Hobson::Project::Workspace
     `git clone "#{project.url}" "#{root}"` or raise "unable to create workspace"
   end
 
+  def rvm?
+    root.join('.rvmrc').exist?
+  end
+
   def bundler?
     root.join('Gemfile').exist?
   end
@@ -99,7 +103,7 @@ class Hobson::Project::Workspace
     prepare! unless ready?
     cmd = args.join(' ')
     logger.info "executing: #{cmd.inspect}"
-    process = ChildProcess.new "cd #{root} && #{cmd}"
+    process = ChildProcess.new wrap_command(cmd)
     process.io.stdout = Tempfile.new("hobson_exec")
     process.io.stderr = Tempfile.new("hobson_exec")
     stdout = File.open(process.io.stdout.path)
@@ -136,5 +140,14 @@ class Hobson::Project::Workspace
     "#<#{self.class} project:#{project.name} root:#{root}>"
   end
   alias_method :to_s, :inspect
+
+  private
+
+  def wrap_command command
+    command = "rvm rvmrc trust && rvm reload && #{command}" if rvm?
+    command = "cd #{root} && #{command}"
+    command
+  end
+
 
 end

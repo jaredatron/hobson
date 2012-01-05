@@ -20,4 +20,4 @@
           %a{:href => test_run_path(test_run)}= test_run.id
         %td
           %a{:href => sha_url(test_run.project.url, test_run.sha)}= test_run.sha
-        %td= distance_of_time_in_words(Time.now - test_run.created_at) + ' ago'
+        %td= distance_of_time_in_words(Time.now - test_run.created_at) + ' ago' if test_run.created_at.present?

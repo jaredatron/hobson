@@ -65,6 +65,7 @@ class Hobson::Project::Workspace
   }
 
   def run_tests tests, &report_progress
+    logger.info "Running Tests: #{tests.join(' ')}"
 
     # split up tests by type
     tests = tests.group_by{|path|
@@ -95,6 +96,7 @@ class Hobson::Project::Workspace
     process = execute(*args, &block)
     unless process.exit_code == 0
       cmd = process.instance_variable_get(:@args).first
+      logger.error "COMMAND FAILED (#{process.exit_code}) #{cmd.inspect}"
       raise ExecutionError, "COMMAND: #{cmd.inspect}\nEXIT: #{process.exit_code}"
     end
   end

@@ -34,6 +34,10 @@ class Hobson::Project::Workspace
     root.join('.rvmrc').exist?
   end
 
+  def rvm_source_file
+    File.expand_path('~/.rvm/scripts/rvm')
+  end
+
   def bundler?
     root.join('Gemfile').exist?
   end
@@ -147,7 +151,7 @@ class Hobson::Project::Workspace
   private
 
   def wrap_command command
-    command = "rvm rvmrc trust && rvm reload && #{command}" if rvm?
+    command = "source '#{rvm_source_file}' && rvm rvmrc trust && rvm reload && #{command}" if rvm?
     command = "cd #{root} && #{command}"
     command
   end

@@ -15,6 +15,16 @@ Class.new Thor do
     ARGV.shift
   end
 
+  desc "config", "puts the current config"
+  def config
+    puts <<-CONFIG.gsub(/^\s+/,'')
+      ROOT:   #{Hobson.root}
+      CONFIG: #{Hobson.config_path}
+      VERSION: #{Hobson.git_version}
+    CONFIG
+    puts Hobson.config.to_yaml
+  end
+
   desc "console", "start an interactive ruby console"
   def console
     require 'ruby-debug'

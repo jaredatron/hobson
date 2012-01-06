@@ -27,16 +27,6 @@ class Hobson::Project::TestRun::Tests
     'feature' => 'features/**/*.feature',
   }
 
-  # TYPES.keys.each do |type|
-  #   define_method type.pluralize do
-  #     tests.find_all{|test| test.type == type}
-  #   end
-  # end
-
-  # def by_type
-  #   group_by(&:type)
-  # end
-
   # scans the workspace
   def detect!
     TYPES.values.

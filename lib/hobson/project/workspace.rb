@@ -1,7 +1,8 @@
-require 'childprocess'
-require 'tempfile'
+require 'pathname'
 
 class Hobson::Project::Workspace
+
+  autoload :Execution, 'hobson/project/workspace/execution'
 
   attr_reader :project
 
@@ -104,13 +105,18 @@ class Hobson::Project::Workspace
       logger.error "COMMAND FAILED (#{process.exit_code}) #{cmd.inspect}"
       raise ExecutionError, "COMMAND: #{cmd.inspect}\nEXIT: #{process.exit_code}"
     end
+    process
   end
 
   def execute *args, &block
     prepare! unless ready?
-    cmd = args.join(' ')
-    logger.info "executing: #{cmd.inspect}"
-    process = ChildProcess.new wrap_command(cmd)
+
+    command = "cd #{root.to_s.inspect} && #{args.join(' ')}"
+    command = "source #{rvm_source_file.inspect} && rvm rvmrc trust #{root.to_s.inspect} && #{command}" if rvm?
+    command = "bash -lc #{command.inspect}"
+
+    logger.info "executing: #{command.inspect}"
+    process = ChildProcess.new(command)
     process.io.stdout = Tempfile.new("hobson_exec")
     process.io.stderr = Tempfile.new("hobson_exec")
     stdout = File.open(process.io.stdout.path)
@@ -147,14 +153,5 @@ class Hobson::Project::Workspace
     "#<#{self.class} project:#{project.name} root:#{root}>"
   end
   alias_method :to_s, :inspect
-
-  private
-
-  def wrap_command command
-    command = "source '#{rvm_source_file}' && rvm rvmrc trust && rvm reload && #{command}" if rvm?
-    command = "cd #{root} && #{command}"
-    command
-  end
-
 
 end

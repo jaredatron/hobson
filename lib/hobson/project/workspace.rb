@@ -1,8 +1,10 @@
 require 'pathname'
+require 'popen4'
+require 'childprocess'
 
 class Hobson::Project::Workspace
 
-  autoload :Execution, 'hobson/project/workspace/execution'
+  # autoload :Execution, 'hobson/project/workspace/execution'
 
   attr_reader :project
 
@@ -19,14 +21,14 @@ class Hobson::Project::Workspace
 
   def checkout! sha
     logger.info "checking out #{sha}"
-    execute! "git fetch && git reset --hard #{sha} && git clean -df"
+    execute "git fetch && git reset --hard #{sha} && git clean -df"
   end
 
-  def ready?
+  def exists?
     root.exist? && root.join('.git').directory?
   end
 
-  def prepare!
+  def create!
     root.parent.mkpath
     `git clone "#{project.url}" "#{root}"` or raise "unable to create workspace"
   end
@@ -48,7 +50,7 @@ class Hobson::Project::Workspace
   end
 
   def prepare
-    execute! 'bundle install' if bundler?
+    execute 'bundle install' if bundler?
     root.join('log').mkpath
   end
 
@@ -58,14 +60,16 @@ class Hobson::Project::Workspace
       --quiet
       --require features
       --require #{Hobson.lib.join('hobson/cucumber')}
-      --format Hobson::Cucumber::Formatter
+      --format pretty
       --format pretty --out log/cucumber
+      --format Hobson::Cucumber::Formatter --out log/hobson_status
     ],
     'specs' => %W[
       rspec
       --require #{Hobson.lib.join('hobson/rspec')}
-      --format Hobson::RSpec::Formatter
+      --format documentation
       --format documentation --out log/rspec
+      --format Hobson::RSpec::Formatter --out log/hobson_status
     ],
   }
 
@@ -82,89 +86,75 @@ class Hobson::Project::Workspace
     }
 
     # run each test type
-    %w{features specs}.each{|type|
+    %w{features specs test_units}.each{|type|
       next if tests[type].blank?
       logger.info "running #{type} tests"
-      commands = bundler + TEST_COMMANDS[type] + tests[type]
-      execute!(*commands) do |stdout, stderr|
-        stdout.split("\n").each{|line|
+
+      command = "cd #{root.to_s.inspect} && "
+      command << "bundle exec " if bundler?
+      command << (TEST_COMMANDS[type] + tests[type]).join(' ')
+      command << ">> log/hobson_#{type}.log"
+
+      logger.debug "command: #{command}"
+
+      file = root.join('log/hobson_status')
+      FileUtils.touch(file)
+      status = root.join('log/hobson_status').open
+      process = ChildProcess.new(command)
+      process.io.inherit!
+
+      update = proc{
+        status.read.split("\n").each{|line|
           if line =~ /^TEST:([^:]+):(START|COMPLETE):(\d+)(?::(PASS|FAIL|PENDING))?$/
             report_progress.call($1, $2.downcase.to_sym, Time.at($3.to_i), $4)
           end
         }
+      }
+
+      with_clean_env{ process.start }
+      update.call while process.alive?
+      update.call
+      status.close
+
+      if process.crashed?
+        raise ExecutionError, "#{command.inspect} crashed with exit code #{process.exit_code}"
       end
     }
+    tests
   end
 
   ExecutionError = Class.new(StandardError)
 
-  def execute! *args, &block
-    execution = execute(*args, &block)
-    if execution.failed?
-      logger.error "COMMAND FAILED (#{execution.exit_code}) #{execution.args.inspect}"
-      raise ExecutionError, "COMMAND: #{execution.args.inspect}\nEXIT: #{execution.exit_code}"
-    end
-    execution
-  end
-
   def execute *args, &block
-    prepare! unless ready?
+    create! unless exists?
 
     command = "cd #{root.to_s.inspect} && #{args.join(' ')}"
     command = "source #{rvm_source_file.inspect} && rvm rvmrc trust #{root.to_s.inspect} > /dev/null && #{command}" if rvm?
     command = "bash -lc #{command.inspect}"
 
     logger.info "executing: #{command.inspect}"
-    execution = Execution.new(command, &block)
 
+    with_clean_env{
+      output = nil
+      errors = nil
+      status = POpen4::popen4(command){|stdout, stderr, stdin|
+        output = stdout.read
+        errors = stderr.read
+      }
+      raise ExecutionError, "#{command.inspect} could not be started" if status.nil?
+      raise ExecutionError, "#{command.inspect} crashed with exit code #{$?.exitstatus}\n#{errors}" unless $?.success?
+      return output
+    }
+  end
+
+  def with_clean_env &block
     Hobson::Bundler.with_clean_env{
       # TODO this should probably be somewhere better
       ENV['RAILS_ENV'] = 'test'
       ENV['DISPLAY'  ] = ':1'
-      execution.start
-    }
-
-    execution.read_loop{|out, err|
-      logger.info "\n\n?????\n\n"
-      logger.info  out if out.present?
-      logger.error err if err.present?
-      yield out, err if block_given?
+      return yield
     }
   end
-
-
-  #   process = ChildProcess.new(command)
-  #   process.io.stdout = Tempfile.new("hobson_exec")
-  #   process.io.stderr = Tempfile.new("hobson_exec")
-  #   stdout = File.open(process.io.stdout.path)
-  #   stderr = File.open(process.io.stderr.path)
-
-  #   Hobson::Bundler.with_clean_env{
-  #     # TODO this should probably be somewhere better
-  #     ENV['RAILS_ENV'] = 'test'
-  #     ENV['DISPLAY'  ] = ':1'
-  #     process.start
-  #   }
-
-  #   read = proc do
-  #     out, err = stdout.read, stderr.read
-  #     logger.debug out if out.present?
-  #     logger.debug err if err.present?
-  #     if (out+err).include?('Segmentation fault')
-  #       raise ExecutionError, "#{cmd}\n\n#{out}\n#{err}"
-  #     end
-  #     yield out, err if block_given?
-  #   end
-
-  #   while process.alive?
-  #     read.call
-  #     sleep 0.25
-  #   end
-
-  #   read.call
-
-  #   process
-  # end
 
   def inspect
     "#<#{self.class} project:#{project.name} root:#{root}>"

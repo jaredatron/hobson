@@ -10,7 +10,7 @@ module Hobson::Bundler
       ENV.delete("BUNDLE_GEMFILE")
       ENV["RUBYOPT"] = ENV["RUBYOPT"].gsub('-rbundler/setup', ' ') if ENV["RUBYOPT"]
 
-      yield
+      return yield
     }
   end
 

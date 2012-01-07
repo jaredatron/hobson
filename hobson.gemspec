@@ -33,6 +33,7 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency "right_aws"
   s.add_runtime_dependency "SystemTimer"
   s.add_runtime_dependency "childprocess"
+  s.add_runtime_dependency "popen4"
   s.add_runtime_dependency "log4r"
   s.add_runtime_dependency "json"
   s.add_runtime_dependency "open4"

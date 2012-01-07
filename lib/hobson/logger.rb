@@ -18,6 +18,16 @@ module Hobson
     @logger ||= Log4r::Logger.new('Hobson').tap{|logger| logger.outputters = [log_outputter] }
   end
 
+  def log_to_stdout!
+    return if logging_to_stdout?
+    @logging_to_stdout = true
+    logger.outputters << Log4r::StdoutOutputter.new('Hobson', :formatter => LogFormatter.new)
+  end
+
+  def logging_to_stdout?
+    @logging_to_stdout
+  end
+
   attr_reader :temp_logfile
 
   def log_to_a_tempfile &block

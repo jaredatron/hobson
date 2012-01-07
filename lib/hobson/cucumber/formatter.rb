@@ -11,7 +11,7 @@ module Hobson
       include ::Cucumber::Formatter::Io
 
       def initialize step_mother, path_or_io, options
-        @io = ensure_io(path_or_io, "runtimes")
+        @io = ensure_io(path_or_io, "hobson_status")
       end
 
       def before_feature feature

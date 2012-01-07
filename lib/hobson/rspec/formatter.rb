@@ -11,7 +11,7 @@ RSpec.configure do |config|
 
   config.before :all do
     spec = get_spec.call(self)
-    puts "TEST:#{spec}:START:#{Time.now.to_i}"
+    Hobson::RSpec::Formatter.puts "TEST:#{spec}:START:#{Time.now.to_i}"
   end
 
   config.after :all do
@@ -24,17 +24,36 @@ RSpec.configure do |config|
       'FAIL' : 'PASS'
     end
 
-    puts "TEST:#{spec}:COMPLETE:#{Time.now.to_i}:#{status}"
+    Hobson::RSpec::Formatter.puts "TEST:#{spec}:COMPLETE:#{Time.now.to_i}:#{status}"
   end
 
 end
 
+
+
 module Hobson
   module RSpec
     class Formatter < ::RSpec::Core::Formatters::BaseFormatter
-      def initialize output
-        super StringIO.new
+
+      def self.instances
+        @@instances ||= []
       end
+
+      def self.puts *args
+        instances.each{|instance|
+          instance.io.puts *args
+          instance.io.flush
+        }
+      end
+
+      attr_accessor :io
+
+      def initialize io
+        super
+        @io = io
+        self.class.instances << self
+      end
+
     end
   end
 end

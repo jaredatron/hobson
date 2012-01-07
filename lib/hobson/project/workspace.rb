@@ -86,7 +86,7 @@ class Hobson::Project::Workspace
       next if tests[type].blank?
       logger.info "running #{type} tests"
       commands = bundler + TEST_COMMANDS[type] + tests[type]
-      execute! *commands do |stdout, stderr|
+      execute!(*commands) do |stdout, stderr|
         stdout.split("\n").each{|line|
           if line =~ /^TEST:([^:]+):(START|COMPLETE):(\d+)(?::(PASS|FAIL|PENDING))?$/
             report_progress.call($1, $2.downcase.to_sym, Time.at($3.to_i), $4)
@@ -99,55 +99,72 @@ class Hobson::Project::Workspace
   ExecutionError = Class.new(StandardError)
 
   def execute! *args, &block
-    process = execute(*args, &block)
-    unless process.exit_code == 0
-      cmd = process.instance_variable_get(:@args).first
-      logger.error "COMMAND FAILED (#{process.exit_code}) #{cmd.inspect}"
-      raise ExecutionError, "COMMAND: #{cmd.inspect}\nEXIT: #{process.exit_code}"
+    execution = execute(*args, &block)
+    if execution.failed?
+      logger.error "COMMAND FAILED (#{execution.exit_code}) #{execution.args.inspect}"
+      raise ExecutionError, "COMMAND: #{execution.args.inspect}\nEXIT: #{execution.exit_code}"
     end
-    process
+    execution
   end
 
   def execute *args, &block
     prepare! unless ready?
 
     command = "cd #{root.to_s.inspect} && #{args.join(' ')}"
-    command = "source #{rvm_source_file.inspect} && rvm rvmrc trust #{root.to_s.inspect} && #{command}" if rvm?
+    command = "source #{rvm_source_file.inspect} && rvm rvmrc trust #{root.to_s.inspect} > /dev/null && #{command}" if rvm?
     command = "bash -lc #{command.inspect}"
 
     logger.info "executing: #{command.inspect}"
-    process = ChildProcess.new(command)
-    process.io.stdout = Tempfile.new("hobson_exec")
-    process.io.stderr = Tempfile.new("hobson_exec")
-    stdout = File.open(process.io.stdout.path)
-    stderr = File.open(process.io.stderr.path)
+    execution = Execution.new(command, &block)
 
     Hobson::Bundler.with_clean_env{
       # TODO this should probably be somewhere better
       ENV['RAILS_ENV'] = 'test'
       ENV['DISPLAY'  ] = ':1'
-      process.start
+      execution.start
     }
 
-    read = proc do
-      out, err = stdout.read, stderr.read
-      logger.debug out if out.present?
-      logger.debug err if err.present?
-      if (out+err).include?('Segmentation fault')
-        raise ExecutionError, "#{cmd}\n\n#{out}\n#{err}"
-      end
+    execution.read_loop{|out, err|
+      logger.info "\n\n?????\n\n"
+      logger.info  out if out.present?
+      logger.error err if err.present?
       yield out, err if block_given?
-    end
-
-    while process.alive?
-      read.call
-      sleep 0.25
-    end
-
-    read.call
-
-    process
+    }
   end
+
+
+  #   process = ChildProcess.new(command)
+  #   process.io.stdout = Tempfile.new("hobson_exec")
+  #   process.io.stderr = Tempfile.new("hobson_exec")
+  #   stdout = File.open(process.io.stdout.path)
+  #   stderr = File.open(process.io.stderr.path)
+
+  #   Hobson::Bundler.with_clean_env{
+  #     # TODO this should probably be somewhere better
+  #     ENV['RAILS_ENV'] = 'test'
+  #     ENV['DISPLAY'  ] = ':1'
+  #     process.start
+  #   }
+
+  #   read = proc do
+  #     out, err = stdout.read, stderr.read
+  #     logger.debug out if out.present?
+  #     logger.debug err if err.present?
+  #     if (out+err).include?('Segmentation fault')
+  #       raise ExecutionError, "#{cmd}\n\n#{out}\n#{err}"
+  #     end
+  #     yield out, err if block_given?
+  #   end
+
+  #   while process.alive?
+  #     read.call
+  #     sleep 0.25
+  #   end
+
+  #   read.call
+
+  #   process
+  # end
 
   def inspect
     "#<#{self.class} project:#{project.name} root:#{root}>"

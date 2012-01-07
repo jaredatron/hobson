@@ -39,6 +39,7 @@ Class.new Thor do
       @auto_indent_mode = IRB.conf[:AUTO_INDENT]
     }
     IRB.start
+    Hobson.log_to_stdout!
   end
 
   desc "test", "tell Hobson to run the tests for the current sha"

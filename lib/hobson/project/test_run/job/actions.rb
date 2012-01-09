@@ -34,6 +34,7 @@ class Hobson::Project::TestRun::Job
     eval_hook :save_artifacts
 
     tearing_down!
+    save_log_files!
     eval_hook :teardown
 
   rescue Object => e
@@ -42,6 +43,15 @@ class Hobson::Project::TestRun::Job
     self['backtrace'] = e.backtrace.join("\n")
   ensure
     complete!
+    begin
+      save_log_files!
+    rescue Exception => e
+      logger.error "Error saving log files on error"
+    end
+  end
+
+  def save_log_files!
+    worspace.root.join('log').children.each{|path| save_artifact path}
     save_artifact(Hobson.temp_logfile.tap(&:flush).path, 'test_run.log') if Hobson.temp_logfile.present?
   end
 

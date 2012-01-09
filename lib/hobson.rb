@@ -11,6 +11,10 @@ require 'right_aws'
 
 module Hobson
 
+  DEFAULT_CONFIG = {
+    :max_retries => 3,
+  }.freeze
+
   extend self
 
   autoload :RedisHash,    'hobson/redis_hash'
@@ -44,7 +48,7 @@ module Hobson
   def config
     @config ||= begin
       raise "unable to find config file in #{root}" unless config_path.present? && File.exists?(config_path)
-      YAML.load_file(config_path)
+      DEFAULT_CONFIG.merge(YAML.load_file(config_path))
     end
   end
 

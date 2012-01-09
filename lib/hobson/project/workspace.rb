@@ -96,6 +96,7 @@ class Hobson::Project::Workspace
       file = root.join('log/hobson_status')
       FileUtils.touch(file)
       status = root.join('log/hobson_status').open
+      status.read # ignore existing content
 
       fork_and_execute(command){
         status.read.split("\n").each{|line|

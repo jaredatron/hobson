@@ -12,7 +12,7 @@ class Hobson::Project::TestRun::Job
   end
 
   def test_needing_to_be_run
-    tests.find_all{|test| test.waiting? || (test.fail? && test.tries < 3) }
+    tests.find_all{|test| (test.waiting? || test.fail?) && test.tries <= Hobson.config[:max_retries] }
   end
 
   def est_runtime

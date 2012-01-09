@@ -58,14 +58,12 @@ class Hobson::Project::Workspace
       --quiet
       --require features
       --require #{Hobson.lib.join('hobson/cucumber')}
-      --format pretty
       --format pretty --out log/cucumber
       --format Hobson::Cucumber::Formatter --out log/hobson_status
     ],
     'specs' => %W[
       rspec
       --require #{Hobson.lib.join('hobson/rspec')}
-      --format documentation
       --format documentation --out log/rspec
       --format Hobson::RSpec::Formatter --out log/hobson_status
     ],
@@ -91,7 +89,6 @@ class Hobson::Project::Workspace
       command = "cd #{root.to_s.inspect} && "
       command << "bundle exec " if bundler?
       command << (TEST_COMMANDS[type] + tests[type]).join(' ')
-      command << ">> log/hobson_#{type}.log"
 
       logger.debug "command: #{command}"
 

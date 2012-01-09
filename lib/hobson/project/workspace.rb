@@ -146,7 +146,7 @@ class Hobson::Project::Workspace
         output = stdout.read
         errors = stderr.read
       }
-      output.split("\n").each{|line| logger.info  line}
+      output.split("\n").each{|line| logger.debug line}
       errors.split("\n").each{|line| logger.error line}
       raise ExecutionError, "#{command.inspect} could not be started" if status.nil?
       raise ExecutionError, "#{command.inspect} crashed with exit code #{$?.exitstatus}\n#{errors}" unless $?.success?

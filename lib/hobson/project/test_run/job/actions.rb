@@ -20,7 +20,10 @@ class Hobson::Project::TestRun::Job
     while (tests = test_needing_to_be_run).present?
       workspace.run_tests tests.each(&:trying!).map(&:name).sort do |name, state, time, result|
         test = tests.find{|test| test.name == name}
-        raise "unable to find #{name.inspect} in #{tests.map(&:name).inspect}" if test.nil?
+        if test.nil?
+          logger.error "!!!ERROR!!!\nrecieved a status update for #{name.inspect} but we were only running #{tests.map(&:name).inspect}"
+          next
+        end
         case state
         when :start
           test.started_at   = time

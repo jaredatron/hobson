@@ -90,9 +90,9 @@ module Hobson::Server::Helpers
   def sort_tests tests
     tests.sort_by{|test|
       status = case test.status.to_sym
-        when :running  : 0
-        when :complete : test.pass? ? 2 : 1
-        when :waiting  : 3
+        when :running  ; 0
+        when :complete ; test.pass? ? 2 : 1
+        when :waiting  ; 3
         else 4
       end
       [status, test.job || -1]

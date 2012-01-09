@@ -23,8 +23,8 @@ class Hobson::Project::TestRun::Job
       workspace.run_tests tests do |name, state, time, result|
         test = test_run.tests[name]
         case state
-        when :start    : test.started_at   = time
-        when :complete : test.completed_at = time
+        when :start    ; test.started_at   = time
+        when :complete ; test.completed_at = time
         end
         test.result  = result  if result.present?
       end

@@ -12,7 +12,7 @@ class Hobson::Project::TestRun
     enqueued_jobs?    ? 'waiting to be run'   :
     started_building? ? 'building'            :
     enqueued_build?   ? 'waiting to be built' :
-    'waiting…'
+    'waiting...'
   end
 
   alias_method :started?,   :enqueued_jobs?

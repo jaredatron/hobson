@@ -77,9 +77,9 @@ class Hobson::Project::Workspace
     # split up tests by type
     tests = tests.group_by{|path|
       case path
-      when /.feature$/: 'features'
-      when /_spec.rb$/: 'specs'
-      when /_test.rb$/: 'test_units'
+      when /.feature$/; 'features'
+      when /_spec.rb$/; 'specs'
+      when /_test.rb$/; 'test_units'
       end
     }
 

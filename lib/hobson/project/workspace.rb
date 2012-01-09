@@ -129,11 +129,13 @@ class Hobson::Project::Workspace
   def execute command
     create! unless exists?
 
+    logger.info "executing: #{command.inspect}"
+
     command = "cd #{root.to_s.inspect} && #{command}"
     command = "source #{rvm_source_file.inspect} && rvm rvmrc trust #{root.to_s.inspect} > /dev/null && #{command}" if rvm?
     command = "bash -lc #{command.inspect}"
 
-    logger.info "executing: #{command.inspect}"
+    logger.debug "actually executing: #{command.inspect}"
 
     Hobson::Bundler.with_clean_env{
       # TODO this should probably be somewhere better

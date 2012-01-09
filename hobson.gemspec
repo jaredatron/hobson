@@ -18,7 +18,11 @@ Gem::Specification.new do |s|
   s.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
   s.require_paths = ["lib"]
 
-  s.add_development_dependency "ruby-debug"
+  if RUBY_VERSION.to_f < 1.9
+    s.add_development_dependency "ruby-debug"
+  else
+    s.add_development_dependency "ruby-debug19"
+  end
   s.add_development_dependency "rake"
   s.add_development_dependency "shotgun"
   s.add_development_dependency "rspec"
@@ -31,7 +35,7 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency "resque", "~> 1.19.0"
   s.add_runtime_dependency "daemons"
   s.add_runtime_dependency "right_aws"
-  s.add_runtime_dependency "SystemTimer"
+  s.add_runtime_dependency "SystemTimer" if RUBY_VERSION.to_f < 1.9
   s.add_runtime_dependency "childprocess"
   s.add_runtime_dependency "popen4"
   s.add_runtime_dependency "log4r"

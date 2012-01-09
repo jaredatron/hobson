@@ -11,6 +11,10 @@ class Hobson::Project::TestRun::Job
     test_run.tests.find_all{|test| test.job == index }
   end
 
+  def test_needing_to_be_run
+    tests.find_all{|test| test.waiting? || (test.fail? && test.tries < 3) }
+  end
+
   def est_runtime
     tests.map(&:est_runtime).compact.sum
   end

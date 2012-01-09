@@ -17,11 +17,9 @@ class Hobson::Project::TestRun::Job
     eval_hook :setup
 
     running_tests!
-    while self.tests.any?(&:waiting?)
-      tests = self.tests.find_all(&:waiting?).map(&:name).sort
-
-      workspace.run_tests tests do |name, state, time, result|
-        test = test_run.tests[name]
+    while (tests = test_needing_to_be_run).present?
+      workspace.run_tests tests.each(&:trying!).map(&:name).sort do |name, state, time, result|
+        test = tests.find{|test| test.name == name}
         case state
         when :start    ; test.started_at   = time
         when :complete ; test.completed_at = time
@@ -51,7 +49,7 @@ class Hobson::Project::TestRun::Job
   end
 
   def save_log_files!
-    worspace.root.join('log').children.each{|path| save_artifact path}
+    workspace.root.join('log').children.each{|path| save_artifact path}
     save_artifact(Hobson.temp_logfile.tap(&:flush).path, 'test_run.log') if Hobson.temp_logfile.present?
   end
 

@@ -5,9 +5,10 @@ class Hobson::Project::TestRun::Tests::Test
   def initialize tests, name
     @tests, @name = tests, name
     self.created_at ||= Time.now
+    self.tries ||= 0
   end
 
-  %w{job est_runtime created_at started_at completed_at result}.each do |attr|
+  %w{job est_runtime created_at started_at completed_at result tries}.each do |attr|
     class_eval <<-RUBY, __FILE__, __LINE__
       def #{attr}
         @#{attr} ||= tests.test_run["test:\#{name}:#{attr}"]
@@ -34,6 +35,13 @@ class Hobson::Project::TestRun::Tests::Test
       else
         :unknown
     end
+  end
+
+  def trying!
+    self.tries += 1
+    self.started_at &&= nil
+    self.completed_at &&= nil
+    self.result &&= nil
   end
 
   def waiting?
@@ -79,7 +87,8 @@ class Hobson::Project::TestRun::Tests::Test
     "job:#{job.inspect} "\
     "status:#{status.inspect} "\
     "result:#{result.inspect} "\
-    "runtime:#{runtime.inspect}>"
+    "runtime:#{runtime.inspect} "\
+    "tries:#{tries.inspect}>"
   end
   alias_method :to_s, :inspect
 

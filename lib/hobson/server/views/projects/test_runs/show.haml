@@ -74,6 +74,7 @@
         %tr
           %th Job
           %th File
+          %th Tries
           %th Est.Runtime
           %th Runtime
           %th Status
@@ -88,6 +89,7 @@
               - if job.present?
                 %a{:href => "ssh://#{job['hostname']}"} Job #{job.index}
             %td= test.name
+            %td= test.tries
             %td= test.est_runtime.presence || 'unknown'
             %td= test.runtime
             %td= test.status

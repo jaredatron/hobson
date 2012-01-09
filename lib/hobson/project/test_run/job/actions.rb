@@ -20,11 +20,14 @@ class Hobson::Project::TestRun::Job
     while (tests = test_needing_to_be_run).present?
       workspace.run_tests tests.each(&:trying!).map(&:name).sort do |name, state, time, result|
         test = tests.find{|test| test.name == name}
+        raise "unable to find #{name.inspect} in #{tests.map(&:name).inspect}" if test.nil?
         case state
-        when :start    ; test.started_at   = time
-        when :complete ; test.completed_at = time
+        when :start
+          test.started_at   = time
+        when :complete
+          test.completed_at = time
+          test.result = result
         end
-        test.result  = result  if result.present?
       end
     end
 

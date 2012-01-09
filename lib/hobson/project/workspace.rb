@@ -98,61 +98,62 @@ class Hobson::Project::Workspace
       file = root.join('log/hobson_status')
       FileUtils.touch(file)
       status = root.join('log/hobson_status').open
-      process = ChildProcess.new(command)
-      process.io.inherit!
 
-      update = proc{
+      fork_and_execute(command){
         status.read.split("\n").each{|line|
           if line =~ /^TEST:([^:]+):(START|COMPLETE):(\d+)(?::(PASS|FAIL|PENDING))?$/
             report_progress.call($1, $2.downcase.to_sym, Time.at($3.to_i), $4)
           end
         }
       }
-
-      with_clean_env{ process.start }
-      update.call while process.alive?
-      update.call
       status.close
-
-      if process.crashed?
-        raise ExecutionError, "#{command.inspect} crashed with exit code #{process.exit_code}"
-      end
     }
     tests
   end
 
   ExecutionError = Class.new(StandardError)
 
-  def execute *args, &block
+  def fork_and_execute command, &block
+    pid = fork{ execute command }
+    logger.debug "PID:#{pid}"
+    while Process.waitpid2(pid, ::Process::WNOHANG).nil?
+      yield
+      sleep 0.1
+    end
+    yield
+    begin Process.wait; rescue Errno::ECHILD; end
+    raise ExecutionError, "#{command.inspect} crashed with exit code #{$?.exitstatus}" unless $?.success?
+    $?
+  end
+
+  def execute command
     create! unless exists?
 
-    command = "cd #{root.to_s.inspect} && #{args.join(' ')}"
+    command = "cd #{root.to_s.inspect} && #{command}"
     command = "source #{rvm_source_file.inspect} && rvm rvmrc trust #{root.to_s.inspect} > /dev/null && #{command}" if rvm?
     command = "bash -lc #{command.inspect}"
 
     logger.info "executing: #{command.inspect}"
 
-    with_clean_env{
+    Hobson::Bundler.with_clean_env{
+      # TODO this should probably be somewhere better
+      ENV['RAILS_ENV'] = 'test'
+      ENV['DISPLAY'  ] = ':1'
+
       output = nil
       errors = nil
       status = POpen4::popen4(command){|stdout, stderr, stdin|
         output = stdout.read
         errors = stderr.read
       }
+      output.split("\n").each{|line| logger.info  line}
+      errors.split("\n").each{|line| logger.error line}
       raise ExecutionError, "#{command.inspect} could not be started" if status.nil?
       raise ExecutionError, "#{command.inspect} crashed with exit code #{$?.exitstatus}\n#{errors}" unless $?.success?
       return output
     }
   end
 
-  def with_clean_env &block
-    Hobson::Bundler.with_clean_env{
-      # TODO this should probably be somewhere better
-      ENV['RAILS_ENV'] = 'test'
-      ENV['DISPLAY'  ] = ':1'
-      return yield
-    }
-  end
 
   def inspect
     "#<#{self.class} project:#{project.name} root:#{root}>"

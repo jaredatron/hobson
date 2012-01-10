@@ -4,12 +4,13 @@ require 'childprocess'
 
 class Hobson::Project::Workspace
 
-  attr_reader :project
+  attr_reader :project, :test_run_index
 
   delegate :logger, :to => :project
 
   def initialize project
     @project = project
+    @test_run_index = 0
   end
 
   # TODO rename root to path
@@ -52,8 +53,9 @@ class Hobson::Project::Workspace
     root.join('log').mkpath
   end
 
-  def run_tests tests, index, &report_progress
-    logger.info "Running Tests (#{index}): #{tests.join(' ')}"
+  def run_tests tests, &report_progress
+    @test_run_index += 1
+    logger.info "Running Tests #{log_index}: #{tests.join(' ')}"
 
     # split up tests by type
     tests = tests.group_by{|path|
@@ -67,34 +69,36 @@ class Hobson::Project::Workspace
     # run each test type
     %w{features specs test_units}.each{|type|
       next if tests[type].blank?
-      logger.info "running #{type} tests"
-
       command = "cd #{root.to_s.inspect} && "
       command << "bundle exec " if bundler?
-      command << (test_command(type, index) + tests[type]).join(' ')
+      command << (test_command(type) + tests[type]).join(' ')
       command << "; true" # we dont care about the exit status
 
-      logger.debug "command: #{command}"
-
-      file = root.join('log/hobson_status')
-      FileUtils.touch(file)
-      status = root.join('log/hobson_status').open
-      status.read # ignore existing content
-
-      fork_and_execute(command){
-        status.read.split("\n").each{|line|
-          if line =~ /^TEST:([^:]+):(START|COMPLETE):(\d+)(?::(PASS|FAIL|PENDING))?$/
-            report_progress.call($1, $2.downcase.to_sym, Time.at($3.to_i), $4)
-          end
-        }
+      status_file = root.join(hobson_status_file)
+      FileUtils.touch(status_file)
+      status_file.open{|status|
+        status.read # ignore existing content
+        fork_and_execute(command) do
+          status.read.split("\n").each{|line|
+            if line =~ /^TEST:([^:]+):(START|COMPLETE):(\d+)(?::(PASS|FAIL|PENDING))?$/
+              report_progress.call($1, $2.downcase.to_sym, Time.at($3.to_i), $4)
+            end
+          }
+        end
       }
-      status.close
     }
     tests
   end
 
-  def test_command type, index=0
-    index = '' if index == 0
+  def log_index
+    @test_run_index == 0 ? "" : @test_run_index.to_s
+  end
+
+  def hobson_status_file
+    "log/hobson_status#{log_index}"
+  end
+
+  def test_command type
     case type.to_sym
     when :features
       %W[
@@ -102,15 +106,15 @@ class Hobson::Project::Workspace
         --quiet
         --require features
         --require #{Hobson.lib.join('hobson/cucumber')}
-        --format pretty --out log/feature_run#{index}
-        --format Hobson::Cucumber::Formatter --out log/hobson_status#{index}
+        --format pretty --out log/feature_run#{log_index}
+        --format Hobson::Cucumber::Formatter --out #{hobson_status_file}
       ]
     when :specs
       %W[
         rspec
         --require #{Hobson.lib.join('hobson/rspec')}
-        --format documentation --out log/spec_run#{index}
-        --format Hobson::RSpec::Formatter --out log/hobson_status#{index}
+        --format documentation --out log/spec_run#{log_index}
+        --format Hobson::RSpec::Formatter --out #{hobson_status_file}
       ]
     when :test_units
       %W[echo not yet supported && false]

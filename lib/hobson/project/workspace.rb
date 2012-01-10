@@ -78,12 +78,16 @@ class Hobson::Project::Workspace
       FileUtils.touch(status_file)
       status_file.open{|status|
         status.read # ignore existing content
-        fork_and_execute(command) do
-          status.read.split("\n").each{|line|
-            if line =~ /^TEST:([^:]+):(START|COMPLETE):(\d+)(?::(PASS|FAIL|PENDING))?$/
-              yield $1, $2.downcase.to_sym, Time.at($3.to_i), $4
-            end
-          }
+        begin
+          fork_and_execute(command) do
+            status.read.split("\n").each{|line|
+              if line =~ /^TEST:([^:]+):(START|COMPLETE):(\d+)(?::(PASS|FAIL|PENDING))?$/
+                yield $1, $2.downcase.to_sym, Time.at($3.to_i), $4
+              end
+            }
+          end
+        rescue ExecutionError => e
+          logger.error "error running tests: #{e}"
         end
       }
     }

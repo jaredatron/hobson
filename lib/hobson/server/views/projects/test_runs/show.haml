@@ -46,6 +46,14 @@
               %dt Job
               %dd #{job.index}
 
+            .status
+              %dt Status
+              %dd= job.status
+
+            .tries
+              %dt Tries
+              %dd= job.tries
+
             .est-runtime
               %dt Est. Runtime
               %dd= distance_of_time_in_words job.est_runtime

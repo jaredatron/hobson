@@ -15,6 +15,10 @@ class Hobson::Project::TestRun::Job
     tests.find_all{|test| !test.pass? && test.tries <= Hobson.config[:max_retries] }
   end
 
+  def tries
+    tests.map(&:tries).sort.last
+  end
+
   def est_runtime
     tests.map(&:est_runtime).compact.sum
   end

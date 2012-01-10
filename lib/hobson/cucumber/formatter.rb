@@ -16,13 +16,13 @@ module Hobson
 
       def before_feature feature
         raise "started twice!" unless @started_at.nil?
-        @io.puts "TEST:#{feature.file}:START:#{Time.now.to_i}"
+        @io.puts "TEST:#{feature.file}:START:#{Time.now.to_f}"
         @io.flush
       end
 
       def after_feature(feature)
         status = feature.instance_variable_get(:@feature_elements).any?(&:failed?) ? 'FAIL' : 'PASS'
-        @io.puts "TEST:#{feature.file}:COMPLETE:#{Time.now.to_i}:#{status}"
+        @io.puts "TEST:#{feature.file}:COMPLETE:#{Time.now.to_f}:#{status}"
         @io.flush
       end
 

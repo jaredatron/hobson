@@ -11,7 +11,7 @@ RSpec.configure do |config|
 
   config.before :all do
     spec = get_spec.call(self)
-    Hobson::RSpec::Formatter.puts "TEST:#{spec}:START:#{Time.now.to_i}"
+    Hobson::RSpec::Formatter.puts "TEST:#{spec}:START:#{Time.now.to_f}"
   end
 
   config.after :all do
@@ -24,7 +24,7 @@ RSpec.configure do |config|
       'FAIL' : 'PASS'
     end
 
-    Hobson::RSpec::Formatter.puts "TEST:#{spec}:COMPLETE:#{Time.now.to_i}:#{status}"
+    Hobson::RSpec::Formatter.puts "TEST:#{spec}:COMPLETE:#{Time.now.to_f}:#{status}"
   end
 
 end

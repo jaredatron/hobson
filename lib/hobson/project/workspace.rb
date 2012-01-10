@@ -55,7 +55,7 @@ class Hobson::Project::Workspace
 
   def run_tests tests, &report_progress
     @test_run_index += 1
-    logger.info "Running Tests #{log_index}: #{tests.join(' ')}"
+    logger.info "Running Tests #{@test_run_index}: #{tests.join(' ')}"
 
     # split up tests by type
     tests = tests.group_by{|path|
@@ -71,11 +71,11 @@ class Hobson::Project::Workspace
       next if tests[type].blank?
       command = "cd #{root.to_s.inspect} && "
       command << "bundle exec " if bundler?
-      command << (test_command(type) + tests[type]).join(' ')
+      command << test_command(type, tests[type])
       command << "; true" # we dont care about the exit status
 
       status_file = root.join(hobson_status_file)
-      FileUtils.touch(status_file)
+      status_file.open('a'){} # touch
       status_file.open{|status|
         status.read # ignore existing content
         begin
@@ -94,15 +94,11 @@ class Hobson::Project::Workspace
     tests
   end
 
-  def log_index
-    @test_run_index == 0 ? "" : @test_run_index.to_s
-  end
-
   def hobson_status_file
-    "log/hobson_status#{log_index}"
+    "log/hobson_status#{@test_run_index}"
   end
 
-  def test_command type
+  def test_command type, tests
     case type.to_sym
     when :features
       %W[
@@ -110,19 +106,21 @@ class Hobson::Project::Workspace
         --quiet
         --require features
         --require #{Hobson.lib.join('hobson/cucumber')}
-        --format pretty --out log/feature_run#{log_index}
+        --format pretty --out log/feature_run#{@test_run_index}
         --format Hobson::Cucumber::Formatter --out #{hobson_status_file}
+        #{tests*' '}
       ]
     when :specs
       %W[
         rspec
         --require #{Hobson.lib.join('hobson/rspec')}
-        --format documentation --out log/spec_run#{log_index}
+        --format documentation --out log/spec_run#{@test_run_index}
         --format Hobson::RSpec::Formatter --out #{hobson_status_file}
+        #{tests*' '}
       ]
     when :test_units
       %W[echo not yet supported && false]
-    end
+    end * ' '
   end
 
   ExecutionError = Class.new(StandardError)

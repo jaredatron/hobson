@@ -81,7 +81,7 @@ class Hobson::Project::Workspace
         fork_and_execute(command) do
           status.read.split("\n").each{|line|
             if line =~ /^TEST:([^:]+):(START|COMPLETE):(\d+)(?::(PASS|FAIL|PENDING))?$/
-              report_progress.call($1, $2.downcase.to_sym, Time.at($3.to_i), $4)
+              yield $1, $2.downcase.to_sym, Time.at($3.to_i), $4
             end
           }
         end

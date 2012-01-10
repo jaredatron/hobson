@@ -18,6 +18,7 @@ class Hobson::Project::TestRun::Job
 
     running_tests!
     while (tests = test_needing_to_be_run).present?
+      eval_hook :before_running_tests, :tests => tests
       names = tests.each(&:trying!).map(&:name).sort
       workspace.run_tests(names){ |name, state, time, result|
         test = tests.find{|test| test.name == name} or next

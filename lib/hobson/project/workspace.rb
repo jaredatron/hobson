@@ -52,25 +52,8 @@ class Hobson::Project::Workspace
     root.join('log').mkpath
   end
 
-  TEST_COMMANDS = {
-    'features' => %W[
-      cucumber
-      --quiet
-      --require features
-      --require #{Hobson.lib.join('hobson/cucumber')}
-      --format pretty --out log/cucumber
-      --format Hobson::Cucumber::Formatter --out log/hobson_status
-    ],
-    'specs' => %W[
-      rspec
-      --require #{Hobson.lib.join('hobson/rspec')}
-      --format documentation --out log/rspec
-      --format Hobson::RSpec::Formatter --out log/hobson_status
-    ],
-  }
-
-  def run_tests tests, &report_progress
-    logger.info "Running Tests: #{tests.join(' ')}"
+  def run_tests tests, index, &report_progress
+    logger.info "Running Tests (#{index}): #{tests.join(' ')}"
 
     # split up tests by type
     tests = tests.group_by{|path|
@@ -88,7 +71,7 @@ class Hobson::Project::Workspace
 
       command = "cd #{root.to_s.inspect} && "
       command << "bundle exec " if bundler?
-      command << (TEST_COMMANDS[type] + tests[type]).join(' ')
+      command << (test_command(type, index) + tests[type]).join(' ')
       command << "; true" # we dont care about the exit status
 
       logger.debug "command: #{command}"
@@ -108,6 +91,30 @@ class Hobson::Project::Workspace
       status.close
     }
     tests
+  end
+
+  def test_command type, index=0
+    index = '' if index == 0
+    case type.to_sym
+    when :features
+      %W[
+        cucumber
+        --quiet
+        --require features
+        --require #{Hobson.lib.join('hobson/cucumber')}
+        --format pretty --out log/feature_run#{index}
+        --format Hobson::Cucumber::Formatter --out log/hobson_status#{index}
+      ]
+    when :specs
+      %W[
+        rspec
+        --require #{Hobson.lib.join('hobson/rspec')}
+        --format documentation --out log/spec_run#{index}
+        --format Hobson::RSpec::Formatter --out log/hobson_status#{index}
+      ]
+    when :test_units
+      %W[echo not yet supported && false]
+    end
   end
 
   ExecutionError = Class.new(StandardError)

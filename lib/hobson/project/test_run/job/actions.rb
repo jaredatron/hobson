@@ -17,13 +17,11 @@ class Hobson::Project::TestRun::Job
     eval_hook :setup
 
     running_tests!
+    test_run_count = 0
     while (tests = test_needing_to_be_run).present?
-      workspace.run_tests tests.each(&:trying!).map(&:name).sort do |name, state, time, result|
-        test = tests.find{|test| test.name == name}
-        if test.nil?
-          logger.error "!!!ERROR!!!\nrecieved a status update for #{name.inspect} but we were only running #{tests.map(&:name).inspect}"
-          next
-        end
+      names = tests.each(&:trying!).map(&:name).sort
+      workspace.run_tests(names, test_run_count+=1){ |name, state, time, result|
+        test = tests.find{|test| test.name == name} or next
         case state
         when :start
           test.started_at   = time
@@ -31,7 +29,7 @@ class Hobson::Project::TestRun::Job
           test.completed_at = time
           test.result = result
         end
-      end
+      }
     end
 
     saving_artifacts!

@@ -7,9 +7,9 @@ class Hobson::Project::TestRun::Job
   end
 
   def data
-    test_run.data.inject({}){ |data, (key, value)|
-      key.match(/^#{prefix}(.*)$/) ? data.update($1 => value) : data
-    }
+    @data ||= test_run.data.keys.
+      map{|key| key[/^#{prefix}(.*)$/, 1] }.compact.
+      inject({}){ |data, key| data[key] = self[key]; data }
   end
 
   def [] key

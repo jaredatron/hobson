@@ -1,14 +1,19 @@
 - @page_title = "Tests"
 
-%table
+%table.sortable
   %thead
     %tr
       %th Name
-      %th Avg. Runtime
-      %th Runtimes (seconds)
+      %th{:class => :sorttable_numeric} Avg. Tries
+      %th{:class => :sorttable_numeric} Avg. Runtime
+      %th{:sorttable_customkey => 0} Runtimes (seconds)
   %tbody
     - @tests.sort_by{|name, data| data.avg_runtime}.reverse.each do |name, data|
       %tr
         %td= name
+        %td= data.avg_tries.to_s.scan(/\d+\.\d\d/).first
         %td= distance_of_time_in_words(data.avg_runtime)
         %td= data.runtimes.sort.reverse.inspect
+
+:javascript
+  $(function(){ Hobson.autoRefresh.stop(); });

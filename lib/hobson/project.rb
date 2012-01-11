@@ -69,7 +69,13 @@ class Hobson::Project
       @runtimes ||= []
     end
     def avg_runtime
-      @avg_runtime ||= runtimes.present? ? runtimes.inject(:+) / runtimes.length : 0.0
+      @avg_runtime ||= runtimes.present? ? runtimes.sum / runtimes.length.to_f : 0.0
+    end
+    def tries
+      @tries ||= []
+    end
+    def avg_tries
+      @avg_runtime ||= tries.present? ? tries.sum / tries.length.to_f : 0.0
     end
   end
 
@@ -80,6 +86,7 @@ class Hobson::Project
         tests[test.name] ||= Tests.new
         runtime = test.runtime.to_f || 0.0
         tests[test.name].runtimes << runtime if test.pass? && runtime > 0.0
+        tests[test.name].tries << test.tries if test.tries > 0
       }
     }
     tests

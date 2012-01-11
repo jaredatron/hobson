@@ -36,7 +36,7 @@
       - tests_completed
 
     %dt Test Retries
-    %dd= test_run.tests.map(&:tries).sum - test_run.tests.count
+    %dd= test_run.tests.map{|t| t.tries < 1 ? 1 : t.tries}.sum - test_run.tests.count
 
   - if test_run.jobs.present?
     %section.jobs

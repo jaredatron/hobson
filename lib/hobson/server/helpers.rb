@@ -49,11 +49,13 @@ module Hobson::Server::Helpers
   end
 
   def est_test_run_duration
-    test_run.jobs.map{|j| j.est_runtime || 0}.sort.last
+    @est_test_run_duration ||= test_run.jobs.map{|j| j.est_runtime || 0}.sort.last
+    @est_test_run_duration ||= 0
   end
 
   def test_run_duration
     @test_run_duration ||= (test_run.complete_at || now) - (test_run.started_at || now)
+    @test_run_duration ||= 0
   end
 
   def progress

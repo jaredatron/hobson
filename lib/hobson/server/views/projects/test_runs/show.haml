@@ -9,8 +9,6 @@
       - action_button 'Rerun', test_run_path+'/rerun'
     - if @test_run.running?
       - action_button 'Abort', test_run_path+'/abort'
-    - if @test_run.failed?
-      - action_button 'Rerun Failed Tests', test_run_path+'/rerun-failed-tests'
     - unless @test_run.running?
       - action_button 'Delete', test_run_path, :delete
 

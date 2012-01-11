@@ -24,7 +24,7 @@ class Hobson::Project::TestRun::Job
   end
 
   def runtime
-    tests.map(&:runtime).compact.sum
+    (complete_at || Time.now) - (checking_out_code_at || Time.now)
   end
 
   def inspect

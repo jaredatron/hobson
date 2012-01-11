@@ -11,7 +11,7 @@ describe Hobson do
 
     describe "#config_path" do
       subject{ Hobson.config_path }
-      it { should == ClientWorkingDirectory.path + 'config/hobson.yml' }
+      it { should == ClientWorkingDirectory.path.join('config/hobson.yml').to_s }
     end
 
     describe "#config" do
@@ -30,7 +30,7 @@ describe Hobson do
 
     describe "#config_path" do
       subject{ Hobson.config_path }
-      it { should == WorkerWorkingDirectory.path + 'config.yml' }
+      it { should == WorkerWorkingDirectory.path.join('config.yml').to_s }
     end
 
     describe "#config" do

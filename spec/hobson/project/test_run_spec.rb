@@ -59,7 +59,7 @@ describe Hobson::Project::TestRun do
         test_run = Factory.test_run
         Factory.job(test_run, 0)
 
-        test_run.status.should == 'waiting…'
+        test_run.status.should == 'waiting...'
 
         test_run.enqueued_build!
         test_run.status.should == 'waiting to be built'

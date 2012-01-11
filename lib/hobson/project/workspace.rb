@@ -127,7 +127,7 @@ class Hobson::Project::Workspace
 
   def fork_and_execute command, &block
     pid = fork{ execute command }
-    logger.debug "PID:#{pid}"
+    logger.debug "fork_and_execute pid(#{pid}) command(#{command})"
     while Process.waitpid2(pid, ::Process::WNOHANG).nil?
       yield
       sleep 0.1

@@ -8,13 +8,23 @@ class Hobson::RedisHash
   attr_reader :redis, :key
   delegate :keys, :to => :cache
 
+
+  def get field
+    value = @redis.hget(@key, field.to_s)
+    value ? Marshal.load(value) : nil
+  end
+
+  def set field, value
+    @redis.hset(@key, field.to_s, Marshal.dump(value))
+  end
+
   def [] field
     cache[field.to_s]
   end
 
   def []= field, value
     cache[field.to_s] = value
-    @redis.hset(@key, field.to_s, Marshal.dump(value))
+    set(field, value)
   end
 
   def delete key

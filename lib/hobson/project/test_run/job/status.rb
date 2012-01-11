@@ -7,7 +7,6 @@ class Hobson::Project::TestRun::Job
     :checking_out_code,
     :preparing,
     :running_tests,
-    :aborting,
     :saving_artifacts,
     :tearing_down,
     :complete
@@ -16,12 +15,8 @@ class Hobson::Project::TestRun::Job
     aborting! unless complete?
   end
 
-  def aborted?
-    aborting_at.present?
-  end
-
   def running?
-    checking_out_code_at.present? && !complete? && !aborted?
+    checking_out_code_at.present? && !complete?
   end
 
   def errored?
@@ -29,12 +24,11 @@ class Hobson::Project::TestRun::Job
   end
 
   def complete?
-    complete_at.present? || aborting_at.present?
+    complete_at.present? || test_run.aborted?
   end
 
   def status
     errored?           ? 'errored'           :
-    aborted?           ? 'aborted'           :
     complete?          ? 'complete'          :
     tearing_down?      ? 'tearing down'      :
     saving_artifacts?  ? 'saving artifacts'  :
@@ -42,7 +36,7 @@ class Hobson::Project::TestRun::Job
     preparing?         ? 'preparing'         :
     checking_out_code? ? 'checking out code' :
     enqueued?          ? 'waiting to be run' :
-    'waiting…'
+    'waiting...'
   end
 
 end

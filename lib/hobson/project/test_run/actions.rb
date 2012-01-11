@@ -10,6 +10,8 @@ class Hobson::Project::TestRun
   # add a list of tests to the TestRun data
   # schedule N RunTests resque jobs for Y jobs (balancing is done in this step)
   def build!
+    return if aborted?
+
     started_building!
     number_of_jobs = Resque.workers.length
     number_of_jobs = 2 if number_of_jobs < 2 # TODO move to project setting
@@ -34,10 +36,6 @@ class Hobson::Project::TestRun
     enqueued_jobs! # done
 
     # TODO upload Hobson.temp_logfile as a test_run artifact
-  end
-
-  def abort!
-    jobs.each(&:abort!)
   end
 
 end

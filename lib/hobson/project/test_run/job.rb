@@ -12,6 +12,7 @@ class Hobson::Project::TestRun::Job
   end
 
   def test_needing_to_be_run
+    return [] if test_run.aborted?
     tests.find_all{|test| !test.pass? && test.tries <= Hobson.config[:max_retries] }
   end
 

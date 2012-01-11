@@ -23,7 +23,7 @@ class Hobson::Project::TestRun
   end
 
   def est_runtime
-    tests.map(&:est_runtime).sum
+    jobs.map(&:est_runtime).sort.last
   end
 
   def jobs

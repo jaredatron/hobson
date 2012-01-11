@@ -4,7 +4,11 @@ require 'log4r'
 module Hobson
 
   def log
-    @log ||= ENV['HOBSON_LOG'] ||= config[:log] ||= root.join('log/hobson.log')
+    @log or begin
+      @log = Pathname.new(ENV['HOBSON_LOG'] || config[:log] || root.join('log/hobson.log'))
+      ENV['HOBSON_LOG'] ||= @log.to_s
+    end
+    @log
   end
 
   def log_outputter

@@ -106,6 +106,12 @@ class Hobson::Server < Sinatra::Base
     redirect test_run_path
   end
 
+  post "/projects/:project_name/test_runs/:id/abort" do |project_name, id|
+    @test_run = Hobson::Project[project_name].test_runs(id)
+    @test_run.abort!
+    redirect test_run_path
+  end
+
   get "/projects/:project_name/tests" do |project_name|
     @project  = Hobson::Project[project_name]
     @tests = @project.tests

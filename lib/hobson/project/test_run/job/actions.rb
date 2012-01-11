@@ -6,37 +6,47 @@ class Hobson::Project::TestRun::Job
   end
 
   def run_tests!
+    return if aborting?
+
     self['hostname'] = `curl -s http://169.254.169.254/latest/meta-data/public-hostname`.chomp
     self['hostname'] = `hostname`.chomp if self['hostname'].blank? || !$?.success?
 
-    checking_out_code!
-    workspace.checkout! test_run.sha
+    unless aborting?
+      checking_out_code!
+      workspace.checkout! test_run.sha
+    end
 
-    preparing!
-    workspace.prepare
-    eval_hook :setup
+    unless aborting?
+      preparing!
+      workspace.prepare
+      eval_hook :setup
+    end
 
-    running_tests!
-    while (tests = test_needing_to_be_run).present?
-      eval_hook :before_running_tests, :tests => tests
-      names = tests.each(&:trying!).map(&:name).sort
-      workspace.run_tests(names){ |name, state, time, result|
-        test = tests.find{|test| test.name == name} or next
-        case state
-        when :start
-          test.started_at   = time
-        when :complete
-          test.completed_at = time
-          test.result = result
-        end
-      }
+    unless aborting?
+      running_tests!
+      while (tests = test_needing_to_be_run).present?
+        break if aborting?
+        eval_hook :before_running_tests, :tests => tests
+        names = tests.each(&:trying!).map(&:name).sort
+        workspace.run_tests(names){ |name, state, time, result|
+          test = tests.find{|test| test.name == name} or next
+          case state
+          when :start
+            test.started_at   = time
+          when :complete
+            test.completed_at = time
+            test.result = result
+          end
+          break if aborting?
+        }
+      end
     end
 
     saving_artifacts!
+    save_log_files!
     eval_hook :save_artifacts
 
     tearing_down!
-    save_log_files!
     eval_hook :teardown
 
   rescue Object => e

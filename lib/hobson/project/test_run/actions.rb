@@ -36,18 +36,8 @@ class Hobson::Project::TestRun
     # TODO upload Hobson.temp_logfile as a test_run artifact
   end
 
-  def rerun_failed_tests!
-    failed_tests = tests.find_all(&:fail?)
-    job_index = jobs.size + 1
-    failed_tests.each{|failed_test|
-      failed_test.status = "waiting"
-      failed_test.result = nil
-      failed_test.runtime = nil
-      failed_test.job = job_index
-    }
-    job = Job.new(self, job_index)
-    job.created!
-    job.enqueue!
+  def abort!
+    jobs.each(&:abort!)
   end
 
 end

@@ -5,6 +5,7 @@ class Hobson::Project::TestRun
 
   def status
     errored?          ? 'errored'             :
+    aborted?          ? 'aborted'             :
     failed?           ? 'failed'              :
     passed?           ? 'passed'              :
     complete?         ? 'complete'            :
@@ -19,11 +20,15 @@ class Hobson::Project::TestRun
   alias_method :started_at, :enqueued_jobs_at
 
   def running?
-    jobs.any?{|job| job.checking_out_code_at.present? } && !complete?
+    jobs.present? && jobs.any?(&:running?) && !complete? && !aborted?
   end
 
   def errored?
     jobs.any?(&:errored?)
+  end
+
+  def aborted?
+    jobs.any?(&:aborted?)
   end
 
   def complete?

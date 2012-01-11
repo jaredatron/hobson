@@ -1,7 +1,28 @@
 class Hobson::Project::TestRun::Job
 
   extend Hobson::Landmarks
-  landmark :created, :enqueued, :checking_out_code, :preparing, :running_tests, :saving_artifacts, :tearing_down, :complete
+  landmark \
+    :created,
+    :enqueued,
+    :checking_out_code,
+    :preparing,
+    :running_tests,
+    :aborting,
+    :saving_artifacts,
+    :tearing_down,
+    :complete
+
+  def abort!
+    aborting! unless complete?
+  end
+
+  def aborted?
+    aborting_at.present?
+  end
+
+  def running?
+    checking_out_code_at.present? && !complete? && !aborted?
+  end
 
   def errored?
     self['exception'].present?
@@ -9,6 +30,7 @@ class Hobson::Project::TestRun::Job
 
   def status
     errored?           ? 'errored'           :
+    aborted?           ? 'aborted'           :
     complete?          ? 'complete'          :
     tearing_down?      ? 'tearing down'      :
     saving_artifacts?  ? 'saving artifacts'  :

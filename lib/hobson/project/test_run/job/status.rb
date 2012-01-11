@@ -28,6 +28,10 @@ class Hobson::Project::TestRun::Job
     self['exception'].present?
   end
 
+  def complete?
+    complete_at.present? || aborting_at.present?
+  end
+
   def status
     errored?           ? 'errored'           :
     aborted?           ? 'aborted'           :

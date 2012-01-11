@@ -12,8 +12,9 @@ body
   background: white
 
 #stamp
+  z-index: 1
   position: absolute
-  top: 1em
+  top: 1.2em
   right: 10px
   font-family: PastDueRegular
   font-size: 100px
@@ -22,14 +23,13 @@ body
     color: red
   &.passed
     color: green
-  &.errored
+  &.errored, &.aborted
     color: orange
 
 #nav
   position: relative
   text-align: center
   background: black
-  // font-size: 125%
   user-select: none
 
   > .title, > .links > a

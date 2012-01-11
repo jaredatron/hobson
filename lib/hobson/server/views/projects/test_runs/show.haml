@@ -5,11 +5,11 @@
 
 %section.test_run{:class => "status-#{classname(test_run.status)}"}
   %section.actions
-    - if @test_run.complete?
+    - if test_run.complete?
       - action_button 'Rerun', test_run_path+'/rerun'
-    - if @test_run.running?
+    - if test_run.running?
       - action_button 'Abort', test_run_path+'/abort'
-    - unless @test_run.running?
+    - unless test_run.running?
       - action_button 'Delete', test_run_path, :delete
 
   %dl.details
@@ -28,13 +28,14 @@
     %dt Duration
     %dd= distance_of_time_in_words(test_run_duration, 0, true) if test_run_duration.present?
 
-    %dt Progress
-    %dd
-      - progress
+    - if test_run.running?
+      %dt Progress
+      %dd
+        - progress
 
-    %dt Tests Completed
-    %dd
-      - tests_completed
+      %dt Tests Completed
+      %dd
+        - tests_completed
 
     %dt Test Retries
     %dd= test_run.tests.map{|t| t.tries < 1 ? 1 : t.tries}.sum - test_run.tests.count
@@ -83,7 +84,8 @@
   - if test_run.tests.present?
     %section.tests
       %h2 Tests
-      - tests_completed
+      - if test_run.running?
+        - tests_completed
       %table
         %thead
           %tr
@@ -120,7 +122,7 @@
     %section.artifacts
       %h2 Artifacts
       %ol.jobs
-        - @test_run.jobs.each do |job|
+        - test_run.jobs.each do |job|
           %li
             %h3 Job #{job.index}
             %ol.artifacts
@@ -129,6 +131,6 @@
                   %a{:href => url}= name
 
 
-- if @test_run.complete?
+- if test_run.complete?
   :javascript
     $(function(){ Hobson.autoRefresh.stop(); });

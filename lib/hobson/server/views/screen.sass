@@ -1,8 +1,29 @@
+@font-face
+  font-family: 'PastDueRegular'
+  src: url('/fonts/pastduedemo-webfont.eot')
+  src: url('/fonts/pastduedemo-webfont.eot?#iefix') format("embedded-opentype"), url('/fonts/pastduedemo-webfont.woff') format("woff"), url('/fonts/pastduedemo-webfont.ttf') format("truetype"), url('/fonts/pastduedemo-webfont.svg#PastDueRegular') format("svg")
+  font-weight: normal
+  font-style: normal
+
+
 body
   font-family: monaco
   font-size: 9pt
   background: white
 
+#stamp
+  position: absolute
+  top: 1em
+  right: 10px
+  font-family: PastDueRegular
+  font-size: 100px
+  -webkit-transform: rotate(40deg)
+  &.failed
+    color: red
+  &.passed
+    color: green
+  &.errored
+    color: orange
 
 #nav
   position: relative

@@ -1,5 +1,8 @@
 - @page_title = "Test Run #{test_run.id}"
 
+- if test_run.complete?
+  #stamp{:class => test_run.status}= test_run.status
+
 %section.test_run{:class => "status-#{classname(test_run.status)}"}
   %section.actions
     - if @test_run.complete?

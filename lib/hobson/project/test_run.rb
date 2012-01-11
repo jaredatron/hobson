@@ -22,6 +22,10 @@ class Hobson::Project::TestRun
     @tests ||= Tests.new(self)
   end
 
+  def est_runtime
+    tests.map(&:est_runtime).sum
+  end
+
   def jobs
     @jobs ||= keys \
       .inject([]){|indices, key| key =~ /^job:(\d+):.*/ and indices << $1.to_i; indices } \

@@ -56,6 +56,21 @@ module Hobson::Server::Helpers
     @test_run_duration ||= (test_run.complete_at || now) - (test_run.started_at || now)
   end
 
+  def progress
+    value, max = @test_run.complete? ? [1,1] : [test_run_duration, est_test_run_duration]
+    title = "#{distance_of_time_in_words(value)} / #{distance_of_time_in_words(max)}"
+    haml_tag '.progress' do
+      haml_tag :progress, :value => value, :max => max, :title => title
+    end
+  end
+
+  def tests_completed
+    value, max = test_run.tests.find_all(&:complete?).count, test_run.tests.count
+    haml_tag '.tests-completed' do
+      haml_tag :progress, :value => value, :max => max, :title => "#{value}/#{max}"
+    end
+  end
+
   def job_timeline job
     last_percentage = 0
     job.landmarks.map do |landmark|

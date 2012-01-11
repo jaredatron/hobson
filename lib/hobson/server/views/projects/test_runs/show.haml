@@ -1,7 +1,7 @@
 - @page_title = "Test Run #{test_run.id}"
 
 %section.test_run{:class => "status-#{classname(test_run.status)}"}
-  .actions
+  %section.actions
     - if @test_run.complete?
       - action_button 'Rerun', test_run_path+'/rerun'
     - if @test_run.running?
@@ -29,96 +29,103 @@
 
     %dt Progress
     %dd
-      - if @test_run.complete?
-        %progress{:value => 1, :max => 1}
-      - elsif est_test_run_duration.present?
-        - max = test_run_duration > est_test_run_duration ? (test_run_duration + 1) : est_test_run_duration
-        %progress{:value => test_run_duration, :max => max}
+      - progress
+
+    %dt Tests Completed
+    %dd
+      - tests_completed
+
+    %dt Test Retries
+    %dd= test_run.tests.map(&:tries).sum - test_run.tests.count
 
   - if test_run.jobs.present?
-    %h2 Jobs
-    %ol.jobs.status
-      - test_run.jobs.each do |job|
-        %li.job{:class => "status-#{classname(job.status)}"}
+    %section.jobs
+      %h2 Jobs
+      %ol.status
+        - test_run.jobs.each do |job|
+          %li.job{:class => "status-#{classname(job.status)}"}
 
-          %dl.details
-            %a.name{:href => "ssh://#{job['hostname']}"}
-              %dt Job
-              %dd #{job.index}
+            %dl.details
+              %a.name{:href => "ssh://#{job['hostname']}"}
+                %dt Job
+                %dd #{job.index}
 
-            .status
-              %dt Status
-              %dd= job.status
+              .status
+                %dt Status
+                %dd= job.status
 
-            .tries
-              %dt Tries
-              %dd= job.tries
+              .tries
+                %dt Tries
+                %dd= job.tries
 
-            .est-runtime
-              %dt Est. Runtime
-              %dd= distance_of_time_in_words job.est_runtime
+              .est-runtime
+                %dt Est. Runtime
+                %dd= distance_of_time_in_words job.est_runtime
 
-            - if job.complete?
-              .runtime
-                %dt Actual Runtime
-                %dd= distance_of_time_in_words job.runtime
+              - if job.complete?
+                .runtime
+                  %dt Actual Runtime
+                  %dd= distance_of_time_in_words job.runtime
 
-            - if job.errored?
-              .error
-                %dt Error
-                %dd
-                  %strong.exception= job['exception']
-                  %pre.backtrace= job['backtrace']
+              - if job.errored?
+                .error
+                  %dt Error
+                  %dd
+                    %strong.exception= job['exception']
+                    %pre.backtrace= job['backtrace']
 
-          .icon
+            .icon
 
-          %ol.timeline
-            - job_timeline(job)
+            %ol.timeline
+              - job_timeline(job)
 
   - if test_run.tests.present?
-    %h2 Tests
-    %table.tests
-      %thead
-        %tr
-          %th Job
-          %th File
-          %th Tries
-          %th Est.Runtime
-          %th Runtime
-          %th Status
-          %th Result
-          %th Log
-      %tbody
-        - sort_tests(test_run.tests).each do |test|
-          - job = test_run.jobs[test.job] if test.job.present?
-          - result = test.result || ''
-          %tr{:class => [result.downcase, test.status]}
-            %td
-              - if job.present?
-                %a{:href => "ssh://#{job['hostname']}"} Job #{job.index}
-            %td= test.name
-            %td= test.tries
-            %td= test.est_runtime.presence || 'unknown'
-            %td= test.runtime
-            %td= test.status
-            %td= test.result
-            %td
-              - artifact_name = case test.type
-                - when "feature" ; "cucumber"
-                - when "spec"    ; "rspec"
-              - if job && artifact_url = job.artifacts[artifact_name]
-                %a{:href => artifact_url}= artifact_name
+    %section.tests
+      %h2 Tests
+      - tests_completed
+      %table
+        %thead
+          %tr
+            %th Job
+            %th File
+            %th Tries
+            %th Est.Runtime
+            %th Runtime
+            %th Status
+            %th Result
+            %th Log
+        %tbody
+          - sort_tests(test_run.tests).each do |test|
+            - job = test_run.jobs[test.job] if test.job.present?
+            - result = test.result || ''
+            %tr{:class => [result.downcase, test.status]}
+              %td
+                - if job.present?
+                  %a{:href => "ssh://#{job['hostname']}"} Job #{job.index}
+              %td= test.name
+              %td= test.tries
+              %td= test.est_runtime.presence || 'unknown'
+              %td= test.runtime
+              %td= test.status
+              %td= test.result
+              %td
+                - artifact_name = case test.type
+                  - when "feature" ; "cucumber"
+                  - when "spec"    ; "rspec"
+                - if job && artifact_url = job.artifacts[artifact_name]
+                  %a{:href => artifact_url}= artifact_name
 
   - if test_run.jobs.present?
-    %h2 Artifacts
-    %ol.jobs
-      - @test_run.jobs.each do |job|
-        %li
-          %h3 Job #{job.index}
-          %ol.artifacts
-            - job.artifacts.each do |name, url|
-              %li
-                %a{:href => url}= name
+    %section.artifacts
+      %h2 Artifacts
+      %ol.jobs
+        - @test_run.jobs.each do |job|
+          %li
+            %h3 Job #{job.index}
+            %ol.artifacts
+              - job.artifacts.each do |name, url|
+                %li
+                  %a{:href => url}= name
 
 
 - if @test_run.complete?

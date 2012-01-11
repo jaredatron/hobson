@@ -68,18 +68,22 @@ module Hobson
       @redis = Redis::Namespace.new('Hobson', :redis => @redis)
       @redis = Redis::Namespace.new(options[:namespace], :redis => @redis) if options[:namespace]
 
-      # FOR DUBBGING
-      # @redis = Class.new{
-      #   instance_methods.each { |m| undef_method m unless m =~ /(^__|^send$|^object_id$)/ }
-      #   def initialize redis
-      #     @redis = redis
-      #   end
-      #   protected
-      #   def method_missing(name, *args, &block)
-      #     puts "REDIS: #{name.inspect}, #{args.inspect}, #{block_given?}"
-      #     @redis.send(name, *args, &block)
-      #   end
-      # }.new(@redis)
+      if $DEBUG || ENV['DEBUG']
+        require 'benchmark'
+        @redis = Class.new{
+          instance_methods.each { |m| undef_method m unless m =~ /(^__|^send$|^object_id$)/ }
+          def initialize redis
+            @redis = redis
+          end
+          protected
+          def method_missing(name, *args, &block)
+            r = nil
+            puts "REDIS: #{name.inspect}, #{args.inspect}, #{block_given?}"
+            puts Benchmark.measure{ r = @redis.send(name, *args, &block) }
+            return r
+          end
+        }.new(@redis)
+      end
 
       @redis
     end

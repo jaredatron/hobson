@@ -22,6 +22,16 @@ class Hobson::Project::TestRun::Tests
     tests.map(&:type).uniq
   end
 
+  def [] name
+    tests.find{ |test| test.name == name }
+  end
+
+  def << name
+    test = Test.new(self, name.to_s)
+    tests << test
+    test
+  end
+
   TYPES = {
     'spec'    => 'spec/**/*_spec.rb',
     'feature' => 'features/**/*.feature',
@@ -33,7 +43,7 @@ class Hobson::Project::TestRun::Tests
       map{ |path| Dir[test_run.workspace.root.join(path)] }.
       flatten.
       map{ |path| Pathname.new(path).relative_path_from(test_run.workspace.root).to_s }.
-      each{ |name| self[name] }
+      each{ |name| self << name }
     self
   end
 
@@ -85,12 +95,6 @@ class Hobson::Project::TestRun::Tests
     }
   end
 
-  def [] name
-    test = Test.new(self, name.to_s)
-    tests << test
-    test
-  end
-
   private
 
   def tests
@@ -98,9 +102,7 @@ class Hobson::Project::TestRun::Tests
       @tests = []
       test_run.data.
         inject([]){ |tests, (key, value)| key =~ /^test:(.*):(.*)$/ and tests << $1; tests }.
-        uniq.
-        sort.
-        map{|name| self[name] }
+        uniq.sort.map{ |name| self << name }
     end
   end
 

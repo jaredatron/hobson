@@ -49,6 +49,7 @@ describe Hobson::Project::TestRun::Tests do
     def balance_for! est_runtimes, number_of_jobs
       tests = Factory.tests
       est_runtimes.each_with_index{|est_runtime, index|
+        tests << "features/#{index}.feature"
         tests["features/#{index}.feature"].est_runtime = est_runtime
       }
       tests.balance_for! number_of_jobs

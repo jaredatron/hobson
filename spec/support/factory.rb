@@ -22,6 +22,7 @@ module Factory
   end
 
   def test name, tests=self.tests
+    tests << name
     tests[name]
   end
 

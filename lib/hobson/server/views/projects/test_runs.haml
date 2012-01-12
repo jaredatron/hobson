@@ -10,7 +10,7 @@
       %th Created
       %th Failed
       %th Passed
-      %th Aborted
+      %th UnRun
       %th Pending
   %tbody
     - @test_runs.sort_by{|t| t.created_at || Time.now }.reverse.each do |test_run|

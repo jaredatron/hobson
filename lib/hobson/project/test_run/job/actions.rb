@@ -28,6 +28,7 @@ class Hobson::Project::TestRun::Job
     eval_hook :setup
 
     abort?
+    running_tests!
     while (tests = test_needing_to_be_run).present?
       abort?
       eval_hook :before_running_tests, :tests => tests

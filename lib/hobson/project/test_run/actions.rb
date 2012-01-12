@@ -25,6 +25,11 @@ class Hobson::Project::TestRun
     logger.info "balancing tests"
     tests.balance_for! number_of_jobs
 
+    tests_without_a_job = tests.find_all{|test| test.job.nil?}
+    if tests_without_a_job.present?
+      raise "FAILED to balance tests!\nThe following tests have no job: #{tests_without_a_job.map(&:name)*' '}"
+    end
+
     logger.info "enqueuing #{number_of_jobs} jobs to run #{tests.length} tests"
     # jobs.each(&:enqueue!)
     (0...number_of_jobs).map{|index|

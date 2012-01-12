@@ -13,7 +13,7 @@ PATH
       log4r
       open4
       popen4
-      redis-namespace (~> 1)
+      redis-namespace (~> 1.0.2)
       resque (~> 1.19.0)
       right_aws
       sass

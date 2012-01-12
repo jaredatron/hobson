@@ -3,8 +3,8 @@ PATH
   specs:
     hobson (0.0.1)
       SystemTimer
-      actionpack (= 3.1.3)
-      activesupport (= 3.1.3)
+      actionpack (~> 3.1.3)
+      activesupport (~> 3.1.3)
       childprocess
       daemons
       haml
@@ -13,6 +13,7 @@ PATH
       log4r
       open4
       popen4
+      rack (~> 1.3.5)
       redis-namespace (~> 1.0.2)
       resque (~> 1.19.0)
       right_aws

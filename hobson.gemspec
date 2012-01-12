@@ -28,8 +28,8 @@ Gem::Specification.new do |s|
   s.add_development_dependency "rspec"
   s.add_development_dependency "resque_unit"
 
-  s.add_runtime_dependency "activesupport", "3.1.3"
-  s.add_runtime_dependency "actionpack", "3.1.3"
+  s.add_runtime_dependency "activesupport", "~> 3.1.3"
+  s.add_runtime_dependency "actionpack", "~> 3.1.3"
   s.add_runtime_dependency "i18n"
   s.add_runtime_dependency "redis-namespace", "~> 1.0.2"
   s.add_runtime_dependency "resque", "~> 1.19.0"
@@ -44,6 +44,7 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency "uuid"
   s.add_runtime_dependency "thor", "~> 0.14.6"
 
+  s.add_runtime_dependency "rack", "~> 1.3.5"
   s.add_runtime_dependency "vegas"
   s.add_runtime_dependency "sinatra"
   s.add_runtime_dependency "haml"

@@ -2,7 +2,33 @@
 
 A distributed test run framework built on resque
 
-# Setup
+# maintenance commands
+
+## list processes
+    clear; ps aux | grep -P 'redis|hobson|resque|ruby|cucumber|rspec|firefox|chrome'
+
+### or
+    clear; ps x
+
+## update hobson
+    (cd ~/hobson_gem; git fetch && git reset --hard origin/master)
+
+## show hobson version
+    clear; (cd ~/hobson_gem; git log -1 )
+
+## start hobson
+    /etc/init.d/hobson start
+
+## rails hobson logs
+    clear; tail -n 0 -f ~/hobson/log/*
+
+## kill hobson
+    kill -2 `cat ~/hobson/hobson.pid`
+
+## kill everything
+    clear; killall -4 ruby; killall firefox; killall chrome; killall chromedriver; killall searchd; ps x
+
+## Setup
 
   0. Add a config/hobson.yml file that looks like this to your development workstation
 

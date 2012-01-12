@@ -64,6 +64,7 @@ class Hobson::Server < Sinatra::Base
     origin_url, ref = params.values_at("origin_url", "ref")
     origin_url.gsub!('&#x2F;','/') # I have no idea why i need this now
     project_ref = Hobson::CI::ProjectRef.new(origin_url, ref)
+    project_ref.save
     project_ref.run_tests! if project_ref.needs_test_run?
     redirect '/ci'
   end

@@ -1,10 +1,16 @@
 class Hobson::CI::ProjectRef
 
-  def self.all
-    Hobson::CI.data.keys.map{|key| self.new *key.split('::') }
+  def self.redis_hash
+    Hobson::RedisHash.new(Hobson.redis, "TestRun:CI")
   end
 
-  delegate :data, :to => Hobson::CI
+  def self.all
+   redis_hash.keys.map{|key| self.new *key.split('::') }
+  end
+
+  def data
+    @data ||= self.class.redis_hash
+  end
 
   attr_reader :origin_url, :ref
 
@@ -16,9 +22,10 @@ class Hobson::CI::ProjectRef
     "#{origin_url}::#{ref}"
   end
 
-  # def save
-  #   data[key] ||= current_sha
-  # end
+  def save
+    data[key] ||= current_sha
+    self
+  end
 
   def delete
     data.delete key

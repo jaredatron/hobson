@@ -43,14 +43,17 @@ Class.new Thor do
   end
 
   desc "test", "tell Hobson to run the tests for the current sha"
+  method_option :no_web, :type => :boolean, :banner => "don't start hobson web"
   def test
     test_run = Hobson::Project.current.run_tests!
     puts "starting test run #{test_run.id} for #{test_run.sha}"
-    Hobson::Server.start! :launch_path => "/projects/#{test_run.project.name}/test_runs/#{test_run.id}"
+    unless self.options.no_web
+      Hobson::Server.start!(:launch_path => "/projects/#{test_run.project.name}/test_runs/#{test_run.id}")
+    end
   end
 
   desc "work", "become a test running worker"
-  method_options %w( demonize -d ) => false, :banner => 'deamonize before becoming a resque worker'
+  method_option %w( demonize -d ) => false, :banner => 'deamonize before becoming a resque worker'
   def work
     if options.demonize?
       require 'daemons'

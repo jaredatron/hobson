@@ -14,6 +14,9 @@ I18n.load_path << $:.map{|path| File.join(path,'action_view/locale/en.yml') }.fi
 class Hobson::Server < Sinatra::Base
 
   def self.start! options={}
+    slave = Redis::Slave.new(:master => Hobson.config[:redis])
+    slave.start!
+    Hobson.root_redis = slave.balancer
     Vegas::Runner.new Hobson::Server, 'hobson', options
   end
 

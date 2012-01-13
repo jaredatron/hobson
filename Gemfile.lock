@@ -15,6 +15,7 @@ PATH
       popen4
       rack (~> 1.3.5)
       redis-namespace (~> 1.0.2)
+      redis-slave
       resque (~> 1.19.0)
       right_aws
       sass
@@ -46,7 +47,7 @@ GEM
     activesupport (3.1.3)
       multi_json (~> 1.0)
     builder (3.0.0)
-    childprocess (0.2.8)
+    childprocess (0.2.9)
       ffi (~> 1.0.6)
     columnize (0.3.6)
     daemons (1.1.5)
@@ -81,6 +82,9 @@ GEM
     redis (2.2.2)
     redis-namespace (1.0.3)
       redis (< 3.0.0)
+    redis-slave (0.0.2)
+      childprocess
+      redis
     resque (1.19.0)
       multi_json (~> 1.0)
       redis-namespace (~> 1.0.2)

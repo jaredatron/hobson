@@ -1,3 +1,6 @@
+require 'redis'
+require 'redis/slave'
+
 require 'active_support'
 require 'active_support/core_ext/array'
 require 'active_support/core_ext/enumerable'
@@ -17,6 +20,7 @@ module Hobson
 
   extend self
 
+  autoload :RedisSlave,   'hobson/redis_slave'
   autoload :RedisHash,    'hobson/redis_hash'
   autoload :Bundler,      'hobson/bundler'
   autoload :Landmarks,    'hobson/landmarks'
@@ -58,6 +62,32 @@ module Hobson
 
   def git_version
     @sha ||= `cd "#{Hobson.lib}" && git rev-parse HEAD`.chomp
+  end
+
+  def root_redis
+    redis = self.redis || return
+    while redis.is_a?(Redis::Namespace)
+      redis = redis.instance_variable_get('@redis')
+    end
+    return redis
+  end
+
+  # set the root connection to redis preserving namespaces
+  def root_redis= redis
+    if self.redis.nil? || self.redis.is_a?(Redis) || self.redis.is_a?(Redis::Slave::Balancer)
+      @redis = redis
+
+    elsif self.redis.is_a?(Redis::Namespace)
+      namespace = @redis
+      until namespace.instance_variable_get('@redis').is_a?(Redis) ||
+        namespace.instance_variable_get('@redis').is_a?(Redis::Slave::Balancer)
+        namespace = namespace.instance_variable_get('@redis')
+      end
+      namespace.instance_variable_set('@redis', redis)
+
+    else
+      raise "unkown type of #{self.redis}"
+    end
   end
 
   def redis

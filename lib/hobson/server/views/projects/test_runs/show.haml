@@ -64,10 +64,9 @@
                 %dt Est. Runtime
                 %dd= distance_of_time_in_words job.est_runtime
 
-              - if job.complete?
-                .runtime
-                  %dt Actual Runtime
-                  %dd= distance_of_time_in_words job.runtime
+              .runtime
+                %dt Actual Runtime
+                %dd= distance_of_time_in_words job.runtime
 
               - if job.errored?
                 .error

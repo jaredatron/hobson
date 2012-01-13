@@ -59,6 +59,7 @@ class Hobson::Project::TestRun::Job
     logger.info %(Exception:\n#{e}\n#{e.backtrace.join("\n")})
     self['exception'] = "#{e.class}: #{e.message}"
     self['backtrace'] = e.backtrace.join("\n")
+    raise # raise to resque shows this as a failed job and you can retry it
   ensure
     complete!
     begin

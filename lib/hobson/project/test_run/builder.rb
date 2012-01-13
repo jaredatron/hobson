@@ -4,7 +4,9 @@ module Hobson::Project::TestRun::Builder
 
   def self.perform project_name, test_run_id
     Hobson.log_to_a_tempfile{
-      Hobson::Project.new(project_name).test_runs(test_run_id).build!
+      project = Hobson::Project[project_name] or raise "Project Not Found!"
+      test_run = project.test_runs(test_run_id) or raise "Test Run Not Found!"
+      test_run.build!
     }
   end
 

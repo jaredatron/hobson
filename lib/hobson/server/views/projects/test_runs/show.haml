@@ -111,11 +111,13 @@
               %td= test.status
               %td= test.result
               %td
-                - artifact_name = case test.type
-                  - when "feature" ; "feature_run#{test.tries}"
-                  - when "spec"    ; "spec_run#{test.tries}"
-                - if job && artifact_url = job.artifacts[artifact_name]
-                  %a{:href => artifact_url}= artifact_name
+                - if job
+                  - (1..test.tries).each do |try|
+                    - artifact_name = case test.type
+                      - when "feature" ; "feature_run#{try}"
+                      - when "spec"    ; "spec_run#{try}"
+                    - if artifact_url = job.artifacts[artifact_name]
+                      %a{:href => artifact_url} run#{try}
 
   - if test_run.jobs.present?
     %section.artifacts

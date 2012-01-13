@@ -26,6 +26,11 @@ class Hobson::Project::TestRun
     jobs.map(&:est_runtime).sort.last
   end
 
+  def duration
+    return 0 unless running? || complete?
+    (complete_at || Time.now) - (started_at || Time.now)
+  end
+
   def jobs
     @jobs ||= keys \
       .inject([]){|indices, key| key =~ /^job:(\d+):.*/ and indices << $1.to_i; indices } \

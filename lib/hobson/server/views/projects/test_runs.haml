@@ -5,15 +5,16 @@
     %tr
       %th
       %th Status
-      %th Id
-      %th SHA
+      %th Test Run Id
+      %th Git Sha
       %th Created
+      %th UnRun
+      %th Retries
       %th Failed
       %th Passed
-      %th UnRun
       %th Pending
   %tbody
-    - @test_runs.sort_by{|t| t.created_at || Time.now }.reverse.each do |test_run|
+    - test_runs.sort_by{|t| t.created_at || Time.now }.reverse.each do |test_run|
       %tr{:class => test_run.status.gsub(' ','-')}
         %td
           %form{:id => "delete#{test_run.id}", :action => test_run_path(test_run), :method => 'post'}
@@ -25,7 +26,12 @@
         %td
           %a{:href => sha_url(test_run.project.url, test_run.sha)}= test_run.sha
         %td= distance_of_time_in_words(Time.now - test_run.created_at) + ' ago' if test_run.created_at.present?
+        %td= test_run.tests.find_all(&:waiting?).count
+        %td= test_run.tests.map{|t| t.tries > 0 ? t.tries - 1 : 0}.sum
         %td= test_run.tests.find_all(&:fail?).count
         %td= test_run.tests.find_all(&:pass?).count
-        %td= test_run.tests.find_all(&:waiting?).count
         %td= test_run.tests.find_all(&:pending?).count
+        %td
+          - max = test_run.tests.size
+          - value = test_run.aborted? ? max : test_run.tests.reject(&:waiting?).size
+          %progress{:value => value, :max => max}

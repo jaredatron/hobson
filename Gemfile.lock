@@ -82,7 +82,7 @@ GEM
     redis (2.2.2)
     redis-namespace (1.0.3)
       redis (< 3.0.0)
-    redis-slave (0.0.2)
+    redis-slave (0.0.3)
       childprocess
       redis
     resque (1.19.0)
@@ -133,6 +133,7 @@ PLATFORMS
 DEPENDENCIES
   hobson!
   rake
+  redis-slave (= 0.0.3)
   resque_unit
   rspec
   ruby-debug

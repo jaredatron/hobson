@@ -13,11 +13,21 @@ I18n.load_path << $:.map{|path| File.join(path,'action_view/locale/en.yml') }.fi
 
 class Hobson::Server < Sinatra::Base
 
+  def self.start_redis_slave!
+    @@slave = Redis::Slave.new(:master => Hobson.config[:redis])
+    @@slave.start!
+    raise "Failed to start Redis Slave" unless @@slave.process.alive?
+    Hobson.root_redis = @@slave.balancer
+    puts "started redis slave at #{@@slave.options[:slave].values_at(:host, :port).join(':')}"
+  end
+
   def self.start! options={}
-    slave = Redis::Slave.new(:master => Hobson.config[:redis])
-    slave.start!
-    Hobson.root_redis = slave.balancer
-    Vegas::Runner.new Hobson::Server, 'hobson', options
+    Vegas::Runner.new Hobson::Server, 'hobson', options do |runner, options, app|
+      runtime_args = runner.instance_variable_get(:@runtime_args)
+      unless runtime_args.include?('-K') || runtime_args.include?('--kill')
+        start_redis_slave!
+      end
+    end
   end
 
   autoload :Partials, 'hobson/server/partials'

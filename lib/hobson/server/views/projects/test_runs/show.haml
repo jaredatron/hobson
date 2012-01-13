@@ -112,8 +112,8 @@
               %td= test.result
               %td
                 - artifact_name = case test.type
-                  - when "feature" ; "cucumber"
-                  - when "spec"    ; "rspec"
+                  - when "feature" ; "feature_run#{test.tries}"
+                  - when "spec"    ; "spec_run#{test.tries}"
                 - if job && artifact_url = job.artifacts[artifact_name]
                   %a{:href => artifact_url}= artifact_name
 

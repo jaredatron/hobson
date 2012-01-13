@@ -48,6 +48,10 @@ class Hobson::Server < Sinatra::Base
   helpers Hobson::Server::Helpers
   helpers ActionView::Helpers::DateHelper
 
+  not_found do
+    '404'
+  end
+
   get '/screen.css' do
     sass :screen
   end
@@ -94,43 +98,35 @@ class Hobson::Server < Sinatra::Base
     haml :'projects', :layout => !request.xhr?
   end
 
-  get "/projects/:project_name" do |project_name|
-    redirect "/projects/#{project_name}/test_runs"
+  get "/projects/:project_name" do
+    redirect test_runs_path
   end
 
-  get "/projects/:project_name/test_runs" do |project_name|
-    @project   = Hobson::Project[project_name]
-    @test_runs = @project.test_runs
+  get "/projects/:project_name/test_runs" do
     haml :'projects/test_runs', :layout => !request.xhr?
   end
 
-  get "/projects/:project_name/test_runs/:id" do |project_name, id|
-    @project  = Hobson::Project[project_name]
-    @test_run = @project.test_runs(id)
+  get "/projects/:project_name/test_runs/:test_run_id" do
     haml :'projects/test_runs/show', :layout => !request.xhr?
   end
 
-  delete "/projects/:project_name/test_runs/:id" do |project_name, id|
-    Hobson::Project[project_name].test_runs(id).delete!
-    redirect "/projects/#{project_name}/test_runs"
+  delete "/projects/:project_name/test_runs/:test_run_id" do
+    test_run.delete!
+    redirect test_runs_path
   end
 
-  post "/projects/:project_name/test_runs/:id/rerun" do |project_name, id|
-    @project  = Hobson::Project[project_name]
-    @test_run = @project.test_runs(id)
-    @test_run = @project.run_tests!(@test_run.sha)
+  post "/projects/:project_name/test_runs/:test_run_id/rerun" do
+    @test_run = project.run_tests!(test_run.sha)
     redirect test_run_path
   end
 
-  post "/projects/:project_name/test_runs/:id/abort" do |project_name, id|
-    @test_run = Hobson::Project[project_name].test_runs(id)
-    @test_run.abort!
+  post "/projects/:project_name/test_runs/:test_run_id/abort" do
+    test_run.abort!
     redirect test_run_path
   end
 
   get "/projects/:project_name/tests" do |project_name|
-    @project  = Hobson::Project[project_name]
-    @tests = @project.tests
+    @tests = project.tests
     haml :'projects/tests', :layout => !request.xhr?
   end
 

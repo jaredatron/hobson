@@ -54,21 +54,9 @@ Class.new Thor do
 
   desc "work", "become a test running worker"
   method_option :daemonize, :type => :boolean, :aliases => %w{-d}, :banner => 'deamonize before becoming a resque worker'
+  method_option :pidfile,   :type => :string,  :aliases => %w{-p}, :banner => 'path to the pid file'
   def work
-    if options.daemonize?
-      require 'daemons'
-      daemon = Daemons.call(
-        :dir_mode   => :script,
-        :dir        => Hobson.root,
-        :ontop      => false,
-        :app_name   => 'hobson',
-        :log_output => true,
-        :log_dir    => Hobson.log.parent
-      ){ Hobson.work! }
-      puts "daemonized PID: #{daemon.pid.pid} AT: #{Time.now}"
-    else
-      Hobson.work!
-    end
+    Hobson.work! :daemonize => options.daemonize?, :pidfile => options.pidfile
   end
 
   desc "web", "start hobson web server (see vegas options)"

@@ -1,121 +1,105 @@
 # Hobson
 
-A distributed test run framework built on resque
+A distributed test run framework built on resque.
 
-# maintenance commands
+Hobson distributes your test suite across N machines aggregating the results live on a beautiful locally run web app.
 
-## list processes
-    clear; ps aux | grep -P 'redis|hobson|resque|ruby|cucumber|rspec|firefox|chrome'
+Hobson can:
 
-### or
-    clear; ps x
+  * auto balance tests across jobs
+  * preserve log files and other artifacts to S3
+  * automatically re-run failed tests
+  * monitor a git repo reference and auto run new SHAs (a basic CI)
 
-## update hobson
-    (cd ~/hobson_gem; git fetch && git reset --hard origin/master)
+# How it works
 
-## show hobson version
-    clear; (cd ~/hobson_gem; git log -1 )
+  Once you setup N machines running a hobson resque worker all you need to do is run '`hobson test`' and Hobson will distribute your test suite across N workers and aggregate the results live into a single web page.
 
-## start hobson
-    /etc/init.d/hobson start
+Hobson is completely decentralized apart from it's persistence in a single redis server. There is no central Hobson server process. Hobson is just a collection of resque workers and local sintra app.
 
-## rails hobson logs
-    clear; tail -n 0 -f ~/hobson/log/*
+## The Common life cycle:
 
-## kill hobson
-    kill -2 `cat ~/hobson/hobson.pid`
+  0. cd into your project directory and run 'hobson test'
+  0. this launches the local hobson web application and opens the status page for the test run you've just created and schedules a 'build test run' job for the current git repo and SHA
+  0. one of your resque workers picks up this job, checks out the given sha and scans it for 'tests'
+  0. these tests are then balanced across N resque jobs. (N being the number of resque workers you have) and then N 'test run' resque jobs are now scheduled
+  0. your cluster of resque workers then starts running their subset of your test suite in parallel
+  0. as each resque worker completes starts a test or completed a test the test run status page is updated
+  0. Once complete you'll end up with something like the following screenshot
+  0. Once a worker completes it's task the log files are uploaded to S3
 
-## kill everything
-    clear; killall -4 ruby; killall firefox; killall chrome; killall chromedriver; killall searchd; ps x
+# A Successful Test Run Status Page:
 
-## Setup
+looks something like this…
 
-  0. Add a config/hobson.yml file that looks like this to your development workstation
+![Green Build](http://dl.dropbox.com/u/1090585/Slingshot/Pictures/Screen%20Shot%202012-01-17%20at%2011.25.38%20AM.png)
+
+---
+# Hooks
+
+Hobson looks in ${APP_ROOT}/config/hobson/ for the following hooks. These hooks are evaluated within the hobson process giving you access to the internal API (see code for more details).
+
+  * setup.rb
+    - run once after `bundle install` but before tests are run
+  * before_running_tests.rb
+    - run before each test command is executed
+  * save_artifacts.rb
+    - run once after all tests have been run
+  * teardown.rb
+    - run once after test run is complete
+
+---
+
+# How does my app know about hobson?
+
+The hobson command looks in ${APP_ROOT}/config/hobson.yml for the redis server it should connect to.
+
+# What does Hobson consider a test?
+
+Right now a 'test' is an individual feature or spec file. In the near future we'll be increasing cucumber feature granularity to the individual feature level. Unfortunately because specs can be defined dynamically it's non-trivial if not impossible to individually address each spec so we have to stay at the level of the file for rspec.
+
+
+# How do I setup Hobson?
+
+## Setup Centralized Dependancies
+
+  0. Setup a redis-server (We recommend a dedicated redis-server instance for Hobson lest you run the chance of your data being lost when a projects test run flushes all databases. If anyone knows how to protect an individual db please contact me)
+  0. Setup an S3 bucket (this is used to upload test run artifacts like logs)
+  0. Create your Hobson config.yml like so
 
         ---
         :redis:
           :host: ec2-0-0-0-0.compute-1.amazonaws.com
-          :db: 3
-          :namespace: 'hobson'
           :port: 6380
-
-  0. Add the same config to any machines you intend to be workers with an additional workspace entry
-
-        :workspace: /Users/change/work/change
-
-  0. add hobson to applications your Gemfile
-  0. run:
-
-        $ bundle install
-        $ bundle exec hobson
-
-  0. to start a worker run:
-
-        $ bundle exec hobson work
-
-  0. to kick off a "test run" run:
-
-        $ bundle exec hobson run
-
-# TODO
-
-  0. fix links to worker hosts (somehow detect S3)
-  0. update ets. runtime logic to no longer need a minumum est runtime.
-    * you can enable 0 est runtimes by collecting a set of 0 runtimes and pushing on the smallest or shortest job set
-  0. add detection of unpushed sha
-  0. find a way to confirm we're running all tests
-  0. add a Hobson & Project settings page for the following settings
-    * min / max jobs per test_run
-    * min / max tests per job
-    * auto re-run failed tests
-
-  0. add test_run runtime estimation taking into account avg. setup & teardown
-  0. add custom formatters that dump failures to individual files and upload those artifacts immediately
-  0. add rerun failed tests functionality &|| add auto rerun of failed tests
-  0. rename test_run/job/application etc.
+        :s3:
+          :access_key_id: INTENTIONALLY_LEFT_BLANK
+          :secret_access_key: INTENTIONALLY_LEFT_BLANK
+          :bucket: INTENTIONALLY_LEFT_BLANK
 
 
+## Setup A Hobson (Resque) Worker
 
-# Life cycle
+  0. Checkout hobson somewhere. For example we'll say you checked it out in ~/hobson_gem
+  0. Install hobson's gems '`(cd ~/hobson_gem/ && bundle)`'
+  0. Create a hobson workspace directory somewhere. For example we'll use ~/hobson
+  0. Place your config.yml here ~/hobson/config.yml
+  0. …(here is where you would setup /etc/init.d/hobson and or monit etc.)
+  0. Start hobson in the the working directory '`cd ~/hobson && ~/hobson_gem/bin/hobson work --daemonize`'
+  0. Rinse and repeat
 
-  0. enqueue a ScheduleTestRun resque job for a given sha
-    * check out the given sha
-    * prepare the environment
-    * discover the tests that are needed to run
-    * add a list of tests to the TestRun data
-    * schedule N RunTests resque jobs for Y jobs (balancing is done in this step)
-    * teardown environment
-  0. Hobson::RunTests jobs are run
-    * check out the given sha
-    * prepare the environment
-    * run the subset of tests
-    * report the result for each test (with backtrace and associated artifacts)
-    * teardown environment
+---
 
-# running tests
-  * check out the given sha
-  * prepare the environment
-  * execute test command (using PTY for non-blocking read)
-    * use a special formatter that writes the current test to a file followed by its result
-    * loop and read from PTY stdin and update redis with that status of what test is being run and then its status
-  * report the result for each test (with backtrace and associated artifacts)
-  * teardown environment
+# Internals
 
+  Hobson persists everything in redis using the following models.
 
-
-
-
-
-
-
-# Objects
+## Hobson Objects
 
 
 ### Hobson::Project
   * name       (String)
   * git url    (String)
   * test runs  (Hobson::Project::TestRun)
-
 
 ### Hobson::Project::TestRun
   * id                (String)
@@ -124,7 +108,6 @@ A distributed test run framework built on resque
   * started_building  (Datetime)
   * scheduled_jobs    (Datetime)
   * tests             (Hobson::Project::TestRun::Tests)
-
 
 ### Hobson::Project::TestRun::Tests
   * tests (Hobson::Project::TestRun::Tests::Test)
@@ -147,26 +130,18 @@ A distributed test run framework built on resque
   * tearing_down          (Datetime)
   * completed_at          (Datetime)
 
-# TestRun Redis Hash
-  {
-    sha                               =>
-    scheduled_build_at                => "Fri Nov 18 10:15:03 -0800 2011"
-    started_building_at               => "Fri Nov 18 10:15:03 -0800 2011"
-    scheduled_jobs_at                 => "Fri Nov 18 10:15:03 -0800 2011"
-    job:#{n}:scheduled_at             => "Fri Nov 18 10:15:03 -0800 2011"
-    job:#{n}:checking_out_code_at     => "Fri Nov 18 10:15:03 -0800 2011"
-    jon:#{n}:preparing_environment_at => "Fri Nov 18 10:15:03 -0800 2011"
-    jon:#{n}:running_tests_at         => "Fri Nov 18 10:15:03 -0800 2011"
-    jon:#{n}:saving_artifacts_at      => "Fri Nov 18 10:15:03 -0800 2011"
-    jon:#{n}:tearing_down_at          => "Fri Nov 18 10:15:03 -0800 2011"
-    jon:#{n}:completed_at             => "Fri Nov 18 10:15:03 -0800 2011"
-    test:#{test_name}:status          => ("waiting"|"started"|"complete")
-    test:#{test_name}:result          => ("pass"|"fail"|"pending")
-    test:#{test_name}:est_runtime     => 23.854
-    test:#{test_name}:runtime         => 23.854
-  }
+---
 
+# TODO
 
-
-
-
+  * detect when a sha isn't on origin and error
+  * update balancing logic to be aware of 0 est runtimes rather then using 0.1 as a hack
+  * find a fix for empty test files
+    * when a test file is empty it's never updated by the hobson status formatter and the whole test run is hung
+  * refactor away from redis hashes and back to normal keys/namespaces with marshaling
+  * add hobson & hobson project configuration options
+    * min / max jobs per test_run
+    * min / max tests per job
+    * auto re-run failed ? tests
+  * improve test_run runtime estimation taking into account avg. setup & teardown
+  * add custom formatters that dump failures to individual files and upload those artifacts immediately

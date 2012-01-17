@@ -134,6 +134,8 @@ Right now a 'test' is an individual feature or spec file. In the near future we'
 
 # TODO
 
+  * add a requested-by tag to show what engineer created what test_run
+  * refactor feature tests to mean individual scenarios rather then .feature file
   * detect when a sha isn't on origin and error
   * update balancing logic to be aware of 0 est runtimes rather then using 0.1 as a hack
   * find a fix for empty test files

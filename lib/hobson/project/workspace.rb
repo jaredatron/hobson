@@ -105,17 +105,17 @@ class Hobson::Project::Workspace
         cucumber
         --quiet
         --require features
-        --require #{Hobson.lib.join('hobson/cucumber')}
+        --require #{Hobson.lib.join('hobson/formatters/cucumber')}
         --format pretty --out log/feature_run#{@test_run_index}
-        --format Hobson::Cucumber::Formatter --out #{hobson_status_file}
+        --format Hobson::Formatters::Cucumber --out #{hobson_status_file}
         #{tests*' '}
       ]
     when :specs
       %W[
         rspec
-        --require #{Hobson.lib.join('hobson/rspec')}
+        --require #{Hobson.lib.join('hobson/formatters/rspec')}
         --format documentation --out log/spec_run#{@test_run_index}
-        --format Hobson::RSpec::Formatter --out #{hobson_status_file}
+        --format Hobson::Formatters::Rspec --out #{hobson_status_file}
         #{tests*' '}
       ]
     when :test_units

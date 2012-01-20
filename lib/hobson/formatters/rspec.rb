@@ -1,5 +1,10 @@
+# Logs the time a feature files takes to run to help in balancing a distrubuted build
+#
+# cucumber -r Hobson::Formatters::Rspec
+#
 require 'rspec'
 require 'rspec/core/formatters/base_formatter'
+require File.expand_path('../now', __FILE__)
 
 RSpec.configure do |config|
 
@@ -11,7 +16,7 @@ RSpec.configure do |config|
 
   config.before :all do
     spec = get_spec.call(self)
-    Hobson::RSpec::Formatter.puts "TEST:#{spec}:START:#{Time.now.to_f}"
+    Hobson::Formatters::Rspec.puts "TEST:#{spec}:START:#{Hobson::Formatters.now.to_f}"
   end
 
   config.after :all do
@@ -24,16 +29,14 @@ RSpec.configure do |config|
       'FAIL' : 'PASS'
     end
 
-    Hobson::RSpec::Formatter.puts "TEST:#{spec}:COMPLETE:#{Time.now.to_f}:#{status}"
+    Hobson::Formatters::Rspec.puts "TEST:#{spec}:COMPLETE:#{Hobson::Formatters.now.to_f}:#{status}"
   end
 
 end
 
-
-
 module Hobson
-  module RSpec
-    class Formatter < ::RSpec::Core::Formatters::BaseFormatter
+  module Formatters
+    class Rspec < ::RSpec::Core::Formatters::BaseFormatter
 
       def self.instances
         @@instances ||= []

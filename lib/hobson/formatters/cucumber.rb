@@ -1,12 +1,14 @@
 # Logs the time a feature files takes to run to help in balancing a distrubuted build
 #
-# cucumber -r Hobson::Cucumber::Formatter
+# cucumber -r Hobson::Formatters::Cucumber
 #
 require 'cucumber'
 require 'cucumber/formatter/io'
+require File.expand_path('../now', __FILE__)
+
 module Hobson
-  module Cucumber
-    class Formatter
+  module Formatters
+    class Cucumber
 
       include ::Cucumber::Formatter::Io
 
@@ -16,13 +18,13 @@ module Hobson
 
       def before_feature feature
         raise "started twice!" unless @started_at.nil?
-        @io.puts "TEST:#{feature.file}:START:#{Time.now.to_f}"
+        @io.puts "TEST:#{feature.file}:START:#{Hobson::Formatters.now.to_f}"
         @io.flush
       end
 
       def after_feature(feature)
         status = feature.instance_variable_get(:@feature_elements).any?(&:failed?) ? 'FAIL' : 'PASS'
-        @io.puts "TEST:#{feature.file}:COMPLETE:#{Time.now.to_f}:#{status}"
+        @io.puts "TEST:#{feature.file}:COMPLETE:#{Hobson::Formatters.now.to_f}:#{status}"
         @io.flush
       end
 

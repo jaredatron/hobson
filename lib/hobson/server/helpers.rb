@@ -99,6 +99,9 @@ module Hobson::Server::Helpers
       left  = ((from - test_run.started_at) / test_run_duration) * 100
       right = ((((to - test_run.started_at) / test_run_duration) * 100) - 100) * -1
 
+      left  = 0 if left < 0
+      right = 100 if right > 100
+
       html_options = {}
       html_options[:title] = "#{landmark} for #{distance_of_time_in_words(duration.to_i)}"
       html_options[:class] = "landmark-#{classname(landmark)}"

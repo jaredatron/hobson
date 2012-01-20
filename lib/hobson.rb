@@ -1,3 +1,4 @@
+require "hobson/version"
 require 'redis'
 require 'redis/slave'
 
@@ -20,37 +21,15 @@ module Hobson
 
   extend self
 
-  autoload :RedisSlave,   'hobson/redis_slave'
-  autoload :RedisHash,    'hobson/redis_hash'
-  autoload :Bundler,      'hobson/bundler'
-  autoload :Landmarks,    'hobson/landmarks'
-  autoload :Artifacts,    'hobson/artifacts'
-  autoload :Project,      'hobson/project'
-  autoload :Server,       'hobson/server'
-  autoload :CI,           'hobson/ci'
-
-  # become a resque-worker and handle hobson resque jobs
-  def work! options={}
-    options[:pidfile] ||= ENV['PIDFILE']
-
-    work = proc{
-      worker = resque::Worker.new('*')
-      worker.verbose = true
-      worker.very_verbose = $DEBUG
-      logger.info "started resque worker #{worker}"
-      File.open(options[:pidfile], 'w') { |f| f << worker.pid } if options[:pidfile]
-      worker.work
-    }
-
-    if options[:daemonize]
-      pid = fork{ work.call }
-      puts "Daemonized a resque worker with pid #{pid}"
-      Process.detach(pid)
-    else
-      puts "Becoming a resque worker"
-      work.call
-    end
-  end
+  autoload :RedisSlave, 'hobson/redis_slave'
+  autoload :RedisHash,  'hobson/redis_hash'
+  autoload :Bundler,    'hobson/bundler'
+  autoload :Landmarks,  'hobson/landmarks'
+  autoload :Artifacts,  'hobson/artifacts'
+  autoload :Project,    'hobson/project'
+  autoload :Worker,     'hobson/worker'
+  autoload :Server,     'hobson/server'
+  autoload :CI,         'hobson/ci'
 
   def root
     @root ||= Pathname.new ENV['HOBSON_ROOT'] ||= Dir.pwd

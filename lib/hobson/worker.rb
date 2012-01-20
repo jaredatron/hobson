@@ -24,7 +24,7 @@ class Hobson::Worker < Resque::Worker
   end
 
   def procline(string)
-    $0 = "hobson-#{Hobson::VERSION}: #{string}"
+    $0 = "Hobson #{hostname}:#{Process.pid} - #{string}"
     log! $0
   end
 

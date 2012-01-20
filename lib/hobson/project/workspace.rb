@@ -20,7 +20,7 @@ class Hobson::Project::Workspace
 
   def checkout! sha
     logger.info "checking out #{sha}"
-    execute "git fetch && git reset --hard #{sha} && git clean -df"
+    execute "git fetch --all && git reset --hard #{sha} && git clean -df"
   end
 
   def exists?

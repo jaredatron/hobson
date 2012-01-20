@@ -11,6 +11,11 @@ Hobson can:
   * automatically re-run failed tests
   * monitor a git repo reference and auto run new SHAs (a basic CI)
 
+# Special Thanks
+
+  to Change.org for funding this project
+  and to Charles Finkel for solving a heap of bugs
+
 # How it works
 
   Once you setup N machines running a hobson resque worker all you need to do is run '`hobson test`' and Hobson will distribute your test suite across N workers and aggregate the results live into a single web page.

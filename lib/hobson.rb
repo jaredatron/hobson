@@ -10,7 +10,7 @@ require 'active_support/inflections'
 
 require 'pathname'
 require 'resque'
-require 'right_aws'
+require 'fog'
 
 module Hobson
 
@@ -65,7 +65,7 @@ module Hobson
 
   def config
     @config ||= begin
-      raise "unable to find config file in #{root}" unless config_path.present? && File.exists?(config_path)
+      raise "unable to find hobson config file in #{root}" unless config_path.present? && File.exists?(config_path)
       DEFAULT_CONFIG.merge(YAML.load_file(config_path))
     end
   end
@@ -106,7 +106,6 @@ module Hobson
 
   def redis
     @redis ||= begin
-      return nil unless config.present?
       options = config[:redis] || {}
       @redis = Redis.new(options)
       @redis = Redis::Namespace.new('Hobson', :redis => @redis)
@@ -135,33 +134,22 @@ module Hobson
 
   def resque
     @resque ||= begin
-      return nil unless config.present?
       Resque.redis = Redis::Namespace.new(:resque, :redis => redis)
       Resque
     end
   end
 
-  def s3
-    @s3 ||= begin
-      return nil unless
-        config.present? &&
-        config[:s3].present? &&
-        config[:s3].has_key?(:access_key_id) &&
-        config[:s3].has_key?(:secret_access_key)
-
-      @s3 = RightAws::S3.new *config[:s3].values_at(:access_key_id, :secret_access_key)
-      @s3.interface.logger= Hobson.logger
-      @s3
-    end
-  end
-
-  def s3_bucket
-    @s3_bucket ||= begin
-      return nil unless
-        config.present? &&
-        config[:s3].present? &&
-        config[:s3].has_key?(:bucket)
-      RightAws::S3::Bucket.new(s3, config[:s3][:bucket], false, 'public-read')
+  def files
+    @files ||= begin
+      raise "storage is not configured" unless config[:storage].present?
+      config[:storage][:directory] ||= 'hobson'
+      storage = Fog::Storage.new(config[:storage].reject{|k,v| k == :directory})
+      directory = storage.directories.get(config[:storage][:directory])
+      directory ||= begin
+        storage.directories.create(:key => config[:storage][:directory], :public => true)
+        storage.directories.get(config[:storage][:directory])
+      end
+      directory.files
     end
   end
 

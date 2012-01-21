@@ -1,5 +1,6 @@
 require 'hobson'
 require 'resque_unit'
+Fog.mock!
 
 SPEC_ROOT = Pathname.new(File.expand_path('..', __FILE__))
 ROOT      = SPEC_ROOT + '..'
@@ -12,10 +13,11 @@ DEFAULT_CONFIG = {
     :db        => 0,
     :namespace => "hobson",
   },
-  :s3 => {
-    :secret_access_key => "INTENTIONALLY_LEFT_BLANK",
-    :access_key_id     => "INTENTIONALLY_LEFT_BLANK",
-    :bucket            => "INTENTIONALLY_LEFT_BLANK",
+  :storage => {
+    :provider              => "aws",
+    :aws_secret_access_key => "x",
+    :aws_access_key_id     => "x",
+    :directory             => "test_bucket",
   },
 }
 

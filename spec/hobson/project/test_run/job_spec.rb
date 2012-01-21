@@ -76,10 +76,10 @@ describe Hobson::Project::TestRun::Job do
     describe "#save_artifact" do
 
       it "should store a key in the redis hash and write a file to S3" do
-        file = stub(:public_link => 'http://example.com')
-        job.should_receive(:save_file).and_return(file)
-        job.save_artifact('Gemfile').should == file
-        job.artifacts.should == {'Gemfile' => 'http://example.com'}
+        file = job.save_artifact('Gemfile')
+        file.key.should == "testruns/#{job.test_run.id}/jobs/#{job.index}/Gemfile"
+        file.content_type.should == "text/plain"
+        job.artifacts.should == {'Gemfile' => "https://s3.amazonaws.com/test_bucket/#{file.key}"}
       end
 
     end

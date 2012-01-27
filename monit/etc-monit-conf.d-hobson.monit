@@ -1,0 +1,5 @@
+check process hobson with pidfile /home/change/hobson/hobson.pid
+  alert tech_ops+hobson_monit@change.org only on { timeout, nonexist }
+  start program = "/etc/init.d/hobson start"
+  stop program = "/etc/init.d/hobson stop"
+  if 5 restarts within 5 cycles then timeout

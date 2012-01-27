@@ -1,0 +1,12 @@
+set daemon 120 # Poll interval in seconds
+
+set logfile syslog facility log_daemon
+
+set mailserver smtp.gmail.com port 587
+  username "hobson@change.org" password "password"
+  using tlsv1
+  with timeout 30 seconds
+
+set alert tech_ops+hobson_monit@change.org
+
+include /etc/monit/conf.d/*

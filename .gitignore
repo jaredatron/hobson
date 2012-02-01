@@ -7,3 +7,5 @@ pkg/*
 .bin
 tmp/*
 log
+*.app
+

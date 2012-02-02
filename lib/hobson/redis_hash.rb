@@ -1,3 +1,5 @@
+require 'benchmark'
+
 class Hobson::RedisHash
 
   def initialize redis, key

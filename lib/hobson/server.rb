@@ -13,25 +13,13 @@ I18n.load_path << $:.map{|path| File.join(path,'action_view/locale/en.yml') }.fi
 
 class Hobson::Server < Sinatra::Base
 
-
-
   def self.start! options={}
     Vegas::Runner.new(self, 'hobson', options)
   end
 
   def initialize app = nil
     super
-    start_redis_slave!
-  end
-
-  def start_redis_slave!
-    @redis_slave ||= begin
-      @redis_slave = Redis::Slave.new(:master => Hobson.config[:redis])
-      @redis_slave.start!
-      raise "Failed to start Redis Slave" unless @redis_slave.process.alive?
-      Hobson.root_redis = @redis_slave.balancer
-      puts "started redis slave at #{@redis_slave.options[:slave].values_at(:host, :port).join(':')}"
-    end
+    Hobson.use_redis_slave!
   end
 
   root = Pathname.new(File.expand_path('..', __FILE__)) + 'server'

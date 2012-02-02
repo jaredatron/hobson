@@ -71,7 +71,7 @@ class Hobson::Project::TestRun::Job
 
   def save_log_files!
     workspace.root.join('log').children.each{|path| save_artifact path}
-    save_artifact(Hobson.temp_logfile.tap(&:flush).path, 'test_run.log') if Hobson.temp_logfile.present?
+    save_artifact(Hobson.temp_logfile.tap(&:flush).path, :name => 'test_run.log') if Hobson.temp_logfile.present?
   end
 
   def abort?

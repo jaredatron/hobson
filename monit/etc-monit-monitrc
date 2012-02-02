@@ -7,6 +7,9 @@ set mailserver smtp.gmail.com port 587
   using tlsv1
   with timeout 30 seconds
 
+set httpd port 2812
+  allow localhost
+
 set alert tech_ops+hobson_monit@change.org
 
 include /etc/monit/conf.d/*

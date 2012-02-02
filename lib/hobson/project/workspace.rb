@@ -13,10 +13,10 @@ class Hobson::Project::Workspace
     @test_run_index = 0
   end
 
-  # TODO rename root to path
   def root
     @root ||= Hobson.root + 'projects' + project.name
   end
+  alias_method :path, :root
 
   def checkout! sha
     logger.info "checking out #{sha}"
@@ -26,6 +26,7 @@ class Hobson::Project::Workspace
   def exists?
     root.exist? && root.join('.git').directory?
   end
+  alias_method :exist?, :exists?
 
   def create!
     root.parent.mkpath

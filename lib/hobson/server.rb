@@ -13,6 +13,8 @@ I18n.load_path << $:.map{|path| File.join(path,'action_view/locale/en.yml') }.fi
 
 class Hobson::Server < Sinatra::Base
 
+
+
   def self.start! options={}
     Vegas::Runner.new(self, 'hobson', options)
   end
@@ -32,9 +34,6 @@ class Hobson::Server < Sinatra::Base
     end
   end
 
-  autoload :Partials, 'hobson/server/partials'
-  autoload :Helpers,  'hobson/server/helpers'
-
   root = Pathname.new(File.expand_path('..', __FILE__)) + 'server'
 
   use Rack::MethodOverride
@@ -44,7 +43,7 @@ class Hobson::Server < Sinatra::Base
   set :public_folder, root + "public"
   set :static,        true
 
-  # helpers ActionView::Helpers
+  require 'hobson/server/helpers'
   helpers Hobson::Server::Helpers
   helpers ActionView::Helpers::DateHelper
 

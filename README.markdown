@@ -4,23 +4,84 @@ A distributed test run framework built on resque.
 
 Hobson distributes your test suite across N machines aggregating the results live on a beautiful locally run web app.
 
-Hobson can:
+## Hobson can:
 
   * auto balance tests across jobs
-  * preserve log files and other artifacts to S3
+  * preserve log files and other artifacts to the cloud
   * automatically re-run failed tests
   * monitor a git repo reference and auto run new SHAs (a basic CI)
 
-# Special Thanks
+## Special Thanks
 
   to Change.org for funding this project
   and to Charles Finkel for solving a heap of bugs
 
-# How it works
+---
 
-  Once you setup N machines running a hobson resque worker all you need to do is run '`hobson test`' and Hobson will distribute your test suite across N workers and aggregate the results live into a single web page.
+# How do I setup Hobson?
 
-Hobson is completely decentralized apart from it's persistence in a single redis server. There is no central Hobson server process. Hobson is just a collection of resque workers and local sintra app.
+## First Setup Hobson's Two Centralized Dependancies & config.yml:
+
+  0. Setup a redis-server (We recommend a dedicated redis-server instance for Hobson lest you run the chance of your data being lost when a projects test run flushes all databases. If anyone knows how to protect an individual db please contact me)
+  0. Setup a cloud storage like S3 (anything Fog supports) (this is used to upload artifacts like logs)
+  0. Create your Hobson config.yml like so
+
+        ---
+        :redis:
+          :host: 127.0.0.1
+          :port: 6380
+        :storage:
+          :provider: AWS
+          :aws_secret_access_key: INTENTIONALLY_LEFT_BLANK
+          :aws_access_key_id: INTENTIONALLY_LEFT_BLANK
+          :directory: BUCKET_NAME_HERE
+
+## Now Setup Your Hobson (Resque) Workers
+
+  0. setup N machines capable of running your project's test suite
+  0. on one of these machines start an isolated redis-server (on another port)
+    * I don't recommend sharing redis with your project(s)
+    * this is the redis you'll reference in your config.yml files later on
+  0. do this on all of your worker machines:
+    0. checkout the hobson repo (in ~/hobson for example)
+    0. `cd ~/hobson && bundle install`
+    0. make a directory for hobson to work within (~/hobson_workspace for example)
+    0. create a ~/hobson_workspace/config.yml file that looks like [this](https://github.com/deadlyicon/example_hobson_project/blob/master/config/hobson.yml)
+    0. …(here is where you would setup /etc/init.d/hobson and or monit etc.)
+    0. start your workers by running this:
+      * `cd ~/hobson_workspace && ~/hobson/bin/hobson work`
+
+### Now Preparing Your Project(s) To Be Run By Hobson
+
+  0. DO NOT ADD hobson TO YOUR GEMFILE OR PROJECT
+  0. checkout the hobson repo on your workstation (in ~/hobson for example)
+  0. copy the same config.yml file you created earlier to $YOUR_PROJECT/config/hobson.yml
+  0. add any hooks you might need [(see these examples)](https://github.com/deadlyicon/example_hobson_project/blob/master/config/hobson)
+
+### Now Kicking Off A Test Run
+
+  just run `hobson test` from with you project
+
+  Something like `cd $YOUR_PROJECT && ~/hobson/bin/hobson test`
+
+  This should start the local Hobson web server opened to your new test run's status page
+
+## Debugging Hobson
+
+  Hobson is very alpha. The main issue you might face is resque worker death. To get visiblity
+  into this run `hobson resque-web` to see the status of resque.
+
+---
+
+## How it works
+
+  Once you setup N machines running a hobson resque worker all you need to do
+  is run '`hobson test`' and Hobson will distribute your test suite across N
+  workers and aggregate the results live into a single web page.
+
+Hobson is completely decentralized apart from it's persistence in a single
+redis server. There is no central Hobson server process. Hobson is just a
+collection of resque workers and local sintra app.
 
 ## The Common life cycle:
 
@@ -64,13 +125,11 @@ The hobson command looks in ${APP_ROOT}/config/hobson.yml for the redis server i
 Right now a 'test' is an individual feature or spec file. In the near future we'll be increasing cucumber feature granularity to the individual feature level. Unfortunately because specs can be defined dynamically it's non-trivial if not impossible to individually address each spec so we have to stay at the level of the file for rspec.
 
 
-# How do I setup Hobson?
+---
 
-## Setup Centralized Dependancies
+# Internals
 
-  0. Setup a redis-server (We recommend a dedicated redis-server instance for Hobson lest you run the chance of your data being lost when a projects test run flushes all databases. If anyone knows how to protect an individual db please contact me)
-  0. Setup an S3 bucket (this is used to upload test run artifacts like logs)
-  0. Create your Hobson config.yml like so
+  Hobson persists everything in redis using the following models.
 
         ---
         :redis:
@@ -103,10 +162,11 @@ Right now a 'test' is an individual feature or spec file. In the near future we'
 
 ### Hobson::Project
   * name       (String)
-  * git url    (String)
-  * test runs  (Hobson::Project::TestRun)
+  * git_url    (String)
+  * test_runs  (Hobson::Project::TestRun)
 
-### Hobson::Project::TestRun
+### Hobson::TestRun
+  * project           (string)
   * id                (String)
   * sha               (String)
   * scheduled_build   (Datetime)
@@ -145,7 +205,7 @@ Right now a 'test' is an individual feature or spec file. In the near future we'
   * update balancing logic to be aware of 0 est runtimes rather then using 0.1 as a hack
   * find a fix for empty test files
     * when a test file is empty it's never updated by the hobson status formatter and the whole test run is hung
-  * refactor away from redis hashes and back to normal keys/namespaces with marshaling
+  * improve the way Hobson uses redis. It's wicked slow atm.
   * add hobson & hobson project configuration options
     * min / max jobs per test_run
     * min / max tests per job

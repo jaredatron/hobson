@@ -101,22 +101,30 @@ describe Hobson::Project::TestRun do
           test_run.jobs.length.should == 2
         end
 
-        it "should balance specs and features evenly across 2 jobs" do
+        it "should assign specs to one job worker and features to the other" do
           test_run.build!
-          test_run.jobs.first.tests.map(&:name).sort.should == %w[
-            features/a.feature
-            features/b.feature
-            features/c.feature
-            features/d.feature
-            features/e.feature
-          ].sort
-          test_run.jobs.last.tests.map(&:name).sort.should == %w[
-            spec/a_spec.rb
-            spec/b_spec.rb
-            spec/c_spec.rb
-            spec/d_spec.rb
-            spec/e_spec.rb
-          ].sort
+
+          # using a set of sets allows comparison to not case about the other
+          # of tests or what job got what set of tests
+          expected_job_tests = Set[
+            %w[
+              features/a.feature
+              features/b.feature
+              features/c.feature
+              features/d.feature
+            ].to_set,
+            %w[
+              spec/a_spec.rb
+              spec/b_spec.rb
+              spec/c_spec.rb
+              spec/d_spec.rb
+            ].to_set
+          ]
+
+
+          actual_jobs_tests = test_run.jobs.map{|job| job.tests.map(&:name).to_set }.to_set
+
+          actual_jobs_tests.should == expected_job_tests
         end
 
       end

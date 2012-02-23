@@ -22,8 +22,8 @@ describe Hobson::Project::TestRun::Tests do
 
       before{ tests.detect! }
 
-      it "should have a length of 10" do
-        tests.length.should == 10
+      it "should have a length of 8" do
+        tests.length.should == 8
       end
 
       it "should contain only Test objects" do
@@ -36,7 +36,7 @@ describe Hobson::Project::TestRun::Tests do
 
       describe "#types" do
         it "should return ['feature', 'spec']" do
-          tests.types.should == %w{feature spec}.sort
+          tests.types.to_set.should == %w{feature spec}.to_set
         end
       end
 

@@ -1,5 +1,5 @@
 class RedisMonitor
-  instance_methods.each { |m| undef_method m unless m =~ /^__/ }
+  instance_methods.each { |m| undef_method m unless m =~ /^(__|object_id$)/ }
 
   def initialize(redis)
     @redis = redis

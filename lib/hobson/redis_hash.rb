@@ -30,8 +30,8 @@ class Hobson::RedisHash
   end
 
   def delete key
-    @redis.hdel(@key, key)
-    @cache.delete(key)
+    redis.hdel(@key, key)
+    @cache.delete(key) if @cache
   end
 
   def cache

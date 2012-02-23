@@ -96,6 +96,10 @@ class Hobson::Project
     @redis ||= Redis::Namespace.new("Project:#{name}", :redis => Hobson.redis)
   end
 
+  def delete
+    redis.keys.each{|key| redis.del key }
+  end
+
   def logger
     @logger ||= Log4r::Logger.new("Hobson::Project")
   end

@@ -19,7 +19,7 @@ class Hobson::Server < Sinatra::Base
 
   def initialize app = nil
     super
-    Hobson.use_redis_slave!
+    Hobson.use_redis_slave! unless ENV['HOBSON_REDIS_SLAVE'] == 'false'
   end
 
   root = Pathname.new(File.expand_path('..', __FILE__)) + 'server'

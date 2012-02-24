@@ -1,3 +1,5 @@
+require 'hobson/version'
+
 require 'redis'
 require 'redis/slave'
 
@@ -27,27 +29,30 @@ module Hobson
   autoload :Artifacts,    'hobson/artifacts'
   autoload :Project,      'hobson/project'
   autoload :Server,       'hobson/server'
+  autoload :Worker,       'hobson/worker'
   autoload :CI,           'hobson/ci'
 
   # become a resque-worker and handle hobson resque jobs
   def work! options={}
     options[:pidfile] ||= ENV['PIDFILE']
 
+    self.resque # ensure resque is all setup
+
     work = proc{
-      worker = resque::Worker.new('*')
+      worker = Worker.new
       worker.verbose = true
       worker.very_verbose = $DEBUG
-      logger.info "started resque worker #{worker}"
+      logger.info "started worker #{worker}"
       File.open(options[:pidfile], 'w') { |f| f << worker.pid } if options[:pidfile]
       worker.work
     }
 
     if options[:daemonize]
       pid = fork{ work.call }
-      puts "Daemonized a resque worker with pid #{pid}"
+      puts "Daemonized a worker with pid #{pid}"
       Process.detach(pid)
     else
-      puts "Becoming a resque worker"
+      puts "Becoming a worker"
       work.call
     end
   end
@@ -101,5 +106,6 @@ module Hobson
 
 end
 
+require 'hobson/version'
 require 'hobson/logger'
 require 'hobson/redis'

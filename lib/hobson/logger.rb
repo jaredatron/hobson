@@ -41,8 +41,10 @@ module Hobson
     yield
   ensure
     logger.outputters = logger.outputters - [temp_log_outputter]
-    @temp_logfile.close
-    @temp_logfile.unlink
+    if @temp_logfile
+      @temp_logfile.close
+      @temp_logfile.unlink
+    end
     @temp_logfile = nil
   end
 

@@ -72,8 +72,10 @@
                 .error
                   %dt Error
                   %dd
-                    %strong.exception= job['exception']
-                    %pre.backtrace= job['backtrace']
+                    %h2 Exception #{job['exception:class']}:
+                    .exception= job['exception:message']
+                    %h2 Backtrace:
+                    .backtrace= job['exception:backtrace']
 
             .icon
 

@@ -16,13 +16,16 @@ class Hobson::Project::TestRun::Job
   def eval_hook hook, additional_data = {}
     logger.info "running #{hook} hook"
     path = workspace.root.join("config/hobson/#{hook}.rb")
-    if path.exist?
-      logger.info "instance evaling #{path}"
-      HookEnvironment.new(self, additional_data).instance_eval(path.read)
-      true
-    else
+    if !path.exist?
       logger.info "#{path} not found"
-      false
+      return false
+    end
+    logger.info "instance evaling #{path}"
+    begin
+      HookEnvironment.new(self, additional_data).instance_eval(path.read, path.to_s, 1)
+    rescue Exception => e
+      e.backtrace.unshift "#{path}:0:in `instance eval'"
+      raise
     end
   end
 

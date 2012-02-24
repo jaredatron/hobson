@@ -163,8 +163,8 @@ class Hobson::Project::Workspace
       }
       output.split("\n").each{|line| logger.debug line}
       errors.split("\n").each{|line| logger.error line}
-      raise ExecutionError, "#{command.inspect} could not be started" if status.nil?
-      raise ExecutionError, "#{command.inspect} crashed with exit code #{$?.exitstatus}\n#{errors}" unless $?.success?
+      raise ExecutionError, "COMMAND FAILED TO START\n#{command}" if status.nil?
+      raise ExecutionError, "COMMAND EXITED WITH CODE #{$?.exitstatus}\n#{command}\n\n#{errors}" unless $?.success?
       return output
     }
   end

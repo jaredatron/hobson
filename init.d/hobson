@@ -13,10 +13,11 @@
 
 
 PATH=/home/change/.rvm/bin:/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
-HOBSON_ROOT=/home/change/hobson
-HOBSON_CONFIG=/home/change/hobson/config.yml
-PIDFILE=/home/change/hobson/hobson.pid
-HOBSON="rvm use ruby-1.9.3-p0 do ruby /home/change/hobson_gem/bin/hobson work --pidfile $PIDFILE"
+HOBSON_ROOT=/home/change/hobson_workspace
+HOBSON_CONFIG=$HOBSON_ROOT/config.yml
+PIDFILE=$HOBSON_ROOT/hobson.pid
+USER=change
+HOBSON="rvm use ruby-1.9.3-p0 do ruby ~/hobson/bin/hobson work --pidfile $PIDFILE"
 NAME=hobson
 DESC=hobson
 
@@ -33,7 +34,7 @@ case "$1" in
         echo -n "Starting $DESC: "
         touch $PIDFILE
         chown change:change $PIDFILE
-        if start-stop-daemon --start --background --umask 007 --pidfile $PIDFILE --chuid change:change --exec /bin/bash -- -c "$HOBSON"
+        if start-stop-daemon --start --background --umask 007 --pidfile $PIDFILE --chuid $USER:$USER --exec /bin/bash -- -c "$HOBSON"
         then
                 echo "$NAME."
         else

@@ -12,13 +12,14 @@
 ### END INIT INFO
 
 
-PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+PATH=/home/change/.rvm/bin:/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 HOBSON_ROOT=/home/change/hobson
 HOBSON_CONFIG=/home/change/hobson/config.yml
-DAEMON=/home/change/hobson_gem/bin/hobson
+PIDFILE=/home/change/hobson/hobson.pid
+HOBSON="rvm use ruby-1.9.3-p0 do ruby /home/change/hobson_gem/bin/hobson work --pidfile $PIDFILE"
 NAME=hobson
 DESC=hobson
-PIDFILE=/home/change/hobson/hobson.pid
+
 
 export HOBSON_ROOT
 export HOBSON_CONFIG
@@ -32,7 +33,7 @@ case "$1" in
         echo -n "Starting $DESC: "
         touch $PIDFILE
         chown change:change $PIDFILE
-        if start-stop-daemon --start --quiet --umask 007 --pidfile $PIDFILE --chuid change:change --exec $DAEMON -- work --daemonize --pidfile=$PIDFILE
+        if start-stop-daemon --start --background --umask 007 --pidfile $PIDFILE --chuid change:change --exec /bin/bash -- -c "$HOBSON"
         then
                 echo "$NAME."
         else
@@ -41,7 +42,7 @@ case "$1" in
         ;;
   stop)
         echo -n "Stopping $DESC: "
-        if start-stop-daemon --stop --retry forever/QUIT/1 --quiet --oknodo --pidfile $PIDFILE --exec $DAEMON
+        if start-stop-daemon --stop --retry forever/QUIT/1 --oknodo --pidfile $PIDFILE
         then
                 echo "$NAME."
         else
@@ -57,7 +58,7 @@ case "$1" in
 
   status)
         echo -n "$DESC is "
-        if start-stop-daemon --stop --quiet --signal 0 --pidfile ${PIDFILE}
+        if start-stop-daemon --stop --signal 0 --pidfile ${PIDFILE}
         then
                 echo "running"
         else

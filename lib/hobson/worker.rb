@@ -14,7 +14,7 @@ class Hobson::Worker < Resque::Worker
   end
 
   def proc_name
-    parent? ? "hobson-#{Hobson.git_version}" : "hobson-worker:parent-#{@parent_pid}"
+    parent? ? "Hobson Worker (#{Hobson.git_version[0..8]})" : "Hobson Test Runner for #{@parent_pid}"
   end
 
   def procline(string)

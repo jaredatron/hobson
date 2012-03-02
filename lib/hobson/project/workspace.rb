@@ -30,7 +30,7 @@ class Hobson::Project::Workspace
 
   def create!
     root.parent.mkpath
-    `git clone --depth 1 "#{project.url}" "#{root}"` or raise "unable to create workspace"
+    `git clone "#{project.url}" "#{root}"` or raise "unable to create workspace"
   end
 
   def rvm?

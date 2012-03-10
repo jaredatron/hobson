@@ -199,6 +199,8 @@ Right now a 'test' is an individual feature or spec file. In the near future we'
 
 # TODO
 
+  * use redis index sets instead of using the keys command
+  * add a test run post processing job to do things like compile SimpleCov reports
   * add a requested-by tag to show what engineer created what test_run
   * refactor feature tests to mean individual scenarios rather then .feature file
   * detect when a sha isn't on origin and error

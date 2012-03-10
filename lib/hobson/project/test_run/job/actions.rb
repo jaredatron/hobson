@@ -10,13 +10,9 @@ class Hobson::Project::TestRun::Job
   def run_tests!
     return if test_run.aborted?
 
-    begin
-      Timeout::timeout(5){
-        self['hostname'] = `curl -s http://169.254.169.254/latest/meta-data/public-hostname`.chomp
-      }
-    rescue Timeout::Error
-    end
-    self['hostname'] = `hostname`.chomp if self['hostname'].blank? || !$?.success?
+    self['hostname'] = Timeout::timeout(5){ # try the S3 public hostname api
+      `curl -s http://169.254.169.254/latest/meta-data/public-hostname`.chomp
+    } rescue `hostname`.chomp
 
     abort?
     checking_out_code!

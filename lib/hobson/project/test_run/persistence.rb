@@ -6,7 +6,13 @@ class Hobson::Project::TestRun
     @redis_hash ||= Hobson::RedisHash.new(redis, "TestRun:#{id}")
   end
 
+  def save!
+    project.redis.sadd(:test_runs, id)
+    created!
+  end
+
   def delete!
+    project.redis.srem(:test_runs, id)
     redis.del("TestRun:#{id}")
     true
   end

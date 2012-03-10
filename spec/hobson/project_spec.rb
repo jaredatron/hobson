@@ -74,9 +74,9 @@ describe Hobson::Project do
         Factory.project.test_runs.should be_an Array
         test_runs = []
         test_runs << project.run_tests!
-        Factory.project.test_runs.should == test_runs.sort_by(&:id)
+        Factory.project.test_runs.map(&:id).to_set.should == test_runs.map(&:id).to_set
         test_runs << project.run_tests!
-        Factory.project.test_runs.should == test_runs.sort_by(&:id)
+        Factory.project.test_runs.map(&:id).to_set.should == test_runs.map(&:id).to_set
       end
 
       it "should return a test run when given an id" do

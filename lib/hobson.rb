@@ -104,6 +104,10 @@ module Hobson
     end
   end
 
+  def projects project=nil
+    project.present? ? Project[project] : redis.smembers(:projects).map{|p| Project[p] }
+  end
+
 end
 
 require 'hobson/version'

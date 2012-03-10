@@ -14,6 +14,7 @@ module Factory
     test_run = Hobson::Project::TestRun.new(project)
     test_run.created!
     test_run.sha = ClientWorkingDirectory.current_sha
+    test_run.save!
     test_run
   end
 

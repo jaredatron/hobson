@@ -20,13 +20,6 @@ class Hobson::Project
       project
     end
 
-    def all
-      Hobson.redis.keys.inject([]){ |projects, key|
-        key =~ /^Project:(.*):url$/ and projects << self[$1]
-        projects
-      }
-    end
-
   end
 
   attr_reader :name
@@ -49,16 +42,15 @@ class Hobson::Project
   def test_runs id=nil
     if id.present?
       test_run = TestRun.new(self, id)
-      return test_run.data.keys.present? ? test_run : nil
+      test_run.data.keys.present? ? test_run : nil
+    else
+      @test_runs ||= redis.smembers(:test_runs).map{|id| TestRun.new(self, id) }
     end
-    @test_runs ||= redis.keys \
-      .inject([]){|ids, key| key =~ /^TestRun:([\w-]+)$/ and ids << $1; ids } \
-      .sort.map{|id| TestRun.new(self, id) }
   end
 
   def run_tests! sha = current_sha
     test_run = TestRun.new(self)
-    test_run.created!
+    test_run.save!
     test_run.sha = sha
     test_run.enqueue!
     test_run
@@ -93,10 +85,14 @@ class Hobson::Project
   end
 
   def redis
-    @redis ||= Redis::Namespace.new("Project:#{name}", :redis => Hobson.redis)
+    @redis ||= begin
+      Hobson.redis.sadd(:projects, name)
+      Redis::Namespace.new("Project:#{name}", :redis => Hobson.redis)
+    end
   end
 
   def delete
+    Hobson.redis.srem(:projects, name)
     redis.keys.each{|key| redis.del key }
   end
 

@@ -4,7 +4,7 @@ module Hobson::Server::Helpers
   alias_method :h, :escape_html
 
   def project
-    @project ||= Hobson::Project[params["project_name"]] or raise Sinatra::NotFound
+    @project ||= Hobson::Project[params["project_name"]]
   end
 
   def test_runs

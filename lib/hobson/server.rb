@@ -81,7 +81,7 @@ class Hobson::Server < Sinatra::Base
   end
 
   get "/projects" do
-    @projects = Hobson::Project.all
+    @projects = Hobson.projects
     haml :'projects', :layout => !request.xhr?
   end
 

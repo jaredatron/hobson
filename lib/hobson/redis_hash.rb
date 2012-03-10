@@ -10,7 +10,6 @@ class Hobson::RedisHash
   attr_reader :redis, :key
   delegate :keys, :to => :cache
 
-
   def get field
     value = @redis.hget(@key, field.to_s)
     value ? Marshal.load(value) : nil

@@ -14,35 +14,36 @@ class Hobson::Project::TestRun::Job
       `curl -s http://169.254.169.254/latest/meta-data/public-hostname`.chomp
     } rescue `hostname`.chomp
 
-    abort?
-    checking_out_code!
-    workspace.checkout! test_run.sha
-
-    abort?
-    preparing!
-    workspace.prepare
-    eval_hook :setup
-
-    abort?
-    running_tests!
-    while (tests = test_needing_to_be_run).present?
-      abort?
-      eval_hook :before_running_tests, :tests => tests
-      abort?
-      names = tests.each(&:trying!).map(&:name).sort
-      workspace.run_tests(names){ |name, state, time, result|
-        abort?
-        test = tests.find{|test| test.name == name} or next
-        case state
-        when :start
-          test.started_at   = time
-        when :complete
-          test.completed_at = time
-          test.result = result
-        end
-      }
+    unless abort?
+      checking_out_code!
+      workspace.checkout! test_run.sha
     end
-    abort?
+
+    unless abort?
+      preparing!
+      workspace.prepare
+      eval_hook :setup
+    end
+
+    unless abort?
+      running_tests!
+      while (tests = test_needing_to_be_run).present?
+        break if abort?
+        eval_hook :before_running_tests, :tests => tests
+        break if abort?
+        names = tests.each(&:trying!).map(&:name).sort
+        workspace.run_tests(names){ |name, state, time, result|
+          test = tests.find{|test| test.name == name} or next
+          case state
+          when :start
+            test.started_at   = time
+          when :complete
+            test.completed_at = time
+            test.result = result
+          end
+        }
+      end
+    end
 
     saving_artifacts!
     save_log_files!
@@ -57,13 +58,13 @@ class Hobson::Project::TestRun::Job
     self['exception:class'] = e.class.to_s
     self['exception:message'] = e.message.to_s
     self['exception:backtrace'] = e.backtrace.join("\n")
-    raise # raise to resque shows this as a failed job and you can retry it
+    raise # raise so resque shows this as a failed job and you can retry it
   ensure
     complete!
     begin
       save_log_files!
     rescue Exception => e
-      logger.error "Error saving log files on error"
+      logger.error "Error saving log files on error\n#{e}\n#{e.backtrace*"\n"}"
     end
   end
 
@@ -74,8 +75,6 @@ class Hobson::Project::TestRun::Job
 
   def abort?
     return false if !running? || !test_run.aborted?
-    logger.info "ABORTING! (#{caller.first})"
-    exit!
   end
 
 end

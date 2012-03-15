@@ -56,10 +56,19 @@ class Hobson::Server < Sinatra::Base
     end
   end
 
+  MAX_CHECK_FOR_CHANGES_INTERVAL = 60 # seconds
   get '/ci/check-for-changes' do
-    project_refs = Hobson::CI::ProjectRef.all.find_all(&:needs_test_run?)
-    project_refs.each(&:run_tests!)
-    {:success => true, :changes => project_refs.size}.to_json
+    now = Time.now
+    @@last_time_we_checked_for_changes ||= now - MAX_CHECK_FOR_CHANGES_INTERVAL
+    seconds_since_last_check = now - @@last_time_we_checked_for_changes
+    response = {:success => true, :seconds_since_last_check => seconds_since_last_check, :checked => false}
+    if seconds_since_last_check >= MAX_CHECK_FOR_CHANGES_INTERVAL
+      @@last_time_we_checked_for_changes = now
+      project_refs = Hobson::CI::ProjectRef.all.find_all(&:needs_test_run?)
+      project_refs.each(&:run_tests!)
+      response[:checked] = true
+    end
+    response.to_json
   end
 
   get "/ci/new" do

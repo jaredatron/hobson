@@ -32,31 +32,6 @@ module Hobson
   autoload :Worker,       'hobson/worker'
   autoload :CI,           'hobson/ci'
 
-  # become a resque-worker and handle hobson resque jobs
-  def work! options={}
-    options[:pidfile] ||= ENV['PIDFILE']
-
-    self.resque # ensure resque is all setup
-
-    work = proc{
-      worker = Worker.new
-      worker.verbose = true
-      worker.very_verbose = $DEBUG
-      logger.info "started worker #{worker}"
-      File.open(options[:pidfile], 'w') { |f| f << worker.pid } if options[:pidfile]
-      worker.work
-    }
-
-    if options[:daemonize]
-      pid = fork{ work.call }
-      puts "Daemonized a worker with pid #{pid}"
-      Process.detach(pid)
-    else
-      puts "Becoming a worker"
-      work.call
-    end
-  end
-
   def root
     @root ||= Pathname.new ENV['HOBSON_ROOT'] ||= Dir.pwd
   end

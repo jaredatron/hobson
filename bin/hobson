@@ -56,7 +56,7 @@ Class.new Thor do
   method_option :daemonize, :type => :boolean, :aliases => %w{-d}, :banner => 'deamonize before becoming a resque worker'
   method_option :pidfile,   :type => :string,  :aliases => %w{-p}, :banner => 'path to the pid file'
   def work
-    Hobson.work! :daemonize => options.daemonize?, :pidfile => options.pidfile
+    Hobson::Worker.become! :daemonize => options.daemonize?, :pidfile => options.pidfile
   end
 
   desc "web", "start hobson web server (see vegas options)"

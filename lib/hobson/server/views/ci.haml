@@ -19,7 +19,7 @@
           - if project_ref.last_test_run.present?
             %a{:href => test_run_path(project_ref.last_test_run)}= project_ref.last_test_run.id
           - else
-            = project_ref.last_test_run.id
+            n/a
 
         %dt Repo Url
         %dd

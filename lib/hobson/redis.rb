@@ -43,6 +43,20 @@ module Hobson
       @redis_slave.start!
       raise "Failed to start Redis Slave" unless @redis_slave.process.alive?
       puts "starting redis slave at #{@redis_slave.options[:slave].values_at(:host, :port).join(':')}"
+      print "waiting for local redis-slave to catch up"
+      missing, synced = [], false
+      until synced
+        begin
+          missing = @redis_slave.balancer.master.keys - @redis_slave.balancer.slave.keys
+        rescue Errno::ECONNREFUSED, RuntimeError
+          next
+        ensure
+          synced = missing.count == 0
+          print '.'
+          sleep 1
+        end
+      end
+      print "\n"
       @redis_slave
     end
   end
@@ -52,7 +66,7 @@ module Hobson
       redis_slave.balancer.keys
     rescue Errno::ECONNREFUSED, RuntimeError
       puts "waiting for redis slave server to start and catch up..."
-      sleep 0.5
+      sleep 1
       retry
     end
     Hobson.root_redis = redis_slave.balancer

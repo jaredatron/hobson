@@ -24,7 +24,6 @@ class Hobson::Worker < Resque::Worker
       worker.very_verbose = $DEBUG
       Hobson.logger.info "started worker #{worker}"
       puts "started worker #{worker}"
-      p Hobson.resque.redis.smembers("workers");
       File.open(options[:pidfile], 'w') { |f| f << worker.pid } if options[:pidfile]
       worker.work
     end

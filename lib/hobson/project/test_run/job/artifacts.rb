@@ -18,7 +18,15 @@ class Hobson::Project::TestRun::Job
     options[:body] ||= path.read
     options[:public] = true unless options.has_key?(:public)
     file = Hobson.files.create(options)
-    public_url = CGI::unescape(file.public_url)
+    public_url = if file.public_url.present?
+      CGI::unescape(file.public_url)
+    else
+      'file://' + File.join(
+        Hobson.files.directory.connection.local_root,
+        Hobson.files.directory.key,
+        file.key
+      ) rescue ""
+    end
     self["artifact:#{name}"] = public_url
     logger.info "saving artifact #{name} -> #{public_url}"
     file

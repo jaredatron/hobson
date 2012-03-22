@@ -12,11 +12,11 @@ class Hobson::RedisHash
 
   def get field
     value = @redis.hget(@key, field.to_s)
-    value ? Marshal.load(value) : nil
+    value ? deserialize(value) : nil
   end
 
   def set field, value
-    @redis.hset(@key, field.to_s, Marshal.dump(value))
+    @redis.hset(@key, field.to_s, serialize(value))
   end
 
   def [] field
@@ -35,7 +35,7 @@ class Hobson::RedisHash
 
   def cache
     @cache ||= @redis.hgetall(@key).inject({}) do |cache,(field,value)|
-      cache.update field => Marshal.load(value)
+      cache.update field => deserialize(value)
     end
   end
 
@@ -51,5 +51,15 @@ class Hobson::RedisHash
     "#<#{self.class} #{key} #{cache.inspect}>"
   end
   alias_method :to_s, :inspect
+
+  private
+
+  def serialize value
+    Marshal.dump(value)
+  end
+
+  def deserialize value
+    Marshal.load(value)
+  end
 
 end

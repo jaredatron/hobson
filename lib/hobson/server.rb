@@ -125,9 +125,9 @@ class Hobson::Server < Sinatra::Base
     redirect test_run_path
   end
 
-  get "/projects/:project_name/tests" do |project_name|
-    @tests = project.tests
-    haml :'projects/tests', :layout => !request.xhr?
+  get "/projects/:project_name/test_runtimes" do |project_name|
+    @test_runtimes = project.test_runtimes
+    haml :'projects/test_runtimes', :layout => !request.xhr?
   end
 
 end

@@ -1,0 +1,22 @@
+- @page_title = "Test Runtimes"
+
+%table.sortable
+  %thead
+    %tr
+      %th Name
+      %th{:class => :sorttable_numeric} Avg. Runtime
+      %th{:sorttable_customkey => 0, :colspan => Hobson::Project::TestRuntimes::MAX_REMEMBERED_RUNTIMES} Runtimes (seconds)
+  %tbody
+    - @test_runtimes.sort_by(&:average).reverse.each do |runtimes|
+      %tr
+        %td= runtimes.test_name
+        %td{:title => runtimes.average}= distance_of_time_in_words(runtimes.average.to_i)
+        - sorted_runtimes = runtimes.sort.reverse
+        - Hobson::Project::TestRuntimes::MAX_REMEMBERED_RUNTIMES.times do |i|
+          - if runtime = sorted_runtimes[i]
+            %td= runtime.to_i
+          - else
+            %td
+
+:javascript
+  $(function(){ Hobson.autoRefresh.stop(); });

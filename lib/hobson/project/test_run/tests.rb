@@ -14,10 +14,6 @@ class Hobson::Project::TestRun::Tests
     tests.each(&:calculate_estimated_runtime!)
   end
 
-  def other_tests
-    @other_tests ||= (test_run.project.test_runs - [test_run]).map(&:tests)
-  end
-
   def types
     tests.map(&:type).uniq
   end

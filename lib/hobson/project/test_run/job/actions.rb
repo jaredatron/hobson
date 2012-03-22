@@ -27,6 +27,7 @@ class Hobson::Project::TestRun::Job
 
     unless abort?
       running_tests!
+      test_runtimes = test_run.project.test_runtimes
       while (tests = test_needing_to_be_run).present?
         break if abort?
         eval_hook :before_running_tests, :tests => tests
@@ -40,6 +41,7 @@ class Hobson::Project::TestRun::Job
           when :complete
             test.completed_at = time
             test.result = result
+            test_runtimes[name] << test.runtime if test.pass?
           end
         }
       end

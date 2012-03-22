@@ -70,13 +70,13 @@ class Hobson::Project::TestRun::Tests::Test
     name <=> other.name
   end
 
-  MINIMUM_ESTIMATED_RUNTIME = 0.1
+  MINIMUM_EST_RUNTIME = 0.1
 
   def calculate_estimated_runtime!
     self.est_runtime ||= begin
-      runtimes = tests.other_tests.map{|t|t[name]}.compact.find_all(&:pass?).map(&:runtime).compact
-      sum = runtimes.map(&:to_f).sum
-      sum <= 0 ? MINIMUM_ESTIMATED_RUNTIME : sum / runtimes.size
+      average_runtime = tests.test_run.project.test_runtimes[name].average
+      average_runtime = MINIMUM_EST_RUNTIME if average_runtime < MINIMUM_EST_RUNTIME
+      average_runtime
     end
   end
 

@@ -1,5 +1,7 @@
 class Hobson::Project::TestRun
 
+  MAX_AGE = 604800 # 7 days
+
   delegate :redis, :to => :project
 
   def redis_hash
@@ -8,6 +10,7 @@ class Hobson::Project::TestRun
 
   def save!
     project.redis.sadd(:test_runs, id)
+    redis_hash.redis.expire(redis_hash.key, MAX_AGE)
     created!
   end
 

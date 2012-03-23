@@ -59,20 +59,13 @@ class Hobson::Project::Workspace
     logger.info "Running Tests #{@test_run_index}: #{tests.join(' ')}"
 
     # split up tests by type
-    tests = tests.group_by{|path|
-      case path
-      when /.feature$/; 'features'
-      when /_spec.rb$/; 'specs'
-      when /_test.rb$/; 'test_units'
-      end
-    }
+    tests.group_by(&:type).each{|type, tests|
+      logger.info "Running #{tests.size} #{type} tests"
+      next if tests.empty?
 
-    # run each test type
-    %w{features specs test_units}.each{|type|
-      next if tests[type].blank?
       command = "cd #{root.to_s.inspect} && "
       command << "bundle exec " if bundler?
-      command << test_command(type, tests[type])
+      command << test_command(type, tests.map(&:name))
       command << "; true" # we dont care about the exit status
 
       status_file = root.join(hobson_status_file)
@@ -82,8 +75,9 @@ class Hobson::Project::Workspace
         begin
           fork_and_execute(command) do
             status.read.split("\n").each{|line|
-              if line =~ /^TEST:([^:]+):(START|COMPLETE):(\d+\.\d+)(?::(PASS|FAIL|PENDING))?$/
-                yield $1, $2.downcase.to_sym, Time.at($3.to_i), $4
+              if line =~ /^TEST:([^:]+):([^:]+):(START|COMPLETE):(\d+\.\d+)(?::(PASS|FAIL|PENDING))?$/
+                type, name, state, occured_at, result = $1, $2, $3.downcase.to_sym, Time.at($4.to_i), $5
+                yield type, name, state, occured_at, result
               end
             }
           end
@@ -92,7 +86,6 @@ class Hobson::Project::Workspace
         end
       }
     }
-    tests
   end
 
   def hobson_status_file
@@ -101,7 +94,7 @@ class Hobson::Project::Workspace
 
   def test_command type, tests
     case type.to_sym
-    when :features
+    when :scenario
       %W[
         cucumber
         --quiet
@@ -109,9 +102,9 @@ class Hobson::Project::Workspace
         --require #{Hobson.lib.join('hobson/formatters/cucumber.rb')}
         --format pretty --out log/feature_run#{@test_run_index}
         --format Hobson::Formatters::Cucumber --out #{hobson_status_file}
-        #{tests*' '}
+        #{tests.map{|name| '--name ' + "^#{Regexp.escape(name)}$".inspect }*' '}
       ]
-    when :specs
+    when :spec
       %W[
         rspec
         --require #{Hobson.lib.join('hobson/formatters/rspec.rb')}
@@ -119,8 +112,10 @@ class Hobson::Project::Workspace
         --format Hobson::Formatters::Rspec --out #{hobson_status_file}
         #{tests*' '}
       ]
-    when :test_units
+    when :test_unit
       %W[echo not yet supported && false]
+    else
+      raise "unknown test type #{type}"
     end * ' '
   end
 

@@ -1,20 +1,24 @@
 class Hobson::Project::TestRun::Tests::Test
 
-  attr_reader :tests, :name
+  attr_reader :tests, :type, :name
 
-  def initialize tests, name
-    @tests, @name = tests, name
+  def initialize tests, type, name
+    @tests, @type, @name = tests, type.to_sym, name
     self.created_at ||= Time.now
     self.tries ||= 0
+  end
+
+  def id
+    "#{type}:#{name}"
   end
 
   %w{job est_runtime created_at started_at completed_at result tries}.each do |attr|
     class_eval <<-RUBY, __FILE__, __LINE__
       def #{attr}
-        @#{attr} ||= tests.test_run["test:\#{name}:#{attr}"]
+        @#{attr} ||= tests.test_run["test:\#{id}:#{attr}"]
       end
       def #{attr}= value
-        @#{attr}   = tests.test_run["test:\#{name}:#{attr}"] = value
+        @#{attr}   = tests.test_run["test:\#{id}:#{attr}"] = value
       end
     RUBY
   end
@@ -25,16 +29,6 @@ class Hobson::Project::TestRun::Tests::Test
         result == "#{result}"
       end
     RUBY
-  end
-
-  def type
-    case name
-      when /.feature$/ ; 'feature'
-      when /_spec.rb$/ ; 'spec'
-      # when /_test.rb$/ ; :test_unit
-      else
-        :unknown
-    end
   end
 
   def trying!
@@ -82,6 +76,7 @@ class Hobson::Project::TestRun::Tests::Test
 
   def inspect
     "#<#{self.class} "\
+    "type:#{type.to_s.inspect} "\
     "name:#{name.inspect} "\
     "est_runtime:#{est_runtime.inspect} "\
     "job:#{job.inspect} "\

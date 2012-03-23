@@ -16,7 +16,7 @@ RSpec.configure do |config|
 
   config.before :all do
     spec = get_spec.call(self)
-    Hobson::Formatters::Rspec.puts "TEST:#{spec}:START:#{Hobson::Formatters.now.to_f}"
+    Hobson::Formatters::Rspec.puts "TEST:spec:#{spec}:START:#{Hobson::Formatters.now.to_f}"
   end
 
   config.after :all do
@@ -29,7 +29,7 @@ RSpec.configure do |config|
       'FAIL' : 'PASS'
     end
 
-    Hobson::Formatters::Rspec.puts "TEST:#{spec}:COMPLETE:#{Hobson::Formatters.now.to_f}:#{status}"
+    Hobson::Formatters::Rspec.puts "TEST:spec:#{spec}:COMPLETE:#{Hobson::Formatters.now.to_f}:#{status}"
   end
 
 end

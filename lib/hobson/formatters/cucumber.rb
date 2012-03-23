@@ -17,15 +17,22 @@ module Hobson
       end
 
       def before_feature feature
-        raise "started twice!" unless @started_at.nil?
-        @io.puts "TEST:#{feature.file}:START:#{Hobson::Formatters.now.to_f}"
+        raise "test started twice!" unless @started_at.nil?
+        @started_at = Hobson::Formatters.now.to_f
+      end
+
+      def scenario_name keyword, name, file_colon_line, source_indent
+        @scenario_name = name
+        @io.puts "TEST:scenario:#{@scenario_name}:START:#{@started_at}"
         @io.flush
       end
 
-      def after_feature(feature)
+      def after_feature feature
         status = feature.instance_variable_get(:@feature_elements).any?(&:failed?) ? 'FAIL' : 'PASS'
-        @io.puts "TEST:#{feature.file}:COMPLETE:#{Hobson::Formatters.now.to_f}:#{status}"
+        @ended_at = Hobson::Formatters.now.to_f
+        @io.puts "TEST:scenario:#{@scenario_name}:COMPLETE:#{@ended_at}:#{status}"
         @io.flush
+        @started_at = @ended_at = nil
       end
 
     end

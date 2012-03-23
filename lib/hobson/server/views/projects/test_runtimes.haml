@@ -1,16 +1,20 @@
 - @page_title = "Test Runtimes"
 
-%table.sortable
+%table.sortable.test-runtimes
   %thead
     %tr
+      %th Type
       %th Name
-      %th{:class => :sorttable_numeric} Avg. Runtime
-      %th{:sorttable_customkey => 0, :colspan => Hobson::Project::TestRuntimes::MAX_REMEMBERED_RUNTIMES} Runtimes (seconds)
+      %th{:class => :sorttable_numeric, :colspan => 2} Avg. Runtime
+      %th{:sorttable_customkey => 0, :colspan => Hobson::Project::TestRuntimes::MAX_REMEMBERED_RUNTIMES} Cached Runtimes
   %tbody
-    - @test_runtimes.sort_by(&:average).reverse.each do |runtimes|
+    - @test_runtimes.sort_by{|r| [r.test_type,r.test_name]}.reverse.each do |runtimes|
       %tr
+        %td= runtimes.test_type
         %td= runtimes.test_name
-        %td{:title => runtimes.average}= distance_of_time_in_words(runtimes.average.to_i)
+        / %td{:title => runtimes.average}= distance_of_time_in_words(runtimes.average.to_i)
+        %td.avg-runtime= runtimes.average.round(2)
+        %td seconds
         - sorted_runtimes = runtimes.sort.reverse
         - Hobson::Project::TestRuntimes::MAX_REMEMBERED_RUNTIMES.times do |i|
           - if runtime = sorted_runtimes[i]

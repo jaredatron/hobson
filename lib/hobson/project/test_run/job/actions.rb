@@ -32,16 +32,20 @@ class Hobson::Project::TestRun::Job
         break if abort?
         eval_hook :before_running_tests, :tests => tests
         break if abort?
-        names = tests.each(&:trying!).map(&:name).sort
-        workspace.run_tests(names){ |name, state, time, result|
-          test = tests.find{|test| test.name == name} or next
+        tests.each(&:trying!)
+        workspace.run_tests(tests){ |type, name, state, occured_at, result|
+          logger.debug("TEST STATUS UPDATE:#{[name, state, occured_at, result].inspect}")
+          test = tests.find{|test| test.id == "#{type}:#{name}" }
+          logger.debug("found test: #{test}")
+          logger.debug tests.map(&:name).inspect
+          test or next
           case state
           when :start
-            test.started_at   = time
+            test.started_at   = occured_at
           when :complete
-            test.completed_at = time
+            test.completed_at = occured_at
             test.result = result
-            test_runtimes[name] << test.runtime if test.pass?
+            test_runtimes[test.id] << test.runtime if test.pass?
           end
         }
       end

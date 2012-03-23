@@ -22,25 +22,37 @@ class Hobson::Project::TestRun::Tests
     tests.find{ |test| test.name == name }
   end
 
-  def << name
-    test = Test.new(self, name.to_s)
-    tests << test
-    test
+  def add type, name
+    tests << Test.new(self, type, name.to_s) if self[name].nil?
+    self
   end
-
-  TYPES = {
-    'spec'    => 'spec/**/*_spec.rb',
-    'feature' => 'features/**/*.feature',
-  }
 
   # scans the workspace
   def detect!
-    TYPES.values.
-      map{ |path| Dir[test_run.workspace.root.join(path)] }.
-      flatten.
-      map{ |path| Pathname.new(path).relative_path_from(test_run.workspace.root).to_s }.
-      each{ |name| self << name }
+    detect_specs!
+    detect_scenarios!
     self
+  end
+
+  # scans the workspace for spec files and uses their relative path as their name
+  def detect_specs!
+    Dir[test_run.workspace.root.join('spec/**/*_spec.rb')].flatten. map{ |spec|
+      add :spec, Pathname.new(spec).relative_path_from(test_run.workspace.root).to_s
+    }
+  end
+
+  # executes a cucumber command to list all scenarios by name
+  def detect_scenarios!
+    test_run.workspace.execute %W[
+      cucumber --quiet --dry-run --no-profile
+      --require #{Hobson.lib.join('hobson/formatters/scenarios.rb')}
+      --format Hobson::Formatters::Scenarios --out hobson_scenarios_list
+    ]*' '
+    scenarios = test_run.workspace.root.join('hobson_scenarios_list').read.split("\n")
+    # some crazy duplicate detection code i copied from the interwebz
+    dups = scenarios.inject({}) {|h,v| h[v]=h[v].to_i+1; h}.reject{|k,v| v==1}.keys
+    raise "Hobson cannot handle duplicate scenario names\nPlease correct these: #{dups.inspect}" if dups.present?
+    scenarios.each{|scenario| add :scenario, scenario}
   end
 
   Group = Struct.new(:tests, :runtime, :jobs)
@@ -91,15 +103,29 @@ class Hobson::Project::TestRun::Tests
     }
   end
 
+  def inspect
+    "#<#{self.class} #{tests.inspect}>"
+  end
+  alias_method :to_s, :inspect
+
+  # loops though all the keys in the test_run hash finding tests by regexp
+  # and creating Test instances for them
+  def reload!
+    @tests = []
+    test_run.data.each{ |(key, value)|
+      key =~ /^test:(.*):(.*):(.*)$/ and add($1, $2)
+    }
+  end
+
+  def to_a
+    tests.clone
+  end
+
   private
 
   def tests
-    @tests or begin
-      @tests = []
-      test_run.data.
-        inject([]){ |tests, (key, value)| key =~ /^test:(.*):(.*)$/ and tests << $1; tests }.
-        uniq.sort.map{ |name| self << name }
-    end
+    @tests or reload!
+    @tests
   end
 
   delegate :each, :inspect, :to_s, :==, '<=>', :size, :length, :count, :to => :tests

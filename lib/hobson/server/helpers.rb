@@ -22,11 +22,15 @@ module Hobson::Server::Helpers
   end
 
   def test_runs_path project=self.project
-    "/projects/#{project.name}/test_runs"
+    "#{project_path(project)}/test_runs"
+  end
+
+  def new_test_run_path project=self.project
+    "#{test_runs_path(project)}/new"
   end
 
   def test_run_path test_run=self.test_run
-    "/projects/#{test_run.project.name}/test_runs/#{test_run.id}"
+    "#{test_runs_path(test_run.project)}/#{test_run.id}"
   end
 
   def repo_url origin_url

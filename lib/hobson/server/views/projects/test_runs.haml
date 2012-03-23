@@ -1,5 +1,13 @@
 - @page_title = "Test Runs"
 
+
+%form#new-test-run{:action => new_test_run_path, :method => 'post'}
+  %label
+    %strong New Test Run:
+    %input{:name => 'sha', :type => :text, :placeholder => 'git sha to test'}
+  %label
+    %input{:type => :submit, :value => 'test'}
+
 %table.test-runs
   %thead
     %tr

@@ -106,6 +106,11 @@ class Hobson::Server < Sinatra::Base
     haml :'projects/test_runs', :layout => !request.xhr?
   end
 
+  post "/projects/:project_name/test_runs/new" do
+    @test_run = project.run_tests!(params[:sha])
+    redirect test_run_path
+  end
+
   get "/projects/:project_name/test_runs/:test_run_id" do
     haml :'projects/test_runs/show', :layout => !request.xhr?
   end

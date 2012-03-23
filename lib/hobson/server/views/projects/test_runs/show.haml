@@ -14,10 +14,15 @@
 
   %dl.details
     %dt Project
-    %dd= test_run.project.name
+    %dd
+      %a{:href => project_path(test_run.project)}= test_run.project.name
 
     %dt SHA
-    %dd= test_run.sha
+    %dd
+      %a{:href => sha_url(test_run.project.url, test_run.sha)}= test_run.sha
+
+    %dt Requestor
+    %dd= test_run.requestor || 'unknown'
 
     %dt Status
     %dd= test_run.status

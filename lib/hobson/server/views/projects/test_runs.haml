@@ -15,6 +15,7 @@
       %th Status
       %th Test Run Id
       %th Git Sha
+      %th Requestor
       %th Created
       %th UnRun
       %th Retries
@@ -32,7 +33,8 @@
         %td
           %a{:href => test_run_path(test_run)}= test_run.id
         %td
-          %a{:href => sha_url(test_run.project.url, test_run.sha)}= test_run.sha
+          %a{:href => sha_url(test_run.project.url, test_run.sha)}= test_run.sha[0..7]
+        %td= test_run.requestor || 'unknown'
         %td= distance_of_time_in_words(Time.now - test_run.created_at) + ' ago' if test_run.created_at.present?
         %td= test_run.tests.find_all(&:waiting?).count
         %td= test_run.tests.map{|t| t.tries > 0 ? t.tries - 1 : 0}.sum

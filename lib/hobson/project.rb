@@ -55,6 +55,7 @@ class Hobson::Project
 
   def run_tests! sha = current_sha
     test_run = TestRun.new(self)
+    test_run.requestor = current_requestor
     test_run.sha = sha
     test_run.save!
     test_run.enqueue!
@@ -86,13 +87,17 @@ class Hobson::Project
     self.name == other.name
   end
 
-  private
-
   def current_sha
     @current_sha ||= begin
       `git rev-parse HEAD`.chomp or raise "unable to get current sha"
       # TODO make sure the current sha is pushed to origin
     end
+  end
+
+  def current_requestor
+    `git var -l | grep GIT_AUTHOR_IDENT`.split('=').last.split(' <').first
+  rescue
+    ""
   end
 
 end

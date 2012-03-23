@@ -26,7 +26,7 @@ class Hobson::Project::TestRun
     redis_hash.to_hash
   end
 
-  %w{sha}.each do |attribute|
+  %w{sha requestor}.each do |attribute|
     class_eval <<-RUBY, __FILE__, __LINE__
       def #{attribute}
         self[:#{attribute}]

@@ -1,0 +1,12 @@
+- page_title "Edit #{project.name}"
+
+%section.edit-project{:name => project.name}
+  %form{:action => project_path, :method => :post}
+    %label
+      %strong Origin:
+      %input{:name => 'project[origin]', :type => :text, :value => project.origin, :required => true}
+    %label
+      %strong Homepage:
+      %input{:name => 'project[homepage]', :type => :text, :value => project.homepage}
+    %label
+      %input{:type => :submit, :value => 'update'}

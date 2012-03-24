@@ -6,34 +6,66 @@ class Hobson::Project
 
   class << self
 
-    alias_method :[], :new
-
-    def current
-      raise "this doesnt look like a git project" unless Pathname.new('.git').directory?
-      from_origin_url `git config --get remote.origin.url`.chomp
+    def create origin=current_origin, name=nil
+      name = name_from_origin(origin) if name.blank?
+      project = new(name)
+      project.origin = origin
+      project
     end
 
-    def from_origin_url origin_url
-      name = origin_url.scan(%r{/([^/]+?)(?:/|\.git)?$}).try(:first).try(:first) or
-        raise "unable to parse name from origin url #{origin_url.inspect}"
+    def find name
       project = new(name)
-      project.url = origin_url
-      project
+      project.new_record? ? nil : project
+    end
+    alias_method :[], :find
+
+    def current
+      origin = current_origin
+      name = name_from_origin(origin)
+      find(name) || create(origin, name)
+    end
+
+    def current_origin
+      path = Hobson.root
+      raise "#{path} this doesnt look like a git project" unless path.join('.git').directory?
+      `cd #{path.to_s.inspect} && git config --get remote.origin.url`.chomp
+    end
+
+    def name_from_origin origin
+      origin.scan(%r{/([^/]+?)(?:/|\.git)?$}).try(:first).try(:first) rescue
+        raise "unable to parse project name from origin #{origin.inspect}"
     end
 
   end
 
   attr_reader :name
   def initialize name
-    @name ||= name
+    @name = name
   end
 
-  def url
-    redis['url']
+  %w{origin homepage}.each{|attr|
+    define_method(:"#{attr}"){ redis[attr] }
+    define_method(:"#{attr}="){|v| redis[attr] = v }
+  }
+
+  def origin
+    redis['origin']
   end
 
-  def url= url
-    redis['url'] = url
+  GITHUB_ORIGIN = %r{^(?:git@github.com:|git://github.com/|https?://.+?@github.com/)([^/]+)/([^/]+)\.git$}
+  def origin= origin
+    redis['origin'] = origin
+    if self.homepage.nil? && origin =~ GITHUB_ORIGIN
+      self.homepage = "https://github.com/#{$1}/#{$2}"
+    end
+  end
+
+  def homepage
+    redis['homepage']
+  end
+
+  def homepage= homepage
+    redis['homepage'] = homepage
   end
 
   def workspace
@@ -53,25 +85,29 @@ class Hobson::Project
     end
   end
 
-  def run_tests! sha = current_sha
+  def run_tests! sha = current_sha, requestor=nil
     test_run = TestRun.new(self)
-    test_run.requestor = current_requestor
+    test_run.requestor = requestor || current_requestor
     test_run.sha = sha
     test_run.save!
     test_run.enqueue!
     test_run
   end
 
+  def new_record?
+    !Hobson.redis.sismember(:projects, name)
+  end
+
   def redis
     @redis ||= begin
-      Hobson.redis.sadd(:projects, name)
+      Hobson.redis.sadd(:projects, name) if new_record?
       Redis::Namespace.new("Project:#{name}", :redis => Hobson.redis)
     end
   end
 
   def delete
-    Hobson.redis.srem(:projects, name)
     redis.keys.each{|key| redis.del key }
+    Hobson.redis.srem(:projects, name)
   end
 
   def logger

@@ -2,8 +2,8 @@ module Factory
 
   extend self
 
-  def project name=ExampleProject::NAME
-    Hobson::Project[name]
+  def project origin=ExampleProject::ORIGIN, name=nil
+    Hobson::Project.create(origin,name)
   end
 
   def workspace

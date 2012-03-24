@@ -11,6 +11,47 @@ body
   font-size: 9pt
   background: white
 
+
+h1,h2,h3
+  margin-bottom: 0.75em
+
+h1
+  font-size: 150%
+h2
+  font-size: 130%
+h3
+  font-size: 110%
+
+ol
+  padding-left: 1em
+  list-style-type: none
+  > li
+    margin-bottom: 0.25em
+
+table
+  th, td
+    padding: 0.25em 0.5em
+
+  th
+    font-weight: bold
+
+strong
+  font-weight: bold
+
+form
+  display: inline-block
+  > label
+    display: block
+    > strong
+      display: inline-block
+      width: 10em
+    > input
+      width: 20em
+      &[type=submit]
+        width: auto
+        float: right
+
+
 #stamp
   z-index: 1
   position: absolute
@@ -30,12 +71,13 @@ body
   position: relative
   text-align: center
   background: black
-  user-select: none
+  user-select: no-select
 
   > .title, > .links > a
     padding: 5px
 
   .title
+    margin-bottom: 0
     height: 25px
     font-size: 200%
     color: white
@@ -88,24 +130,52 @@ body
 #content
   padding: 1em
 
-ol
-  padding-left: 1em
-  list-style-type: none
-  > li
-    margin-bottom: 0.25em
 
-table
-  th, td
-    padding: 0.25em 0.5em
-
-  th
+dl.details
+  overflow: hidden
+  margin-bottom: 1em
+  > *
+    display: block
+    float: left
+    font-size: 110%
+    padding: 0.25em
+  dt
+    clear: left
+    text-align: right
     font-weight: bold
+    width: 10em
+    margin-right: 1em
+    &:after
+      content: ':'
 
-strong
-  font-weight: bold
+.actions
+  position: absolute
+  top: 0
+  right: 0
+  form, input
+    display: inline
+
+section.project
+  position: relative
+
+section.new-project
+
+
+a.new-test-run
+  display: block
+  margin-bottom: 1em
 
 form.new-test-run
-  margin-bottom: 1em
+  label
+    display: block
+    > strong
+      display: inline-block
+      width: 10em
+    > input
+      display: inline-block
+      width: 20em
+      &[type=submit]
+        width: auto
 
 .test-runs tbody tr
   &.running-tests
@@ -121,23 +191,6 @@ form.new-test-run
 
 .test_run
   position: relative
-  .actions
-    position: absolute
-    top: 0
-    right: 0
-    form, input
-      display: inline
-  .details
-    overflow: hidden
-    margin-bottom: 1em
-    > *
-      display: block
-      float: left
-    dt
-      text-align: right
-      font-weight: bold
-      &:after
-        content: ':'
 
   > .details
     > *
@@ -145,7 +198,6 @@ form.new-test-run
     > dt
       margin-right: 1em
       width: 150px
-      clear: left
       font-size: 120%
     > dd
       font-size: 110%

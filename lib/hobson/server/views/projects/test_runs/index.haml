@@ -1,12 +1,7 @@
-- @page_title = "Test Runs"
+- page_title "Test Runs | #{project.name}"
+- auto_refresh!
 
-
-%form#new-test-run{:action => new_test_run_path, :method => 'post'}
-  %label
-    %strong New Test Run:
-    %input{:name => 'sha', :type => :text, :placeholder => 'git sha to test'}
-  %label
-    %input{:type => :submit, :value => 'test'}
+%a.new-test-run{:href => new_test_run_path} New Test Run
 
 %table.test-runs
   %thead
@@ -33,7 +28,7 @@
         %td
           %a{:href => test_run_path(test_run)}= test_run.id
         %td
-          %a{:href => sha_url(test_run.project.url, test_run.sha)}= test_run.sha[0..7]
+          %a{:href => sha_url(test_run.project.origin, test_run.sha)}= test_run.sha[0..7]
         %td= test_run.requestor || 'unknown'
         %td= distance_of_time_in_words(Time.now - test_run.created_at) + ' ago' if test_run.created_at.present?
         %td= test_run.tests.find_all(&:waiting?).count

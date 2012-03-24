@@ -7,16 +7,45 @@ describe Hobson::Project do
 
   client_context do
 
-    describe "current" do
-
-      context "when given no arguments" do
-
-        it "should default to the name of the given git repo" do
-          project.name.should == ExampleProject::NAME
-        end
-
+    describe "create" do
+      it "should discover homepage if origin is a github origin" do
+        %w{
+          git@github.com:deadlyicon/hobson.git
+          git://github.com/deadlyicon/hobson.git
+          https://deadlyicon@github.com/deadlyicon/hobson.git
+        }.each{|origin|
+          project = Hobson::Project.create(origin)
+          project.homepage.should == 'https://github.com/deadlyicon/hobson'
+          project.delete
+        }
       end
+    end
 
+    describe "current" do
+      it "should default to the name of the given git repo" do
+        Hobson::Project.current.origin.should == ExampleProject::ORIGIN
+        Hobson::Project.current.name.should == ExampleProject::NAME
+        Hobson::Project.current.homepage.should == ExampleProject::HOMEPAGE
+      end
+    end
+
+    describe "current_origin" do
+      it "should return the git origin of the project withing Hobson.root" do
+        Hobson::Project.current_origin.should == ExampleProject::ORIGIN
+      end
+    end
+
+
+    describe "name_from_origin" do
+      it "should convert git origins into project names" do
+        %w{
+          git@github.com:deadlyicon/hobson.git
+          git://github.com/deadlyicon/hobson.git
+          https://deadlyicon@github.com/deadlyicon/hobson.git
+        }.each{|origin|
+          Hobson::Project.name_from_origin(origin).should == 'hobson'
+        }
+      end
     end
 
     describe "#run_tests!" do

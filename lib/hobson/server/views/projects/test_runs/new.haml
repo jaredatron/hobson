@@ -1,0 +1,13 @@
+- page_title "New Test Run | #{project.name}"
+
+%section.new-test-run
+  %h1 New Test Run for #{project.name}
+  %form{:action => test_runs_path, :method => 'post'}
+    %label
+      %strong Requestor:
+      %input{:name => 'test_run[requestor]', :type => :text, :placeholder => 'your name', :required => true}
+    %label
+      %strong Git Sha:
+      %input{:name => 'test_run[sha]', :type => :text, :required => true, :pattern => '\b[0-9a-f]{5,40}\b'}
+    %label
+      %input{:type => :submit, :value => 'test'}

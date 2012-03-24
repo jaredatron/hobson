@@ -18,12 +18,12 @@ class Hobson::Project::TestRun::Tests
     tests.map(&:type).uniq
   end
 
-  def [] name
-    tests.find{ |test| test.name == name }
+  def [] test_id
+    tests.find{ |test| test.id == test_id }
   end
 
-  def add type, name
-    tests << Test.new(self, type, name.to_s) if self[name].nil?
+  def add test_id
+    tests << Test.new(test_run, test_id) if self[test_id].nil?
     self
   end
 
@@ -37,7 +37,8 @@ class Hobson::Project::TestRun::Tests
   # scans the workspace for spec files and uses their relative path as their name
   def detect_specs!
     Dir[test_run.workspace.root.join('spec/**/*_spec.rb')].flatten. map{ |spec|
-      add :spec, Pathname.new(spec).relative_path_from(test_run.workspace.root).to_s
+      name = Pathname.new(spec).relative_path_from(test_run.workspace.root).to_s
+      add("spec:#{name}")
     }
   end
 
@@ -52,7 +53,7 @@ class Hobson::Project::TestRun::Tests
     # some crazy duplicate detection code i copied from the interwebz
     dups = scenarios.inject({}) {|h,v| h[v]=h[v].to_i+1; h}.reject{|k,v| v==1}.keys
     raise "Hobson cannot handle duplicate scenario names\nPlease correct these: #{dups.inspect}" if dups.present?
-    scenarios.each{|scenario| add :scenario, scenario}
+    scenarios.each{|name| add "scenario:#{name}"}
   end
 
   Group = Struct.new(:tests, :runtime, :jobs)
@@ -113,7 +114,7 @@ class Hobson::Project::TestRun::Tests
   def reload!
     @tests = []
     test_run.data.each{ |(key, value)|
-      key =~ /^test:(.*):(.*):(.*)$/ and add($1, $2)
+      key =~ /^test:(.+?):(.+?):(.+?)$/ and add("#{$1}:#{$2}")
     }
   end
 

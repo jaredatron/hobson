@@ -50,7 +50,7 @@ class Hobson::Project::Workspace
   end
 
   def prepare
-    execute 'bundle check || bundle install' if bundler?
+    execute 'gem install bundler && bundle check || bundle install' if bundler?
     root.join('log').mkpath
   end
 

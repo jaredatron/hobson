@@ -20,10 +20,13 @@ describe Hobson::Project::TestRun::Tests do
 
     context "after detecting" do
 
-      before{ tests.detect! }
+      before{
+        tests.test_run.workspace.prepare
+        tests.detect!
+      }
 
       it "should have a length of 8" do
-        tests.length.should == 8
+        tests.length.should == 11
       end
 
       it "should contain only Test objects" do
@@ -35,8 +38,8 @@ describe Hobson::Project::TestRun::Tests do
       end
 
       describe "#types" do
-        it "should return ['feature', 'spec']" do
-          tests.types.to_set.should == %w{feature spec}.to_set
+        it "should return ['scenario', 'spec']" do
+          tests.types.to_set.should == %w{spec scenario}.to_set
         end
       end
 
@@ -49,8 +52,8 @@ describe Hobson::Project::TestRun::Tests do
     def balance_for! est_runtimes, number_of_jobs
       tests = Factory.tests
       est_runtimes.each_with_index{|est_runtime, index|
-        tests << "features/#{index}.feature"
-        tests["features/#{index}.feature"].est_runtime = est_runtime
+        tests.add("scenario:features/#{index}.feature")
+        tests["scenario:features/#{index}.feature"].est_runtime = est_runtime
       }
       tests.balance_for! number_of_jobs
       tests.map(&:job).sort

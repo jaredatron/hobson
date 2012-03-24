@@ -13,16 +13,22 @@ class Hobson::Project::TestRuntimes < Hobson::RedisHash
 
   # test_runtimes['foo_spec.rb'] # => #<Runtimes foo_spec.rb 76.0 [12, 100, 100, 100, 88.0, 56.0]>
   def [] test_id
-    Runtimes.new(self, test_id, super || [])
+    Runtimes.new(self, test_id)
   end
 
   def each &block
     keys.map{|test_id| self[test_id] }.each(&block)
   end
 
-  class Runtimes < Struct.new(:test_runtimes, :test_id, :runtimes)
+  class Runtimes
 
+    attr_reader :test_runtimes, :test_id, :test_type, :test_name
     include Enumerable
+
+    def initialize test_runtimes, test_id
+      @test_runtimes, @test_id, @runtimes = test_runtimes, test_id
+      @test_type, @test_name = test_id.scan(/^(.+?):(.+)$/).first
+    end
 
     def to_a
       runtimes.clone
@@ -31,16 +37,6 @@ class Hobson::Project::TestRuntimes < Hobson::RedisHash
     def each &block
       to_a.each(&block)
     end
-
-    def test_type
-      @test_type ||= test_id.split(':').first
-    end
-
-    def test_name
-      @test_name ||= test_id.split(':')[1..-1].join(':')
-    end
-
-    private :runtimes
 
     def average
       @average ||= runtimes.size > 0.0 ? runtimes.sum / runtimes.size : 0.0
@@ -52,7 +48,8 @@ class Hobson::Project::TestRuntimes < Hobson::RedisHash
     end
 
     def << runtime
-      @runtimes = (test_runtimes.get(test_id) || []) + [runtime.to_f]
+      @runtimes = nil; runtimes # reload runtimes
+      @runtimes << runtime.to_f
       @runtimes = @runtimes.last(MAX_REMEMBERED_RUNTIMES)
       test_runtimes[test_id] = @runtimes
     end
@@ -61,6 +58,12 @@ class Hobson::Project::TestRuntimes < Hobson::RedisHash
       "#<#{self.class} #{test_type} #{test_name} #{average} #{runtimes.inspect}>"
     end
     alias_method :to_s, :inspect
+
+    private
+
+    def runtimes
+      @runtimes ||= test_runtimes.get(test_id) || []
+    end
   end
 
 end

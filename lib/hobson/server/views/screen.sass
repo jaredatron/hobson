@@ -245,6 +245,7 @@ form.new-test-run
     .tests-completed progress
       display: block
       width: 100%
+      margin-bottom: 1em
 
     table
       width: 100%
@@ -260,6 +261,30 @@ form.new-test-run
           color: red
         &.pending
           color: orange
+
+        td,th
+          &.job > div
+            width: 4em
+          &.test-name
+            width: 100%
+            overflow: hidden
+            > div
+              width: 1px
+              overflow: visible
+              > div
+                width: 9999em
+          &.tries > div
+            width: 4em
+          &.est-runtim > div
+            width: 4em
+          &.runtime > div
+            width: 6em
+          &.status > div
+            width: 5em
+          &.result > div
+            width: 5em
+          &.logs > div
+            width: 10em
 
 .project_refs
   > .project_ref

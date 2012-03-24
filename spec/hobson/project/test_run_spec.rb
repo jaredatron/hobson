@@ -93,8 +93,6 @@ describe Hobson::Project::TestRun do
         end
 
         it "should schedule schedule 2 jobs" do
-          # test_run.workspace.should_receive(:checkout!).with(test_run.sha)
-          # test_run.workspace.should_receive(:tests)
           Resque.should_receive(:enqueue).with(Hobson::Project::TestRun::Runner, test_run.project.name, test_run.id, 0).once
           Resque.should_receive(:enqueue).with(Hobson::Project::TestRun::Runner, test_run.project.name, test_run.id, 1).once
           test_run.build!
@@ -108,21 +106,23 @@ describe Hobson::Project::TestRun do
           # of tests or what job got what set of tests
           expected_job_tests = Set[
             %w[
-              features/a.feature
-              features/b.feature
-              features/c.feature
-              features/d.feature
+              scenario:A
+              scenario:B
+              scenario:C
+              scenario:D
+              scenario:E
             ].to_set,
             %w[
-              spec/a_spec.rb
-              spec/b_spec.rb
-              spec/c_spec.rb
-              spec/d_spec.rb
+              spec:spec/a_spec.rb
+              spec:spec/b_spec.rb
+              spec:spec/c_spec.rb
+              spec:spec/d_spec.rb
+              spec:spec/e_spec.rb
+              spec:spec/flakey_spec.rb
             ].to_set
           ]
 
-
-          actual_jobs_tests = test_run.jobs.map{|job| job.tests.map(&:name).to_set }.to_set
+          actual_jobs_tests = test_run.jobs.map{|job| job.tests.map(&:id).to_set }.to_set
 
           actual_jobs_tests.should == expected_job_tests
         end

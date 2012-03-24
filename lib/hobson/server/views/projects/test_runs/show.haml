@@ -95,37 +95,52 @@
       %table
         %thead
           %tr
-            %th Job
-            %th Test
-            %th Tries
-            %th Est.Runtime
-            %th Runtime
-            %th Status
-            %th Result
-            %th Log
+            %th.job
+              %div  Job
+            %th.test-name
+              %div  Test
+            %th.tries
+              %div  Tries
+            %th.est-runtime
+              %div  Est.Runtime
+            %th.runtime
+              %div  Runtime
+            %th.status
+              %div  Status
+            %th.result
+              %div  Result
+            %th.logs
+              %div  Logs
         %tbody
           - sort_tests(test_run.tests).each do |test|
             - job = test_run.jobs[test.job] if test.job.present?
             - result = test.result || ''
             %tr{:class => [result.downcase, test.status]}
-              %td
+              %td.job
                 - if job.present?
                   %a{:href => "ssh://#{job['hostname']}"} Job #{job.index}
-              %td
-                #{test.type}: #{test.name.gsub(%r{^spec/},'')}
-              %td= test.tries
-              %td= test.est_runtime.presence || 'unknown'
-              %td= test.runtime
-              %td= test.status
-              %td= test.result
-              %td
-                - if job
-                  - (1..test.tries).each do |try|
-                    - artifact_name = case test.type
-                      - when "feature" ; "feature_run#{try}"
-                      - when "spec"    ; "spec_run#{try}"
-                    - if artifact_url = job.artifacts[artifact_name]
-                      %a{:href => artifact_url} run#{try}
+              %td.test-name
+                %div
+                  .truncate #{test.type}: #{test.name.gsub(%r{^spec/},'')}
+              %td.tries
+                %div= test.tries
+              %td.est-runtime
+                %div= test.est_runtime.presence || 'unknown'
+              %td.runtime
+                %div= test.runtime
+              %td.status
+                %div= test.status
+              %td.result
+                %div= test.result
+              %td.logs
+                %div
+                  - if job
+                    - (1..test.tries).each do |try|
+                      - artifact_name = case test.type
+                        - when "feature" ; "feature_run#{try}"
+                        - when "spec"    ; "spec_run#{try}"
+                      - if artifact_url = job.artifacts[artifact_name]
+                        %a{:href => artifact_url} run#{try}
 
   - if test_run.jobs.present?
     %section.artifacts

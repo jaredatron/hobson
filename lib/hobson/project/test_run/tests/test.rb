@@ -1,27 +1,25 @@
 class Hobson::Project::TestRun::Tests::Test
 
-  attr_reader :tests, :type, :name
+  attr_accessor :test_run, :id, :type, :name
 
-  def initialize tests, type, name
-    @tests, @type, @name = tests, type.to_sym, name
+  def initialize test_run, id
+    @test_run, @id = test_run, id
+    @type, @name = id.scan(/^(.+?):(.+)$/).first
     self.created_at ||= Time.now
     self.tries ||= 0
-  end
-
-  def id
-    "#{type}:#{name}"
   end
 
   %w{job est_runtime created_at started_at completed_at result tries}.each do |attr|
     class_eval <<-RUBY, __FILE__, __LINE__
       def #{attr}
-        @#{attr} ||= tests.test_run["test:\#{id}:#{attr}"]
+        @#{attr} ||= test_run["test:\#{id}:#{attr}"]
       end
       def #{attr}= value
-        @#{attr}   = tests.test_run["test:\#{id}:#{attr}"] = value
+        @#{attr}   = test_run["test:\#{id}:#{attr}"] = value
       end
     RUBY
   end
+
 
   %w{PASS FAIL PENDING}.each do |result|
     class_eval <<-RUBY, __FILE__, __LINE__
@@ -68,7 +66,7 @@ class Hobson::Project::TestRun::Tests::Test
 
   def calculate_estimated_runtime!
     self.est_runtime ||= begin
-      average_runtime = tests.test_run.project.test_runtimes[name].average
+      average_runtime = test_run.project.test_runtimes[id].average
       average_runtime = MINIMUM_EST_RUNTIME if average_runtime < MINIMUM_EST_RUNTIME
       average_runtime
     end

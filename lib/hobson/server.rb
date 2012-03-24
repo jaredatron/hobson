@@ -54,7 +54,7 @@ class Hobson::Server < Sinatra::Base
   get '/ci' do
     @project_refs = Hobson::CI::ProjectRef.all
     if @project_refs.present?
-      haml :ci, :layout => !request.xhr?
+      haml :ci
     else
       redirect '/ci/new'
     end
@@ -75,6 +75,8 @@ class Hobson::Server < Sinatra::Base
     response.to_json
   end
 
+  # ci
+
   get "/ci/new" do
     haml :'ci/new'
   end
@@ -93,46 +95,102 @@ class Hobson::Server < Sinatra::Base
     redirect '/ci'
   end
 
+  # projects
+
+  # index
   get "/projects" do
-    @projects = Hobson.projects
-    haml :'projects', :layout => !request.xhr?
+    haml :'projects/index'
   end
 
+  # new
+  get "/projects/new" do
+    haml :'projects/new'
+  end
+
+  # create
+  put "/projects" do
+    project = params['project']
+    @project = Hobson::Project.create(project['origin'], project['name'])
+    @project.homepage = project['homepage'] if project['homepage'].present?
+
+    redirect project_path
+  end
+
+  # show
   get "/projects/:project_name" do
-    redirect test_runs_path
+    if project.new_record?
+      redirect "#{new_project_path}?name=#{project.name}"
+    else
+      haml :'projects/show'
+    end
   end
 
+  # edit
+  get "/projects/:project_name/edit" do
+    haml :'projects/edit'
+  end
+
+  # update
+  post "/projects/:project_name" do
+    project.url = params['url']
+    redirect project_path
+  end
+
+  # delete
+  delete "/projects/:project_name" do
+    project.delete
+    redirect projects_path
+  end
+
+  # project test runs
+
+  # index
   get "/projects/:project_name/test_runs" do
-    haml :'projects/test_runs', :layout => !request.xhr?
+    haml :'projects/test_runs/index'
   end
 
-  post "/projects/:project_name/test_runs/new" do
-    @test_run = project.run_tests!(params[:sha])
+  # new
+  get "/projects/:project_name/test_runs/new" do
+    @test_runs = true # this makes the breadcrumb work
+    haml :'projects/test_runs/new'
+  end
+
+  # create
+  post "/projects/:project_name/test_runs" do
+    test_run = params['test_run']
+    @test_run = project.run_tests!(test_run['sha'], test_run['requestor'])
     redirect test_run_path
   end
 
+  # show
   get "/projects/:project_name/test_runs/:test_run_id" do
-    haml :'projects/test_runs/show', :layout => !request.xhr?
+    haml :'projects/test_runs/show'
   end
 
+  # delete
   delete "/projects/:project_name/test_runs/:test_run_id" do
     test_run.delete!
     redirect test_runs_path
   end
 
+  # rerun
   post "/projects/:project_name/test_runs/:test_run_id/rerun" do
     @test_run = project.run_tests!(test_run.sha)
     redirect test_run_path
   end
 
+  # abort
   post "/projects/:project_name/test_runs/:test_run_id/abort" do
     test_run.abort!
     redirect test_run_path
   end
 
+  # project runtimes
+
+  # show
   get "/projects/:project_name/test_runtimes" do |project_name|
     @test_runtimes = project.test_runtimes
-    haml :'projects/test_runtimes', :layout => !request.xhr?
+    haml :'projects/test_runtimes'
   end
 
 end

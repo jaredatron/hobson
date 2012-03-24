@@ -1,0 +1,27 @@
+- page_title project.name
+
+%section.project{:name => project.name}
+
+  %dl.details
+    %dt Name
+    %dd= project.name
+    %dt Origin
+    %dd= project.origin
+    %dt Homepage
+    %dd
+      - if project.homepage.present?
+        %a{:href => project.homepage}= project.homepage
+    %dt Test Runs
+    %dd= project.test_runs.size
+    %dt Tests
+    %dd= project.test_runtimes.to_a.size
+
+  %section.actions
+    - action_button 'Edit', edit_project_path, :get
+    - action_button 'Delete', project_path, :delete
+
+  %ol.links
+    %li
+      %a{:href => test_runs_path} Test Runs
+    %li
+      %a{:href => test_runtimes_path} Test Runtimes

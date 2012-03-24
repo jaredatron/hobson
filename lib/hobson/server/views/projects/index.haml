@@ -1,0 +1,21 @@
+- @page_title = "Projects"
+
+%ol.links
+  %li
+    %a{:href => new_project_path} New Project
+
+%table.projects
+  %thead
+    %tr
+      %th Name
+      %th URL
+      %th Homepage
+  %tbody
+    - projects.each do |project|
+      %tr
+        %td
+          %a{:href => project_path(project)}= project.name
+        %td
+          = project.origin
+        %td
+          %a{:href => project.homepage}= project.homepage

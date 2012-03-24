@@ -1,4 +1,5 @@
-- @page_title = "Test Run #{test_run.id}"
+- page_title "Test Run #{test_run.id}"
+- auto_refresh!
 
 - if test_run.complete?
   #stamp{:class => test_run.status}= test_run.status
@@ -19,7 +20,7 @@
 
     %dt SHA
     %dd
-      %a{:href => sha_url(test_run.project.url, test_run.sha)}= test_run.sha
+      %a{:href => sha_url(test_run.project.origin, test_run.sha)}= test_run.sha
 
     %dt Requestor
     %dd= test_run.requestor || 'unknown'
@@ -125,9 +126,9 @@
               %td.tries
                 %div= test.tries
               %td.est-runtime
-                %div= test.est_runtime.presence || 'unknown'
+                %div= test.est_runtime.present? ? test.est_runtime.round(2) : 'unknown'
               %td.runtime
-                %div= test.runtime
+                %div= test.runtime.present? ? test.runtime.round(2) : 'unknown'
               %td.status
                 %div= test.status
               %td.result

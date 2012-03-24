@@ -24,8 +24,8 @@ module WorkerWorkingDirectory
   def reset!
     projects_path.mkpath unless projects_path.exist?
     write_config! DEFAULT_CONFIG
-    sh "git clone #{ExampleProject::GIT_URL} #{example_project_path}" unless example_project_path.exist?
-    git("config --get remote.origin.url").chomp.should == ExampleProject::GIT_URL
+    sh "git clone #{ExampleProject::ORIGIN} #{example_project_path}" unless example_project_path.exist?
+    git("config --get remote.origin.url").chomp.should == ExampleProject::ORIGIN
   end
 
   def git cmd

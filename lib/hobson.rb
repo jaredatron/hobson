@@ -79,8 +79,9 @@ module Hobson
     end
   end
 
-  def projects project=nil
-    project.present? ? Project[project] : redis.smembers(:projects).map{|p| Project[p] }
+  def projects project_name=nil
+    return Project.find(project_name) unless project_name.nil?
+    redis.smembers(:projects).map{|p| Project.find(p) }
   end
 
 end

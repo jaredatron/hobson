@@ -17,7 +17,11 @@ module Hobson
       end
 
       def before_feature feature
-        raise "test started twice!" unless @started_at.nil?
+        if @started_at.nil?
+          error = "FAIL! #{@scenario_name} hasn't completed yet!"
+          @io.puts(error); @io.flush
+          raise error
+        end
         @started_at = Hobson::Formatters.now.to_f
       end
 
@@ -32,7 +36,7 @@ module Hobson
         @ended_at = Hobson::Formatters.now.to_f
         @io.puts "TEST:scenario:#{@scenario_name}:COMPLETE:#{@ended_at}:#{status}"
         @io.flush
-        @started_at = @ended_at = nil
+        @scenario_name = @started_at = @ended_at = nil
       end
 
     end

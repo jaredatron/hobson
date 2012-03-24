@@ -3,8 +3,21 @@ module Hobson::Server::Helpers
   include Rack::Utils
   alias_method :h, :escape_html
 
+  def haml layout, options={}
+    options[:layout] ||= !request.xhr?
+    super layout, options
+  end
+
+  def projects
+    @projects ||= Hobson.projects
+  end
+
   def project
-    @project ||= Hobson::Project[params["project_name"]]
+    @project or begin
+      @project = Hobson::Project[params["project_name"]]
+      raise "project #{params["project_name"]} not found" if @project.new_record?
+    end
+    @project
   end
 
   def test_runs
@@ -17,8 +30,20 @@ module Hobson::Server::Helpers
 
   # URL Helpers
 
+  def projects_path
+    "/projects"
+  end
+
+  def new_project_path
+    "#{projects_path}/new"
+  end
+
   def project_path project=self.project
-    "/projects/#{project.name}"
+    "#{projects_path}/#{project.name}"
+  end
+
+  def edit_project_path project=self.project
+    "#{project_path(project)}/edit"
   end
 
   def test_runs_path project=self.project
@@ -33,17 +58,34 @@ module Hobson::Server::Helpers
     "#{test_runs_path(test_run.project)}/#{test_run.id}"
   end
 
-  def repo_url origin_url
-    host, path = origin_url.scan(/(?:https?:\/\/)?(?:.*@)?(.+?)[:\/]+(.+?)(?:\.git)?$/).first
+  def test_runtimes_path project=self.project
+    "#{project_path(project)}/test_runtimes"
+  end
+
+  def repo_url origin
+    host, path = origin.scan(/(?:https?:\/\/)?(?:.*@)?(.+?)[:\/]+(.+?)(?:\.git)?$/).first
     "http://#{host}/#{path}"
   end
 
-  def sha_url origin_url, sha
-    "#{repo_url(origin_url)}/commit/#{sha}"
+  def sha_url origin, sha
+    "#{repo_url(origin)}/commit/#{sha}"
   end
 
-  def ref_url origin_url, ref
-    "#{repo_url(origin_url)}/tree/#{ref}"
+  def ref_url origin, ref
+    "#{repo_url(origin)}/tree/#{ref}"
+  end
+
+  def body_classnames
+    @body_classnames ||= []
+  end
+
+  def auto_refresh!
+    body_classnames << :auto_refresh
+  end
+
+  def page_title page_title=nil
+    @page_title = page_title unless page_title.nil?
+    @page_title
   end
 
   def now

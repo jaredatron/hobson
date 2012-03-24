@@ -61,7 +61,7 @@ class Hobson::CI::ProjectRef
   end
 
   def run_tests!
-    @last_test_run = project.run_tests!(current_sha) and data[key] = current_sha
+    @last_test_run = project.run_tests!(current_sha, 'CI') and data[key] = current_sha
   end
 
   def running?

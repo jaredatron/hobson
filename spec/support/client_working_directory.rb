@@ -14,8 +14,8 @@ module ClientWorkingDirectory
   end
 
   def reset!
-    sh "git clone #{ExampleProject::GIT_URL} #{path}" unless path.exist?
-    git("config --get remote.origin.url").chomp.should == ExampleProject::GIT_URL
+    sh "git clone #{ExampleProject::ORIGIN} #{path}" unless path.exist?
+    git("config --get remote.origin.url").chomp.should == ExampleProject::ORIGIN
     git "reset --hard origin/master"
     git "clean -df"
     write_config! DEFAULT_CONFIG

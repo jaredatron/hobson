@@ -214,3 +214,4 @@ Right now a 'test' is an individual feature or spec file. In the near future we'
     * auto re-run failed ? tests
   * improve test_run runtime estimation taking into account avg. setup & teardown
   * add custom formatters that dump failures to individual files and upload those artifacts immediately
+  * column sorting on test list in web interface

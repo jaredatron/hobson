@@ -1,6 +1,6 @@
 module Hobson::Project::TestRun::Builder
 
-  @queue = :build_test_run
+  @queue = :hobson
 
   def self.perform project_name, test_run_id
     Hobson.log_to_a_tempfile{

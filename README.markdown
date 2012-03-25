@@ -4,6 +4,8 @@ A distributed test run framework built on resque.
 
 Hobson distributes your test suite across N machines aggregating the results live on a beautiful locally run web app.
 
+[![Build Status](https://secure.travis-ci.org/deadlyicon/hobson.png?branch=master)](http://travis-ci.org/deadlyicon/hobson)
+
 ## Hobson can:
 
   * auto balance tests across jobs

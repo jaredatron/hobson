@@ -25,8 +25,8 @@ describe Hobson::Project::TestRun::Tests do
         tests.detect!
       }
 
-      it "should have a length of 8" do
-        tests.length.should == 11
+      it "should have a length of 16" do
+        tests.length.should == 16
       end
 
       it "should contain only Test objects" do

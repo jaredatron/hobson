@@ -105,20 +105,25 @@ describe Hobson::Project::TestRun do
           # using a set of sets allows comparison to not case about the other
           # of tests or what job got what set of tests
           expected_job_tests = Set[
-            %w[
-              scenario:A
-              scenario:B
-              scenario:C
-              scenario:D
-              scenario:E
+            [
+              "scenario:A",
+              "scenario:B",
+              "scenario:C",
+              "scenario:D",
+              "scenario:E",
+              "scenario:As an admin I should be able to create a post",
+              "scenario:As an admin I should be able to create a post and delete it",
+              "scenario:As an admin I should be able to delete a post",
+              "scenario:As an admin I should be able to view a post",
+              "scenario:As a visitor I should be able to view a post",
             ].to_set,
-            %w[
-              spec:spec/a_spec.rb
-              spec:spec/b_spec.rb
-              spec:spec/c_spec.rb
-              spec:spec/d_spec.rb
-              spec:spec/e_spec.rb
-              spec:spec/flakey_spec.rb
+            [
+              "spec:spec/a_spec.rb",
+              "spec:spec/b_spec.rb",
+              "spec:spec/c_spec.rb",
+              "spec:spec/d_spec.rb",
+              "spec:spec/e_spec.rb",
+              "spec:spec/flakey_spec.rb",
             ].to_set
           ]
 

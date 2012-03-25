@@ -16,7 +16,7 @@ module Hobson
         @io = ensure_io(path_or_io, "hobson_status")
       end
 
-      def before_feature feature
+      def before_feature_element feature_element
         @started_at = Hobson::Formatters.now.to_f
       end
 
@@ -26,12 +26,12 @@ module Hobson
         @io.flush
       end
 
-      def after_feature feature
-        status = feature.instance_variable_get(:@feature_elements).any?(&:failed?) ? 'FAIL' : 'PASS'
-        @ended_at = Hobson::Formatters.now.to_f
-        @io.puts "TEST:scenario:#{@scenario_name}:COMPLETE:#{@ended_at}:#{status}"
+      def after_feature_element feature_element
+        ended_at = Hobson::Formatters.now.to_f
+        status = feature_element.failed? ? 'FAIL' : 'PASS'
+        @io.puts "TEST:scenario:#{@scenario_name}:COMPLETE:#{ended_at}:#{status}"
         @io.flush
-        @scenario_name = @started_at = @ended_at = nil
+        @scenario_name = @started_at = nil
       end
 
     end

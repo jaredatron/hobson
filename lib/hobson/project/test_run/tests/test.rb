@@ -31,6 +31,10 @@ class Hobson::Project::TestRun::Tests::Test
 
   def trying!
     self.tries += 1
+    reset!
+  end
+
+  def reset!
     self.started_at &&= nil
     self.completed_at &&= nil
     self.result &&= nil

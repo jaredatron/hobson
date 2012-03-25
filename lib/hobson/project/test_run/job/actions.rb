@@ -33,12 +33,10 @@ class Hobson::Project::TestRun::Job
         eval_hook :before_running_tests, :tests => tests
         break if abort?
         tests.each(&:trying!)
+        logger.debug "running tests: #{tests.map(&:id).inspect}"
         workspace.run_tests(tests){ |type, name, state, occured_at, result|
-          logger.debug("TEST STATUS UPDATE:#{[name, state, occured_at, result].inspect}")
           test = tests.find{|test| test.id == "#{type}:#{name}" }
-          logger.debug("found test: #{test}")
-          logger.debug tests.map(&:name).inspect
-          test or next
+          test or raise "status update for unknown test #{name.inspect}"
           case state
           when :start
             test.started_at   = occured_at

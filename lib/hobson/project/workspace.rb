@@ -69,9 +69,8 @@ class Hobson::Project::Workspace
       command << "; true" # we dont care about the exit status
 
       status_file = root.join(hobson_status_file)
-      status_file.open('a'){} # touch
+      status_file.open('w'){|f|f.write('')} # touch & empty
       status_file.open{|status|
-        status.read # ignore existing content
         begin
           fork_and_execute(command) do
             status.read.split("\n").each{|line|
@@ -82,7 +81,8 @@ class Hobson::Project::Workspace
             }
           end
         rescue ExecutionError => e
-          logger.error "error running tests: #{e}"
+          logger.error "error running tests:\n#{e}\n#{e.backtrace*"\n"}"
+          tests.each{|test| test.reset! if test.started_at && !test.completed_at}
         end
       }
     }
@@ -126,7 +126,7 @@ class Hobson::Project::Workspace
     logger.debug "fork_and_execute pid(#{pid}) command(#{command})"
     while Process.waitpid2(pid, ::Process::WNOHANG).nil?
       yield
-      sleep 0.1
+      sleep 0.5
     end
     yield
     begin Process.wait; rescue Errno::ECHILD; end

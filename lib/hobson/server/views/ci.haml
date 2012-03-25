@@ -10,7 +10,7 @@
       - project = project_ref.project
       - history = Hobson::CI::ProjectRef::HISTORY_LENGTH.times.to_a.zip(project_ref.history).reverse
       - current_test_run_id , current_test_run_status = history.pop.last
-      %li.project_ref{:class => test_run_status_color(current_test_run_status)}
+      %li.project_ref{:class => test_run_status_classname(current_test_run_status)}
 
         %a.project{:href => project_path(project)}
           = project.name.gsub(/-|_|\./,' ')
@@ -20,12 +20,18 @@
 
         .history
           - history.each do |n, (test_run_id, test_run_status)|
-            %a.test_run{:href => test_run_path(test_run_id, project.name), :class => test_run_status_color(test_run_status)}
+            - if test_run_id.present?
+              %a.test_run{:title => test_run_id, :href => test_run_path(test_run_id, project.name), :class => test_run_status_classname(test_run_status)}
 
-        %a.icon{:href => test_run_path(current_test_run_id, project.name), :title => "test run: #{current_test_run_id}"}
-          .red !
-          .green ✓
-          .blue ?
+            - else
+              .test_run{:class => 'nil'} ⚙
+
+        - if current_test_run_id.present?
+          %a.icon{:href => test_run_path(current_test_run_id, project.name), :title => current_test_run_id}
+            .fail !
+            .pass ✓
+            .building ⚙
+            .nil ?
 
 :javascript
   Hobson.CI.pollForChanges();

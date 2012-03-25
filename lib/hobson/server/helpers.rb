@@ -66,7 +66,6 @@ module Hobson::Server::Helpers
   end
 
   def test_run_path test_run_id=self.test_run_id, project_name=self.project_name
-    return '#' if test_run_id.nil?
     if test_run_id.is_a? Hobson::Project::TestRun
       test_run_id, project_name = test_run_id.id, test_run_id.project.name
     end
@@ -187,19 +186,18 @@ module Hobson::Server::Helpers
     }
   end
 
-  def test_run_status_color test_run_status
+  def test_run_status_classname test_run_status
     case test_run_status
-    when 'errored','aborted','failed'
-      'red'
     when 'passed'
-      'green'
+      'pass'
+    when 'errored','aborted','failed'
+      'fail'
     when 'complete','running tests','waiting to be run','building','waiting to be built','waiting...'
-      'blue'
+      'building'
     else
-      'transparent'
+      'nil'
     end
   end
-
 
   # Sam Elliott’s partials.rb
   # https://gist.github.com/119874

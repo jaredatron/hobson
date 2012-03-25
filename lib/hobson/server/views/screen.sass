@@ -348,6 +348,7 @@ form.new-test-run
 
 .project_refs
   > .project_ref
+    $grey: #c4c4c4
     $red: #EC3E2D
     $green: #B8EA88
     $blue: #7EC4ED
@@ -366,19 +367,22 @@ form.new-test-run
       &[href="#"]
         cursor: default
 
-    &.green
-      +glass($green)
-      .icon > .green
+    &.nil
+      +glass($grey)
+      .icon > .nil
         display: block
-    &.red
-      +glass($red)
-      .icon > .red
-        display: block
-    &.blue
+    &.building
       +glass($blue)
-      .icon > .blue
+      .icon > .building
         display: block
-
+    &.pass
+      +glass($green)
+      .icon > .pass
+        display: block
+    &.fail
+      +glass($red)
+      .icon > .fail
+        display: block
     >
       .project, .ref
         display: block
@@ -398,14 +402,14 @@ form.new-test-run
         width: 8%
         border-radius: 2em
         box-shadow: 0 0 10px black
-        &.transparent
+        &.nil
           visibility: hidden
-        &.green
-          background-color: $green
-        &.red
-          background-color: $red
-        &.blue
+        &.building
           background-color: $blue
+        &.pass
+          background-color: $green
+        &.fail
+          background-color: $red
 
       .icon
         font-size: 700%
@@ -413,11 +417,11 @@ form.new-test-run
         text-shadow: 0px 0px 10px black
         > *
           display: none
-          &.red
+          &.fail
             color: darken($red,10%)
-          &.green
+          &.pass
             color: darken($green,10%)
-          &.blue
+          &.building
             color: darken($blue,10%)
 
 #new_project_ref

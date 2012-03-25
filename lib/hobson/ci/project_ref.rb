@@ -69,7 +69,7 @@ class Hobson::CI::ProjectRef
   end
 
   def test_run_statuses
-    @test_run_statuses ||= test_runs.map(&:status)
+    @test_run_statuses ||= test_runs.map{|tr| tr.nil? ? 'nil' : tr.status}
   end
 
   # def status

@@ -13,11 +13,8 @@ module Hobson::Server::Helpers
   end
 
   def project
-    @project or begin
-      @project = Hobson::Project[params["project_name"]]
-      raise "project #{params["project_name"]} not found" if @project.new_record?
-    end
-    @project
+    @project ||= Hobson::Project[params["project_name"]] or
+      raise "project #{params["project_name"]} not found"
   end
 
   def test_runs
@@ -26,6 +23,10 @@ module Hobson::Server::Helpers
 
   def test_run
     @test_run ||= project.test_runs(params["test_run_id"]) or raise Sinatra::NotFound
+  end
+
+  def project_refs
+    @project_refs ||= Hobson::CI.project_refs
   end
 
   # URL Helpers
@@ -170,6 +171,19 @@ module Hobson::Server::Helpers
       end
       [status, test.job || -1]
     }
+  end
+
+  def test_run_status_color test_run_status
+    case test_run_status
+    when 'errored','aborted','failed'
+      'red'
+    when 'passed'
+      'green'
+    when 'complete','running tests','waiting to be run','building','waiting to be built','waiting...'
+      'blue'
+    else
+      'blue'
+    end
   end
 
 

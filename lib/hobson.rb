@@ -79,8 +79,7 @@ module Hobson
     end
   end
 
-  def projects project_name=nil
-    return Project.find(project_name) unless project_name.nil?
+  def projects
     redis.smembers(:projects).map{|p| Project.find(p) }
   end
 

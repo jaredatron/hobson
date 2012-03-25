@@ -13,7 +13,7 @@
       %li.project_ref{:class => test_run_status_color(current_test_run_status)}
 
         %a.project{:href => project_path(project)}
-          = project.name.gsub(/-|_/,' ')
+          = project.name.gsub(/-|_|\./,' ')
 
         %a.ref{:href => ref_url(project.origin, project_ref.ref)}
           = project_ref.ref
@@ -22,7 +22,7 @@
           - history.each do |n, (test_run_id, test_run_status)|
             %a.test_run{:href => test_run_path(test_run_id, project.name), :class => test_run_status_color(test_run_status)}
 
-        %a.icon{:href => test_run_path(current_test_run_id, project.name)}
+        %a.icon{:href => test_run_path(current_test_run_id, project.name), :title => "test run: #{current_test_run_id}"}
           .red !
           .green ✓
           .blue ?

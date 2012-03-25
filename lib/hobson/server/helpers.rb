@@ -196,7 +196,7 @@ module Hobson::Server::Helpers
     when 'complete','running tests','waiting to be run','building','waiting to be built','waiting...'
       'blue'
     else
-      'blue'
+      'transparent'
     end
   end
 

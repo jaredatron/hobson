@@ -128,7 +128,7 @@
               %td.est-runtime
                 %div= test.est_runtime.present? ? test.est_runtime.round(2) : 'unknown'
               %td.runtime
-                %div= test.runtime.present? ? test.runtime.round(2) : 'unknown'
+                %div= test.runtime.round(2) if test.runtime.present?
               %td.status
                 %div= test.status
               %td.result

@@ -336,7 +336,7 @@ form.new-test-run
           &.result > div
             width: 5em
           &.logs > div
-            width: 10em
+            width: 13em
 
 @mixin glass($dark)
   $light: lighten($dark, 5%)
@@ -352,7 +352,7 @@ form.new-test-run
     $green: #B8EA88
     $blue: #7EC4ED
 
-    display: inline-block
+    float: left
     height: 18em
     width: 20em
 
@@ -398,6 +398,8 @@ form.new-test-run
         width: 8%
         border-radius: 2em
         box-shadow: 0 0 10px black
+        &.transparent
+          visibility: hidden
         &.green
           background-color: $green
         &.red

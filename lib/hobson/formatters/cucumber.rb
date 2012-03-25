@@ -17,11 +17,6 @@ module Hobson
       end
 
       def before_feature feature
-        if @started_at.nil?
-          error = "FAIL! #{@scenario_name} hasn't completed yet!"
-          @io.puts(error); @io.flush
-          raise error
-        end
         @started_at = Hobson::Formatters.now.to_f
       end
 

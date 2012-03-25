@@ -33,4 +33,8 @@ module Factory
     job
   end
 
+  def project_ref project_name=self.project.name, ref=:master
+    Hobson::CI::ProjectRef.create(project_name, ref)
+  end
+
 end

@@ -338,36 +338,104 @@ form.new-test-run
           &.logs > div
             width: 10em
 
+@mixin glass($dark)
+  $light: lighten($dark, 5%)
+  $white: rgba(255,255,255,0.5)
+  $clear: rgba(255,255,255,0)
+  box-shadow: 6px 6px 31px lightgrey, inset 0px 0px 30px 0px $white
+  background: -webkit-linear-gradient(top,$white 0%,$white 2%,$clear 20%,$clear 80%,$white 98%,$white 100%), -webkit-repeating-linear-gradient(-45deg,$light 0%,$light 2%,$dark 3%,$dark 5%,$light 6%)
+  border: 3px solid $dark
+
 .project_refs
   > .project_ref
-    float: left
-    margin: 10px
-    padding: 10px
-    border-radius: 10px
-    box-shadow: 3px 3px 10px black
-    > a
-      text-decoration: none
-      color: black
-    h1
-      font-size: 150%
-    h2
-      font-size: 130%
-    h1, h2
-      text-align: center
-    &.running
-      background-color: lightblue
-    &.failed
-      background-color: lighten(red, 10%)
-    &.passed
-      background-color: green
+    $red: #EC3E2D
+    $green: #B8EA88
+    $blue: #7EC4ED
 
-    dl
-      dt
+    display: inline-block
+    height: 18em
+    width: 20em
+
+    margin: 1em
+    padding: 2em
+    border-radius: 2em
+
+    &.green
+      +glass($green)
+      .icon > .green
+        display: block
+    &.red
+      +glass($red)
+      .icon > .red
+        display: block
+    &.blue
+      +glass($blue)
+      .icon > .blue
+        display: block
+
+    >
+      .project, .ref
+        display: block
+        text-align: center
         font-weight: bold
-        &:after
-          content: ':'
-      dd
-        margin-bottom: 1em
+        margin-bottom: 0.5em
+
+      .project
+        font-size: 200%
+      .ref
+        font-size: 150%
+
+      .history > *
+        margin: 1.5em 0
+        display: inline-block
+        height: 1.5em
+        width: 8%
+        border-radius: 2em
+        box-shadow: 0 0 10px black
+        &.green
+          background-color: $green
+        &.red
+          background-color: $red
+        &.blue
+          background-color: $blue
+
+      .icon
+        font-size: 700%
+        text-align: center
+        text-shadow: 0px 0px 10px black
+        > *
+          display: none
+          &.red
+            color: darken($red,10%)
+          &.green
+            color: darken($green,10%)
+          &.blue
+            color: darken($blue,10%)
+
+    .DISABLED
+      > a
+        text-decoration: none
+        color: black
+      h1
+        font-size: 180%
+      h2
+        font-size: 130%
+      h1, h2
+        text-align: center
+      &.running
+        background-color: lightblue
+      &.failed
+        background-color: lighten(red, 10%)
+      &.passed
+        background-color: green
+
+      dl
+        dt
+          font-weight: bold
+          &:after
+            content: ':'
+        dd
+          margin-bottom: 1em
 
 #new_project_ref
   label

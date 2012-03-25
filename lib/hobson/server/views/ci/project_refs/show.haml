@@ -1,0 +1,22 @@
+- page_title "#{project_ref.id} | Project Ref | CI"
+
+%section.project-ref{:id => project_ref.id}
+
+  %section.actions
+    - action_button 'Run Tests', project_ref_run_tests_path, :get
+    - action_button 'Edit',      edit_project_path,          :get
+    - action_button 'Delete',    project_path,               :delete
+
+  %dl.details
+    %dt Project
+    %dd
+      %a{:href => project_path(project_ref.project)}= project_ref.project.name
+
+    %dt Ref
+    %dd
+      %a{:href => sha_url(project_ref.project.origin, project_ref.ref)}= project_ref.ref
+
+    %dt Test Runs
+    %dd
+      %ol
+        = partial :'projects/test_runs/list', :test_runs => project_ref.test_runs

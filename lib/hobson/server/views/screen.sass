@@ -167,11 +167,11 @@ dl.details
 .actions
   position: absolute
   top: 0
-  right: 60px
+  right: 80px
   form, input
     display: inline
 
-section.project
+section.project, section.project-ref
   position: relative
 
 section.new-project
@@ -193,7 +193,7 @@ form.new-test-run
       &[type=submit]
         width: auto
 
-.test-runs tbody tr
+table.test-runs tbody tr
   &.running-tests
     background: lightblue
   &.errored
@@ -362,20 +362,21 @@ form.new-test-run
   background: -webkit-linear-gradient(top,$white 0%,$white 2%,$clear 20%,$clear 80%,$white 98%,$white 100%), -webkit-repeating-linear-gradient(-45deg,$light 0%,$light 2%,$dark 3%,$dark 5%,$light 6%)
   border: 3px solid $dark
 
-.project_refs
-  > .project_ref
+.project-refs
+  > .project-ref
     $grey: #c4c4c4
     $red: #EC3E2D
     $green: #B8EA88
     $blue: #7EC4ED
+    $padding: 2em
 
+    position: relative
     float: left
-    height: 18em
-    width: 20em
-
+    height: 20em
+    width: 22em
     margin: 1em
-    padding: 2em
     border-radius: 2em
+    text-align: center
 
     a
       color: black
@@ -399,40 +400,57 @@ form.new-test-run
       +glass($red)
       .icon > .fail
         display: block
+    &:hover
+      > .gear
+        display: block
     >
+      *
+        position: absolute
+        left: $padding
+        right: $padding
+
+      .gear
+        display: none
+        top: -0.5em
+        right: -0.25em
+        left: auto
+        font-size: 400%
+
       .project, .ref
         display: block
-        text-align: center
         font-weight: bold
-        margin-bottom: 0.5em
 
       .project
+        top: 1em
         font-size: 200%
       .ref
+        top: 5em
         font-size: 150%
 
-      .history > *
-        margin: 1.5em 0
-        display: inline-block
-        height: 1.5em
-        width: 8%
-        border-radius: 2em
-        box-shadow: 0 0 10px black
-        &.nil
-          visibility: hidden
-        &.building
-          background-color: $blue
-        &.pass
-          background-color: $green
-        &.fail
-          background-color: $red
+      .history
+        top: 10.5em
+        > *
+          display: inline-block
+          height: 1.4em
+          width: 1.4em
+          border-radius: 2em
+          box-shadow: 0 0 10px black
+          &.nil
+            background-color: white
+            opacity: 0.25
+          &.building
+            background-color: $blue
+          &.pass
+            background-color: $green
+          &.fail
+            background-color: $red
 
       .icon
-        font-size: 700%
-        text-align: center
-        text-shadow: 0px 0px 10px black
+        bottom: 0.5em
         > *
           display: none
+          font-size: 700%
+          text-shadow: 0px 0px 10px black
           &.fail
             color: darken($red,10%)
           &.pass
@@ -440,7 +458,7 @@ form.new-test-run
           &.building
             color: darken($blue,10%)
 
-#new_project_ref
+#new_project-ref
   label
     display: block
   input[type=text]

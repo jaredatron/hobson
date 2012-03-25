@@ -47,16 +47,27 @@ describe Hobson::CI::ProjectRef do
       end
     end
 
+    %w{shas test_run_ids}.each{|attr|
+      describe "#{attr}" do
+        pending "it should return an #{Hobson::CI::ProjectRef::HISTORY_LENGTH} slot array"
+        pending "it should memoize and only hit redis once"
+      end
+    }
+
     describe "#test_runs" do
       let(:project_ref){ Factory.project_ref }
       context "when this project ref has no previous test_runs" do
         it "should return an empty array" do
-          project_ref.test_runs.should == []
+          project_ref.test_runs.should == Array.new(10)
         end
       end
       context "when this project ref has previous test_runs" do
+        before{
+          project_ref.stub(:current_sha){ '3dc35719edca885e5218c990077ac18fe2a566bf' }
+          @test_runs = 2.times.map{ project_ref.run_tests! }
+        }
         it "should return an empty array" do
-          project_ref.test_runs.should == []
+          project_ref.test_runs.should == Array.new(10).zip(@test_runs.reverse).map(&:last)
         end
       end
     end

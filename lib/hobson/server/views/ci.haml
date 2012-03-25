@@ -1,16 +1,18 @@
 - page_title "CI"
-- auto_refresh!
+-# auto_refresh!
 
 %secion.ci
 
   %a{:href => '/ci/new'} new
 
-  %ul.project_refs
+  %ul.project-refs
     - project_refs.each do |project_ref|
       - project = project_ref.project
-      - history = Hobson::CI::ProjectRef::HISTORY_LENGTH.times.to_a.zip(project_ref.history).reverse
-      - current_test_run_id , current_test_run_status = history.pop.last
-      %li.project_ref{:class => test_run_status_classname(current_test_run_status)}
+      - test_runs = project_ref.test_runs.clone
+      - current_test_run = test_runs.shift
+      %li.project-ref{:class => test_run_status_classname(current_test_run.try(:status))}
+
+        %a.gear{:href => project_ref_path(project_ref)} ⚙
 
         %a.project{:href => project_path(project)}
           = project.name.gsub(/-|_|\./,' ')
@@ -19,19 +21,17 @@
           = project_ref.ref
 
         .history
-          - history.each do |n, (test_run_id, test_run_status)|
-            - if test_run_id.present?
-              %a.test_run{:title => test_run_id, :href => test_run_path(test_run_id, project.name), :class => test_run_status_classname(test_run_status)}
-
+          - test_runs.reverse.each do |test_run|
+            - if test_run.present?
+              %a.test-run{:title => test_run.id, :href => test_run_path(test_run), :class => test_run_status_classname(test_run.status)}
             - else
-              .test_run{:class => 'nil'} ⚙
+              .test-run{:class => 'nil'}
 
-        - if current_test_run_id.present?
-          %a.icon{:href => test_run_path(current_test_run_id, project.name), :title => current_test_run_id}
-            .fail !
-            .pass ✓
-            .building ⚙
-            .nil ?
+        - test_run_status_icon(current_test_run) do
+          .fail !
+          .pass ✓
+          .building ⚙
+          .nil ?
 
 :javascript
   Hobson.CI.pollForChanges();

@@ -1,0 +1,7 @@
+- page_title "Project Refs | CI"
+
+%section.project_refs
+  %ul
+    - project_refs.each do |project_ref|
+      %li
+        =h project_ref.inspect

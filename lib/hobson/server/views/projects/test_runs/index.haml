@@ -1,42 +1,7 @@
 - page_title "Test Runs | #{project.name}"
 - auto_refresh!
 
-%a.new-test-run{:href => new_test_run_path} New Test Run
+%section.test-runs
+  %a.new-test-run{:href => new_test_run_path} New Test Run
 
-%table.test-runs
-  %thead
-    %tr
-      %th
-      %th Status
-      %th Test Run Id
-      %th Git Sha
-      %th Requestor
-      %th Created
-      %th UnRun
-      %th Retries
-      %th Failed
-      %th Passed
-      %th Pending
-  %tbody
-    - test_runs.sort_by{|t| t.created_at || Time.now }.reverse.each do |test_run|
-      %tr{:class => test_run.status.gsub(' ','-')}
-        %td
-          %form{:id => "delete#{test_run.id}", :action => test_run_path(test_run), :method => 'post'}
-            %input{:type=>:hidden, :name=>'_method', :value=>'delete'}
-            %a{:href => "javascript: $('#delete#{test_run.id}').submit()"} X
-        %td= test_run.status
-        %td
-          %a{:href => test_run_path(test_run)}= test_run.id
-        %td
-          %a{:href => sha_url(test_run.project.origin, test_run.sha)}= test_run.sha[0..7]
-        %td= test_run.requestor || 'unknown'
-        %td= distance_of_time_in_words(Time.now - test_run.created_at) + ' ago' if test_run.created_at.present?
-        %td= test_run.tests.find_all(&:waiting?).count
-        %td= test_run.tests.map{|t| t.tries > 0 ? t.tries - 1 : 0}.sum
-        %td= test_run.tests.find_all(&:fail?).count
-        %td= test_run.tests.find_all(&:pass?).count
-        %td= test_run.tests.find_all(&:pending?).count
-        %td
-          - max = test_run.tests.size
-          - value = test_run.aborted? ? max : test_run.tests.reject(&:waiting?).size
-          %progress{:value => value, :max => max}
+  - partial :'projects/test_runs/list', :test_runs => test_runs

@@ -34,20 +34,20 @@ class Hobson::CI::ProjectRef
   end
 
   def check_for_new_sha!
-    create_test_run! if current_sha_untested?
+    run_tests! if current_sha_untested?
   end
 
   def current_sha_untested?
-    shas.exclude? current_sha
+    current_sha.present? && shas.exclude?(current_sha)
   end
 
-  def create_test_run! sha=current_sha
+  def run_tests! sha=current_sha
     test_run = project.run_tests!(sha, "CI:#{id}")
     redis.pipelined{ # single request
-      redis.lpush(:shas,              sha)
-      redis.lpush(:test_run_ids,      test_run.id)
-      redis.ltrim(:shas,              0, HISTORY_LENGTH)
-      redis.ltrim(:test_run_ids,      0, HISTORY_LENGTH)
+      redis.lpush(:shas,         sha)
+      redis.lpush(:test_run_ids, test_run.id)
+      redis.ltrim(:shas,         0, HISTORY_LENGTH)
+      redis.ltrim(:test_run_ids, 0, HISTORY_LENGTH)
     }
     test_run
   end
@@ -55,62 +55,21 @@ class Hobson::CI::ProjectRef
   %w{shas test_run_ids}.each{|list|
     class_eval <<-RUBY, __FILE__, __LINE__ + 1
       def #{list}
-        @#{list} ||= redis.lrange(:#{list}, 0, HISTORY_LENGTH-1)
+        @#{list} ||= begin
+          values = redis.lrange(:#{list}, 0, HISTORY_LENGTH-1)
+          Array.new(HISTORY_LENGTH).zip(values).map(&:last) # pad array to HISTORY_LENGTH
+        end
       end
     RUBY
   }
 
-  def history
-    @history ||= test_run_ids.zip(test_run_statuses)
-  end
-
   def test_runs
-    @test_runs ||= test_run_ids.map{|id| project.test_runs(id) }
+    @test_runs ||= test_run_ids.map{|id| id.nil? ? nil : project.test_runs(id) }
   end
 
   def test_run_statuses
     @test_run_statuses ||= test_runs.map{|tr| tr.nil? ? 'nil' : tr.status}
   end
-
-  # def status
-  #   @status ||= begin
-  #     # find the most recently complete test run's status
-  #     test_run = test_run_statuses.find(&:complete)
-  #     # if we dont have one we dont have a status, otherwise if its passed its green otherwise red
-  #     test_run.nil? ? nil : test_run.status == 'passed' ? 'green' : 'red'
-  #   end
-  # end
-
-  # # returns a hash of sha => test_run_id
-  # def test_run_index
-  #   @test_run_index ||= redis.hgetall(:test_run_index)
-  # end
-
-  # def shas
-  #   test_run_index.keys
-  # end
-
-  # def test_run_ids
-  #   test_run_index.values
-  # end
-
-  # # a redis hash of sha => test_run_result
-  # def test_run_results
-  #   @test_run_results ||= redis.hgetall(:test_run_results)
-  # end
-
-  # def test_runs
-  #   @test_runs ||= redis.hgetall(:test_runs).each{|sha,test_run_id|
-  #     project.test_runs(test_run_id)
-  #   }
-  # end
-
-  # def test_run_results
-  #   @test_run_results ||= redis.hgetall(:test_runs).each{|sha,test_run_id|
-  #   @test_runs ||= redis.hgetall(:test_runs).each{|sha,test_run_id|
-  #     project.test_runs(itest_run_id)
-  #   }
-  # end
 
   def current_sha
     @current_sha or begin
@@ -118,7 +77,7 @@ class Hobson::CI::ProjectRef
       result       = `#{cmd}`
       @current_sha = result.scan(/(\b[0-9a-f]{5,40}\b)/).try(:first).try(:first)
       if !$?.success? || @current_sha.blank?
-        raise "failed getting remote sha for #{origin_url.inspect} #{ref.inspect}\n#{cmd.inspect} failed"
+        raise "failed getting remote sha for #{project.origin.inspect} #{ref.inspect}\n#{cmd.inspect} failed"
       end
     end
     @current_sha

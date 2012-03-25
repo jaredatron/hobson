@@ -1,0 +1,13 @@
+- page_title "New Project Ref | CI"
+
+%form#new_project_ref{:action => '/ci/project_refs/new', :method => 'post'}
+  %label
+    %h3 Project
+    %select{:name => 'project_ref[project_name]'}
+      - Hobson.projects.each do |project|
+        %option{:value => project.name}= project.name
+  %label
+    %h3 Ref
+    %input{:name => 'project_ref[ref]', :type => :text, :placeholder => 'master', :value => 'master'}
+  %label
+    %input{:type => :submit, :value => 'create'}

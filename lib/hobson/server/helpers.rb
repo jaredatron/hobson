@@ -36,6 +36,14 @@ module Hobson::Server::Helpers
     @project_refs ||= Hobson::CI.project_refs
   end
 
+  def project_ref_id
+    @project_ref_id ||= "#{params["project_name"]}:#{params["ref"]}"
+  end
+
+  def project_ref
+    @project_ref ||= Hobson::CI::ProjectRef.find(project_ref_id)
+  end
+
   # URL Helpers
 
   def projects_path
@@ -74,6 +82,22 @@ module Hobson::Server::Helpers
 
   def test_runtimes_path project_name=self.project_name
     "#{project_path(project_name)}/test_runtimes"
+  end
+
+  def ci_path
+    '/ci'
+  end
+
+  def project_refs_path
+    "#{ci_path}/project_refs"
+  end
+
+  def project_ref_path project_ref=self.project_ref
+    "#{project_refs_path}/#{project_ref.project_name}/#{project_ref.ref}"
+  end
+
+  def project_ref_run_tests_path project_ref=self.project_ref
+    "#{project_ref_path(project_ref)}/run_tests"
   end
 
   def repo_url origin
@@ -196,6 +220,14 @@ module Hobson::Server::Helpers
       'building'
     else
       'nil'
+    end
+  end
+
+  def test_run_status_icon test_run, &block
+    if test_run.nil?
+      haml_tag(:div, :class => 'icon', &block)
+    else
+      haml_tag(:a, :class => 'icon', :href => test_run_path(test_run), :title => test_run.id, &block)
     end
   end
 

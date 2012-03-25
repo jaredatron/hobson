@@ -48,17 +48,60 @@ class Hobson::Server < Sinatra::Base
   end
 
   get "/" do
+    redirect ci_path
+  end
+
+
+  # ci
+
+  # ci dashboard
+  get '/ci' do
+    haml :ci
+  end
+
+  # ci project refs
+
+  # index
+  get "/ci/project_refs" do
+    haml :'ci/project_refs/index'
+  end
+
+  # new
+  get "/ci/project_refs/new" do
+    haml :'ci/project_refs/new'
+  end
+
+  # create
+  post "/ci/project_refs/new" do
+    project_name, ref = params['project_ref'].values_at("project_name", "ref")
+    Hobson::CI::ProjectRef.create(project_name, ref)
+    redirect ci_path
+  end
+
+  # show
+  get "/ci/project_refs/:project_name/:ref" do
+    haml :'ci/project_refs/show'
+  end
+
+  # update
+  post "/ci/project_refs/:project_name/:ref" do
+    raise "NOT IMP"
+    redirect project_ref_path
+  end
+
+  # update
+  get "/ci/project_refs/:project_name/:ref/run_tests" do
+    project_ref.run_tests!
+    redirect ci_path
+  end
+
+  # delete
+  delete "/ci/project_refs/:project_name/:ref" do
+    project_ref.delete
     redirect '/ci'
   end
 
-  get '/ci' do
-    if project_refs.present?
-      haml :ci
-    else
-      redirect '/ci/new'
-    end
-  end
-
+  # check project refs for new commits
   MAX_CHECK_FOR_CHANGES_INTERVAL = 60 # seconds
   get '/ci/check-for-changes' do
     now = Time.now
@@ -71,23 +114,6 @@ class Hobson::Server < Sinatra::Base
       response[:checked] = true
     end
     response.to_json
-  end
-
-  # ci
-
-  get "/ci/new" do
-    haml :'ci/new'
-  end
-
-  post "/ci/new" do
-    project_name, ref = params['project_ref'].values_at("project_name", "ref")
-    Hobson::CI::ProjectRef.create(project_name, ref)
-    redirect '/ci'
-  end
-
-  delete "/ci/new" do
-    Hobson::CI::ProjectRef.new(params).delete
-    redirect '/ci'
   end
 
   # projects

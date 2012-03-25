@@ -80,10 +80,8 @@ class Hobson::Server < Sinatra::Base
   end
 
   post "/ci/new" do
-    origin_url, ref = params.values_at("origin_url", "ref")
-    origin_url.gsub!('&#x2F;','/') # I have no idea why i need this now
-    project_ref = Hobson::CI::ProjectRef.new(origin_url, ref)
-    project_ref.save
+    project_name, ref = params['project_ref'].values_at("project_name", "ref")
+    Hobson::CI::ProjectRef.create(project_name, ref)
     redirect '/ci'
   end
 

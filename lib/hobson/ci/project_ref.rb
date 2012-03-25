@@ -61,7 +61,7 @@ class Hobson::CI::ProjectRef
   }
 
   def history
-    @history ||= shas.zip(test_run_ids, test_run_statuses)
+    @history ||= test_run_ids.zip(test_run_statuses)
   end
 
   def test_runs

@@ -1,5 +1,5 @@
 - page_title "CI"
--# auto_refresh!
+- auto_refresh!
 
 %secion.ci
 
@@ -7,19 +7,25 @@
 
   %ul.project_refs
     - project_refs.each do |project_ref|
-      - history = Hobson::CI::ProjectRef::HISTORY_LENGTH.times.to_a.zip(project_ref.test_run_statuses).reverse
-      - current = history.shift.last
-      %li.project_ref{:class => test_run_status_color(current)}
+      - project = project_ref.project
+      - history = Hobson::CI::ProjectRef::HISTORY_LENGTH.times.to_a.zip(project_ref.history).reverse
+      - current_test_run_id , current_test_run_status = history.pop.last
+      %li.project_ref{:class => test_run_status_color(current_test_run_status)}
 
-        .project= project_ref.project.name.gsub(/-|_/,' ')
+        %a.project{:href => project_path(project)}
+          = project.name.gsub(/-|_/,' ')
 
-        .ref= project_ref.ref
+        %a.ref{:href => ref_url(project.origin, project_ref.ref)}
+          = project_ref.ref
 
-        %ol.history
-          - history.each do |n, test_run_status|
-            %li.test_run{:class => test_run_status_color(test_run_status)}
+        .history
+          - history.each do |n, (test_run_id, test_run_status)|
+            %a.test_run{:href => test_run_path(test_run_id, project.name), :class => test_run_status_color(test_run_status)}
 
-        .icon
+        %a.icon{:href => test_run_path(current_test_run_id, project.name)}
           .red !
           .green ✓
           .blue ?
+
+:javascript
+  Hobson.CI.pollForChanges();

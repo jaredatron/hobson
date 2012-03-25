@@ -12,17 +12,24 @@ module Hobson::Server::Helpers
     @projects ||= Hobson.projects
   end
 
+  def project_name
+    @project_name ||= params["project_name"]
+  end
+
   def project
-    @project ||= Hobson::Project[params["project_name"]] or
-      raise "project #{params["project_name"]} not found"
+    @project ||= Hobson::Project.find(project_name) or raise Sinatra::NotFound
   end
 
   def test_runs
     @test_runs ||= project.test_runs
   end
 
+  def test_run_id
+    @test_run_id ||= params["test_run_id"]
+  end
+
   def test_run
-    @test_run ||= project.test_runs(params["test_run_id"]) or raise Sinatra::NotFound
+    @test_run ||= project.test_runs(test_run_id) or raise Sinatra::NotFound
   end
 
   def project_refs
@@ -39,28 +46,35 @@ module Hobson::Server::Helpers
     "#{projects_path}/new"
   end
 
-  def project_path project=self.project
-    "#{projects_path}/#{project.name}"
+  # project_path(project)
+  # project_path('project_name')
+  def project_path project_name=self.project_name
+    project_name = project_name.name if project_name.is_a? Hobson::Project
+    "#{projects_path}/#{project_name}"
   end
 
-  def edit_project_path project=self.project
-    "#{project_path(project)}/edit"
+  def edit_project_path project_name=self.project_name
+    "#{project_path(project_name)}/edit"
   end
 
-  def test_runs_path project=self.project
-    "#{project_path(project)}/test_runs"
+  def test_runs_path project_name=self.project_name
+    "#{project_path(project_name)}/test_runs"
   end
 
-  def new_test_run_path project=self.project
-    "#{test_runs_path(project)}/new"
+  def new_test_run_path project_name=self.project_name
+    "#{test_runs_path(project_name)}/new"
   end
 
-  def test_run_path test_run=self.test_run
-    "#{test_runs_path(test_run.project)}/#{test_run.id}"
+  def test_run_path test_run_id=self.test_run_id, project_name=self.project_name
+    return '#' if test_run_id.nil?
+    if test_run_id.is_a? Hobson::Project::TestRun
+      test_run_id, project_name = test_run_id.id, test_run_id.project.name
+    end
+    "#{test_runs_path(project_name)}/#{test_run_id}"
   end
 
-  def test_runtimes_path project=self.project
-    "#{project_path(project)}/test_runtimes"
+  def test_runtimes_path project_name=self.project_name
+    "#{project_path(project_name)}/test_runtimes"
   end
 
   def repo_url origin

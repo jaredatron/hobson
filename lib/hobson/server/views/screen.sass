@@ -360,6 +360,12 @@ form.new-test-run
     padding: 2em
     border-radius: 2em
 
+    a
+      color: black
+      text-decoration: none
+      &[href="#"]
+        cursor: default
+
     &.green
       +glass($green)
       .icon > .green
@@ -411,31 +417,6 @@ form.new-test-run
             color: darken($green,10%)
           &.blue
             color: darken($blue,10%)
-
-    .DISABLED
-      > a
-        text-decoration: none
-        color: black
-      h1
-        font-size: 180%
-      h2
-        font-size: 130%
-      h1, h2
-        text-align: center
-      &.running
-        background-color: lightblue
-      &.failed
-        background-color: lighten(red, 10%)
-      &.passed
-        background-color: green
-
-      dl
-        dt
-          font-weight: bold
-          &:after
-            content: ':'
-        dd
-          margin-bottom: 1em
 
 #new_project_ref
   label

@@ -29,8 +29,8 @@ class Hobson::Project::TestRun::Tests
 
   # scans the workspace
   def detect!
-    detect_specs!
-    detect_scenarios!
+    detect_specs!     if test_run.workspace.root.join('spec').exist?
+    detect_scenarios! if test_run.workspace.root.join('features').exist?
     self
   end
 

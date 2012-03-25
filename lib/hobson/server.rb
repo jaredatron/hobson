@@ -107,8 +107,7 @@ class Hobson::Server < Sinatra::Base
     project = params['project']
     @project = Hobson::Project.create(project['origin'], project['name'])
     @project.homepage = project['homepage'] if project['homepage'].present?
-
-    redirect project_path
+    redirect project_path(@project)
   end
 
   # show
@@ -154,7 +153,7 @@ class Hobson::Server < Sinatra::Base
   post "/projects/:project_name/test_runs" do
     test_run = params['test_run']
     @test_run = project.run_tests!(test_run['sha'], test_run['requestor'])
-    redirect test_run_path
+    redirect test_run_path(@test_run)
   end
 
   # show
@@ -171,7 +170,7 @@ class Hobson::Server < Sinatra::Base
   # rerun
   post "/projects/:project_name/test_runs/:test_run_id/rerun" do
     @test_run = project.run_tests!(test_run.sha)
-    redirect test_run_path
+    redirect test_run_path(@test_run)
   end
 
   # abort

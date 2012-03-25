@@ -4,8 +4,7 @@ gemspec
 
 gem 'redis-slave', :git => "git://github.com/deadlyicon/redis-slave.git"
 
-
-group :development, :test do
+group :development do
 
   platform :ruby_18 do
     gem "ruby-debug"
@@ -17,9 +16,12 @@ group :development, :test do
     gem "ruby-debug19"
   end
 
-  gem 'rake'
   gem 'shotgun'
+
+end
+
+group :development, :test do
+  gem 'rake'
   gem 'rspec'
   gem 'resque_unit'
-
 end

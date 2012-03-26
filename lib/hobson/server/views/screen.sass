@@ -377,6 +377,7 @@ table.test-runs tbody tr
     margin: 1em
     border-radius: 2em
     text-align: center
+    text-shadow: 0px 0px 10px white
 
     a
       color: black
@@ -431,10 +432,11 @@ table.test-runs tbody tr
         top: 10.5em
         > *
           display: inline-block
-          height: 1.4em
-          width: 1.4em
+          border: 1px solid black
+          height: 1.3em
+          width: 1.3em
           border-radius: 2em
-          box-shadow: 0 0 10px black
+          box-shadow: 0 0 10px white
           &.nil
             background-color: white
             opacity: 0.25
@@ -450,7 +452,6 @@ table.test-runs tbody tr
         > *
           display: none
           font-size: 700%
-          text-shadow: 0px 0px 10px black
           &.fail
             color: darken($red,10%)
           &.pass

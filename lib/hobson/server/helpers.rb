@@ -92,6 +92,10 @@ module Hobson::Server::Helpers
     "#{ci_path}/project_refs"
   end
 
+  def new_project_ref_path
+    "#{project_refs_path}/new"
+  end
+
   def project_ref_path project_ref=self.project_ref
     "#{project_refs_path}/#{project_ref.project_name}/#{project_ref.ref}"
   end

@@ -31,6 +31,7 @@ module Hobson
   autoload :Server,       'hobson/server'
   autoload :Worker,       'hobson/worker'
   autoload :CI,           'hobson/ci'
+  autoload :Cache,        'hobson/cache'
 
   def root
     @root ||= Pathname.new ENV['HOBSON_ROOT'] ||= Dir.pwd

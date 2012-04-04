@@ -7,6 +7,27 @@ describe Hobson::Project::TestRun do
 
   either_context do
 
+    describe "find" do
+      it "should return nil and remove the id from the project test runs index if the given id finds a new_record" do
+        project  = Factory.project
+        test_run = Factory.test_run(project)
+        test_run.save!
+
+        Hobson::Project::TestRun.find(project, test_run.id).should be_a Hobson::Project::TestRun
+        project.test_runs(test_run.id).should be_a Hobson::Project::TestRun
+        project.test_run_ids.should include test_run.id
+
+        # simulate the test run redis has expiring without being removed from the index
+        test_run.redis.del("TestRun:#{test_run.id}")
+        # reload the project
+        project = Hobson::Project[project.name]
+
+        Hobson::Project::TestRun.find(project, test_run.id).should be_nil
+        project.test_runs(test_run.id).should be_nil
+        project.test_run_ids.should_not include test_run.id
+      end
+    end
+
     describe "#data" do
       it "should return a hash" do
         test_run.data.should be_a Hash

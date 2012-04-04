@@ -7,6 +7,18 @@ class Hobson::Project::TestRun
   autoload :Tests,   'hobson/project/test_run/tests'
   autoload :Job,     'hobson/project/test_run/job'
 
+  def self.find project, id
+    test_run = new(project, id)
+    if test_run.new_record?
+      # if you're looking for a test_run that does not exist it's probably
+      # been removed by expiration and should be removed from the index set
+      test_run.delete!
+      return nil
+    else
+      return test_run
+    end
+  end
+
   delegate :workspace, :to => :project
   attr_reader :project
 

@@ -76,13 +76,13 @@ class Hobson::Project
     @test_runtimes ||= TestRuntimes.new(self)
   end
 
+  def test_run_ids
+    @test_run_ids ||= redis.smembers(:test_runs)
+  end
+
   def test_runs id=nil
-    if id.present?
-      test_run = TestRun.new(self, id)
-      test_run.data.keys.present? ? test_run : nil
-    else
-      @test_runs ||= redis.smembers(:test_runs).map{|id| TestRun.new(self, id) }
-    end
+    return TestRun.find(self, id) if id.present?
+    @test_runs ||= test_run_ids.map{|id| TestRun.find(self, id) }.compact
   end
 
   def run_tests! sha = current_sha, requestor=nil

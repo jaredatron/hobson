@@ -20,6 +20,10 @@ class Hobson::Project::TestRun
     true
   end
 
+  def new_record?
+    data.empty?
+  end
+
   delegate :[], :[]=, :keys, :to => :redis_hash
 
   def data

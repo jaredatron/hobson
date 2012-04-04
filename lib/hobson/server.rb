@@ -1,3 +1,5 @@
+require 'time'
+
 require 'sinatra/base'
 require 'vegas'
 require 'haml'

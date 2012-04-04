@@ -9,7 +9,9 @@
   %td
     %a{:href => sha_url(test_run.project.origin, test_run.sha)}= test_run.sha[0..7]
   %td= test_run.requestor || 'unknown'
-  %td= distance_of_time_in_words(Time.now - test_run.created_at) + ' ago' if test_run.created_at.present?
+  %td
+    - if test_run.created_at.present?
+      %abbr{:class => "timeago", :title => test_run.created_at.iso8601}= test_run.created_at
   %td= test_run.tests.find_all(&:waiting?).count
   %td= test_run.tests.map{|t| t.tries > 0 ? t.tries - 1 : 0}.sum
   %td= test_run.tests.find_all(&:fail?).count

@@ -1,6 +1,6 @@
 class Hobson::Project::TestRun
 
-  MAX_AGE = 604800 # 7 days
+  MAX_AGE = 172800 # 2 days
 
   delegate :redis, :to => :project
 
@@ -9,13 +9,13 @@ class Hobson::Project::TestRun
   end
 
   def save!
-    project.redis.sadd(:test_runs, id)
+    project.redis.zadd(:test_runs, created_at.to_f, id)
     redis_hash.redis.expire(redis_hash.key, MAX_AGE)
     created!
   end
 
   def delete!
-    project.redis.srem(:test_runs, id)
+    project.redis.zrem(:test_runs, id)
     redis.del("TestRun:#{id}")
     true
   end

@@ -77,7 +77,7 @@ class Hobson::Project
   end
 
   def test_run_ids
-    @test_run_ids ||= redis.smembers(:test_runs)
+    @test_run_ids ||= redis.zrange(:test_runs, 0, 99999999)
   end
 
   def test_runs id=nil
@@ -91,6 +91,8 @@ class Hobson::Project
     test_run.sha = sha
     test_run.save!
     test_run.enqueue!
+    @test_run_ids << test_run.id if @test_run_ids.present?
+    @test_runs << test_run if @test_runs.present?
     test_run
   end
 

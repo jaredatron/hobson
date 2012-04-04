@@ -190,6 +190,7 @@ class Hobson::Server < Sinatra::Base
   # delete
   delete "/projects/:project_name/test_runs/:test_run_id" do
     test_run.delete!
+    Hobson::Cache.delete Hobson::Cache.build_key(test_run, :list)
     redirect test_runs_path
   end
 

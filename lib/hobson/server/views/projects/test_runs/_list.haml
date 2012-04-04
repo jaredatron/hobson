@@ -14,24 +14,8 @@
       %th Pending
   %tbody
     - test_runs.sort_by{|t| t.created_at || Time.now }.reverse.each do |test_run|
-      %tr{:class => test_run.status.gsub(' ','-')}
-        %td
-          %form{:id => "delete#{test_run.id}", :action => test_run_path(test_run), :method => 'post'}
-            %input{:type=>:hidden, :name=>'_method', :value=>'delete'}
-            %a{:href => "javascript: $('#delete#{test_run.id}').submit()"} X
-        %td= test_run.status
-        %td
-          %a{:href => test_run_path(test_run)}= test_run.id
-        %td
-          %a{:href => sha_url(test_run.project.origin, test_run.sha)}= test_run.sha[0..7]
-        %td= test_run.requestor || 'unknown'
-        %td= distance_of_time_in_words(Time.now - test_run.created_at) + ' ago' if test_run.created_at.present?
-        %td= test_run.tests.find_all(&:waiting?).count
-        %td= test_run.tests.map{|t| t.tries > 0 ? t.tries - 1 : 0}.sum
-        %td= test_run.tests.find_all(&:fail?).count
-        %td= test_run.tests.find_all(&:pass?).count
-        %td= test_run.tests.find_all(&:pending?).count
-        %td
-          - max = test_run.tests.size
-          - value = test_run.aborted? ? max : test_run.tests.reject(&:waiting?).size
-          %progress{:value => value, :max => max}
+      - cache_key = Hobson::Cache.build_key test_run, :list
+      - if Hobson::Cache.has_key?(cache_key)
+        = Hobson::Cache.read(cache_key)
+      - else
+        = render :partial => :'projects/test_runs/test_run', :object => test_run, :locals => {:cache_key => cache_key}

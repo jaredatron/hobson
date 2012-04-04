@@ -18,5 +18,4 @@
     %dt Test Runs
     %dd
       %ol
-        - @test_runs = project_ref.test_runs.compact # partial optons wernt working
-        = partial :'projects/test_runs/list' # , :test_runs => project_ref.test_runs
+        = partial :'projects/test_runs/list', :locals => { :test_run_ids => project_ref.test_run_ids.compact }

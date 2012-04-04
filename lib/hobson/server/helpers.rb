@@ -117,6 +117,10 @@ module Hobson::Server::Helpers
     "#{repo_url(origin)}/tree/#{ref}"
   end
 
+  def redis
+    @redis ||= Redis::Namespace.new(:server, :redis => Hobson.redis)
+  end
+
   def body_classnames
     @body_classnames ||= []
   end

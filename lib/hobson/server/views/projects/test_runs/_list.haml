@@ -14,9 +14,12 @@
       %th Pending
   %tbody
     - test_run_ids.compact.each do |test_run_id|
-      - tr = redis.get("test_run:#{test_run_id}")
+      - cache_key = "test_run:#{test_run_id}"
+      - tr = redis.get(cache_key)
       - if tr.nil? # if we have this test run tr cached in redis
         - test_run = project.test_runs(test_run_id)
         - tr = partial :'projects/test_runs/list/test_run', :locals => {:test_run => test_run}
-        - redis.set("test_run:#{test_run_id}", tr) if test_run.complete?
+        - if test_run.complete?
+          - redis.set(cache_key, tr)
+          - redis.expire(cache_key, Hobson::Project::TestRun::MAX_AGE)
       = tr

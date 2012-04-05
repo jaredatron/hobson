@@ -77,7 +77,7 @@ class Hobson::Project
   end
 
   def test_run_ids
-    @test_run_ids ||= redis.zrange(:test_runs, 0, 99999999)
+    @test_run_ids ||= redis.zrange(:test_runs, 0, 99999999).reverse
   end
 
   def test_runs id=nil

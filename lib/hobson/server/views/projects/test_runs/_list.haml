@@ -1,4 +1,3 @@
-- test_run_ids ||= project.test_run_ids
 %table.test-runs
   %thead
     %tr
@@ -14,7 +13,7 @@
       %th Passed
       %th Pending
   %tbody
-    - test_run_ids.each do |test_run_id|
+    - test_run_ids.compact.each do |test_run_id|
       - tr = redis.get("test_run:#{test_run_id}")
       - if tr.nil? # if we have this test run tr cached in redis
         - test_run = project.test_runs(test_run_id)

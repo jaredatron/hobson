@@ -18,4 +18,4 @@
     %dt Test Runs
     %dd
       %ol
-        = partial :'projects/test_runs/list', :locals => { :test_run_ids => project_ref.test_run_ids.compact }
+        = partial :'projects/test_runs/list', :locals => { :test_run_ids => project_ref.test_run_ids.compact, :project => project_ref.project }

@@ -4,4 +4,4 @@
 %section.test-runs
   %a.new-test-run{:href => new_test_run_path} New Test Run
 
-  = partial :'projects/test_runs/list'
+  = partial :'projects/test_runs/list', :locals => { :test_run_ids => project.test_run_ids, :project => project }

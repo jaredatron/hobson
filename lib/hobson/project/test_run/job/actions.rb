@@ -1,10 +1,43 @@
 require 'timeout'
+require 'simplecov'
+
 
 class Hobson::Project::TestRun::Job
+
+  FINISH_TEST_RUN_LOCK = 'finish_test_run_lock'
 
   def enqueue!
     Hobson.resque.enqueue(Hobson::Project::TestRun::Runner, test_run.project.name, test_run.id, index)
     enqueued!
+  end
+
+  def lock_can_finish_test_run
+    # test_run.redis
+    result = false
+    until result == true
+      result = test_run.project.redis.setnx(FINISH_TEST_RUN_LOCK, 'lock')
+      sleep 0.1
+      #TODO: check for lock expiration
+    end
+  end
+
+  def release_can_finish_test_run
+    test_run.project.redis.del FINISH_TEST_RUN_LOCK
+  end
+
+  def can_finish_test_run?
+    #make sure only one job is in here at any time:
+    lock_can_finish_test_run
+    begin
+      # mark this job as ready for wrap up
+      ready_to_finish_run!
+
+      #This reload seems unnecessary, but the status is cached, and not cleared (except locally) on write.
+      test_run.redis_hash.reload!
+      test_run.jobs.all?(&:ready_to_finish_run?)
+    ensure
+      release_can_finish_test_run
+    end
   end
 
   def run_tests!
@@ -56,6 +89,12 @@ class Hobson::Project::TestRun::Job
     tearing_down!
     eval_hook :teardown
 
+    if can_finish_test_run?
+      finishing_test_run!
+      eval_hook :finish_test_run
+      save_test_run_artifacts!
+    end
+
   rescue Object => e
     logger.info %(Exception:\n#{e}\n#{e.backtrace.join("\n")})
     self['exception'] = e.to_s
@@ -65,6 +104,7 @@ class Hobson::Project::TestRun::Job
     raise # raise so resque shows this as a failed job and you can retry it
   ensure
     complete!
+
     begin
       save_log_files!
     rescue Exception => e
@@ -75,6 +115,12 @@ class Hobson::Project::TestRun::Job
   def save_log_files!
     workspace.root.join('log').children.each{|path| save_artifact path}
     save_artifact(Hobson.temp_logfile.tap(&:flush).path, :name => 'test_run.log') if Hobson.temp_logfile.present?
+  end
+
+  def save_test_run_artifacts!
+    artifacts_dir = workspace.root.join('artifacts')
+    logger.debug "ARTIE DIR: #{artifacts_dir.to_s}"
+    artifacts_dir.children.each{|path| save_artifact path, :content_type => `file -Ib #{path}`.gsub(/\n/,"") } if File.directory?(artifacts_dir)
   end
 
   def abort?

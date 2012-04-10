@@ -9,7 +9,9 @@ class Hobson::Project::TestRun::Job
     :running_tests,
     :saving_artifacts,
     :tearing_down,
-    :complete
+    :complete,
+    :ready_to_finish_run,
+    :finishing_test_run
 
   def abort!
     aborting! unless complete?
@@ -28,14 +30,16 @@ class Hobson::Project::TestRun::Job
   end
 
   def status
-    errored?           ? 'errored'           :
-    complete?          ? 'complete'          :
-    tearing_down?      ? 'tearing down'      :
-    saving_artifacts?  ? 'saving artifacts'  :
-    running_tests?     ? 'running tests'     :
-    preparing?         ? 'preparing'         :
-    checking_out_code? ? 'checking out code' :
-    enqueued?          ? 'waiting to be run' :
+    errored?              ? 'errored'                      :
+    complete?             ? 'complete'                     :
+    tearing_down?         ? 'tearing down'                 :
+    saving_artifacts?     ? 'saving artifacts'             :
+    running_tests?        ? 'running tests'                :
+    preparing?            ? 'preparing'                    :
+    checking_out_code?    ? 'checking out code'            :
+    enqueued?             ? 'waiting to be run'            :
+    ready_to_finish_run?  ? 'tests completed for this job' :
+    finishing_test_run?   ? 'finishing test run'           :
     'waiting...'
   end
 

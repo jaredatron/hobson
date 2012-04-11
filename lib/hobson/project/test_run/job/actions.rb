@@ -28,26 +28,39 @@ class Hobson::Project::TestRun::Job
     unless abort?
       running_tests!
       test_runtimes = test_run.project.test_runtimes
-      while (tests = test_needing_to_be_run).present?
+      while (batch = test_needing_to_be_run).present?
         break if abort?
-        eval_hook :before_running_tests, :tests => tests
+        eval_hook :before_running_tests, :tests => batch
         break if abort?
-        tests.each(&:trying!)
-        logger.debug "running tests: #{tests.map(&:id).inspect}"
-        workspace.run_tests(tests){ |type, name, state, occured_at, result|
-          test = tests.find{|test| test.id == "#{type}:#{name}" }
+        batch.each(&:trying!)
+        logger.debug "running tests: #{batch.map(&:id).inspect}"
+        workspace.run_tests(batch){ |type, name, state, occured_at, result|
+
+          # find the test this is an update for
+          test = batch.find{|test| test.id == "#{type}:#{name}" }
+
+          # abort if we recieve a report for a test we did not expect to be running
           test or raise "status update for unknown test #{name.inspect}"
+
           case state
           when :start
-            test.started_at   = occured_at
+            # if the test is reported to start more then once, ignore
+            # subsequent started at times
+            test.started_at ||= occured_at
           when :complete
             test.completed_at = occured_at
-            test.result = result
-            test_runtimes[test.id] << test.runtime if test.pass?
+            # if a test result is reported more then once ignore it if
+            # the test was previously reported as a failure
+            test.result = result unless test.fail?
           end
         }
       end
     end
+
+    recording_test_runtimes!
+    tests.each{|test|
+      test_runtimes[test.id] << test.runtime if test.pass?
+    }
 
     saving_artifacts!
     save_log_files!

@@ -7,6 +7,7 @@ class Hobson::Project::TestRun::Job
     :checking_out_code,
     :preparing,
     :running_tests,
+    :recording_test_runtimes,
     :saving_artifacts,
     :tearing_down,
     :complete

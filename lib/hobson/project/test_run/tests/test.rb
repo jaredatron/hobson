@@ -20,7 +20,6 @@ class Hobson::Project::TestRun::Tests::Test
     RUBY
   end
 
-
   %w{PASS FAIL PENDING}.each do |result|
     class_eval <<-RUBY, __FILE__, __LINE__
       def #{result.downcase}?

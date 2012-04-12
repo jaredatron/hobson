@@ -24,7 +24,7 @@ class Hobson::Project::TestRun::Job
   end
 
   def complete?
-    complete_at.present? || test_run.aborted?
+    complete_at.present?
   end
 
   def status

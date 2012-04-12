@@ -26,6 +26,7 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency "resque", "~> 1.19.0"
   s.add_runtime_dependency "fog"
   s.add_runtime_dependency "SystemTimer" if RUBY_VERSION.to_f < 1.9
+  s.add_runtime_dependency "sys-proctable"
   s.add_runtime_dependency "childprocess"
   s.add_runtime_dependency "popen4"
   s.add_runtime_dependency "log4r"

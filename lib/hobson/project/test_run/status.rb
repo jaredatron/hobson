@@ -16,7 +16,7 @@ class Hobson::Project::TestRun
     'waiting...'
   end
 
-  alias_method :abort!, :aborted!
+  alias_method :abort!,     :aborted!
   alias_method :started?,   :enqueued_jobs?
   alias_method :started_at, :enqueued_jobs_at
 

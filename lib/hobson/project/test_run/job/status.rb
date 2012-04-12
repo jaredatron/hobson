@@ -10,11 +10,10 @@ class Hobson::Project::TestRun::Job
     :recording_test_runtimes,
     :saving_artifacts,
     :tearing_down,
+    :aborting,
     :complete
 
-  def abort!
-    aborting! unless complete?
-  end
+  alias_method :aborted?, :aborting?
 
   def running?
     checking_out_code_at.present? && !complete?

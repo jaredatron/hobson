@@ -18,6 +18,8 @@ group :development do
 
   gem 'shotgun'
 
+  gem 'capistrano'
+  gem 'rvm-capistrano'
 end
 
 group :development, :test do

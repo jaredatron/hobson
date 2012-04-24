@@ -1,5 +1,66 @@
 require "rvm/capistrano"
 
+
+# ec2-23-20-146-206.compute-1.amazonaws.com
+# ip-10-124-202-113.ec2.internal
+
+# ec2-184-73-120-68.compute-1.amazonaws.com
+# ip-10-123-30-170.ec2.internal
+
+# ec2-23-20-214-168.compute-1.amazonaws.com
+# ip-10-124-90-12.ec2.internal
+
+# ec2-23-20-195-14.compute-1.amazonaws.com
+# ip-10-122-163-21.ec2.internal
+
+# ec2-50-16-63-50.compute-1.amazonaws.com
+# ip-10-124-79-40.ec2.internal
+
+# ec2-23-20-53-116.compute-1.amazonaws.com
+# ip-10-88-219-220.ec2.internal
+
+# ec2-184-72-165-139.compute-1.amazonaws.com
+# ip-10-124-147-188.ec2.internal
+
+# ec2-204-236-255-89.compute-1.amazonaws.com
+# ip-10-88-233-156.ec2.internal
+
+# ec2-50-17-115-219.compute-1.amazonaws.com
+# domU-12-31-38-04-81-91.compute-1.internal
+
+# ec2-184-72-208-156.compute-1.amazonaws.com
+# domU-12-31-38-01-C9-02.compute-1.internal
+
+# ec2-50-16-9-133.compute-1.amazonaws.com
+# ip-10-90-135-246.ec2.internal
+
+# ec2-184-73-24-209.compute-1.amazonaws.com
+# domU-12-31-38-07-05-E6.compute-1.internal
+
+# ec2-23-20-9-246.compute-1.amazonaws.com
+# ip-10-124-137-136.ec2.internal
+
+# ec2-184-72-166-179.compute-1.amazonaws.com
+# ip-10-124-219-219.ec2.internal
+
+# ec2-23-20-123-107.compute-1.amazonaws.com
+# ip-10-126-35-19.ec2.internal
+
+# ec2-23-20-95-13.compute-1.amazonaws.com
+# ip-10-86-178-180.ec2.internal
+
+# ec2-174-129-137-32.compute-1.amazonaws.com
+# ip-10-123-11-173.ec2.internal
+
+# ec2-174-129-87-249.compute-1.amazonaws.com
+# ip-10-86-210-126.ec2.internal
+
+# ec2-23-20-219-206.compute-1.amazonaws.com
+# ip-10-87-14-108.ec2.internal
+
+# ec2-184-73-185-51.compute-1.amazonaws.com
+# ip-10-123-14-62.ec2.internal
+
 INSTANCES = %w[
   ec2-184-73-185-51.compute-1.amazonaws.com
   ec2-174-129-87-249.compute-1.amazonaws.com

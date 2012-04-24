@@ -119,6 +119,16 @@ describe Hobson::Project do
 
   end
 
+  describe "#current_test_run" do
+
+    it "should return the last test run" do
+      Factory.project.current_test_run.should be_nil
+      test_run = project.run_tests!
+      Factory.project.current_test_run.should == test_run
+    end
+
+  end
+
   # describe "new" do
 
   #   context "when given no arguments" do

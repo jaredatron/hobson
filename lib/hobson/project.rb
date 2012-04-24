@@ -85,6 +85,11 @@ class Hobson::Project
     @test_runs ||= test_run_ids.map{|id| TestRun.find(self, id) }.compact
   end
 
+  def current_test_run
+    TestRun.find(self, test_run_ids.first)
+  end
+  delegate :running?, :abort!, to: :current_test_run, allow_nil: true
+
   def run_tests! sha = current_sha, requestor=nil
     test_run = TestRun.new(self)
     test_run.requestor = requestor || current_requestor

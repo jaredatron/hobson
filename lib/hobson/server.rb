@@ -99,7 +99,11 @@ class Hobson::Server < Sinatra::Base
 
   # delete
   delete "/ci/project_refs/:project_name/:ref" do
-    project_ref.delete
+    if project_ref.running?
+      project_ref.abort!
+    else
+      project_ref.delete
+    end
     redirect '/ci'
   end
 

@@ -28,7 +28,7 @@ class Hobson::Project::TestRun::Job
     unless abort?
       running_tests!
       test_runtimes = test_run.project.test_runtimes
-      while (tests = test_needing_to_be_run).present?
+      while (tests = tests_needing_to_be_run).present?
         break if abort?
         eval_hook :before_running_tests, :tests => tests
         break if abort?

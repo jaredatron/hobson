@@ -2,15 +2,14 @@ require 'spec_helper'
 
 describe Hobson::Project::TestRun do
 
-  subject{ Factory.test_run }
-  alias_method :test_run, :subject
+  let(:project){ Factory.project }
+  let(:test_run){ Factory.test_run(project, 'origin/testing_test_detection') }
+  subject{ test_run }
 
   either_context do
 
     describe "find" do
       it "should return nil and remove the id from the project test runs index if the given id finds a new_record" do
-        project  = Factory.project
-        test_run = Factory.test_run(project)
         test_run.save!
 
         Hobson::Project::TestRun.find(project, test_run.id).should be_a Hobson::Project::TestRun
@@ -19,12 +18,13 @@ describe Hobson::Project::TestRun do
 
         # simulate the test run redis has expiring without being removed from the index
         test_run.redis.del("TestRun:#{test_run.id}")
-        # reload the project
-        project = Hobson::Project[project.name]
 
-        Hobson::Project::TestRun.find(project, test_run.id).should be_nil
-        project.test_runs(test_run.id).should be_nil
-        project.test_run_ids.should_not include test_run.id
+        # reload the project
+        project2 = Hobson::Project[project.name]
+
+        Hobson::Project::TestRun.find(project2, test_run.id).should be_nil
+        project2.test_runs(test_run.id).should be_nil
+        project2.test_run_ids.should_not include test_run.id
       end
     end
 

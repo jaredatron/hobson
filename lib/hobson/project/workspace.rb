@@ -18,9 +18,23 @@ class Hobson::Project::Workspace
   end
   alias_method :path, :root
 
+  def sha_for rev
+    execute("git rev-parse #{rev}").split("\n").last
+  end
+
+  def current_sha
+    sha_for 'HEAD'
+  end
+
   def checkout! sha
     logger.info "checking out #{sha}"
-    execute "git fetch --all && git reset --hard #{sha} && git clean -df"
+    sha = sha_for(sha)
+    logger.debug "#{current_sha} current sha"
+    logger.debug "#{sha} new sha"
+    unless current_sha == sha
+      execute "git fetch --all && git checkout --quiet --force #{sha} -- && git stash clear"
+    end
+    execute "git clean -dfx"
   end
 
   def exists?
@@ -49,9 +63,25 @@ class Hobson::Project::Workspace
     bundler? ? %w{bundle exec} : []
   end
 
-  def prepare
+  def bundle_install!
     execute 'gem install bundler && bundle check || bundle install' if bundler?
-    root.join('log').mkpath
+  end
+
+  def prepare &block
+    # raise ArgumentError, 'block is required for workspace.prepare' unless block_given?
+    execute 'git reset --hard && git clean -dfx'
+    begin
+      logger.debug "attempting to setup from stash"
+      execute 'git stash apply'
+    rescue ExecutionError
+      logger.debug "no stash found. Preparing..."
+      bundle_install!
+      yield if block_given?
+      root.join('log').mkpath
+      root.join('.hobson_prepared').open('w'){|f| f.write("")}
+      execute 'git add -Af && git stash && git stash apply'
+    end
+    execute 'git reset' # empty the git index
   end
 
   def run_tests tests, &report_progress
@@ -122,8 +152,14 @@ class Hobson::Project::Workspace
   ExecutionError = Class.new(StandardError)
 
   def fork_and_execute command, &block
-    pid = fork{ execute command }
-    logger.debug "fork_and_execute pid(#{pid}) command(#{command})"
+    logger.debug "forking and executing command(#{command})"
+    pid = Kernel.fork{
+      logger.debug "fork(#{Process.pid}) executing command(#{command})";
+      execute command
+      logger.debug "fork(#{Process.pid}) exit(#{$?.exitstatus})"
+      exit! $?.exitstatus
+    }
+    logger.debug "fork pid(#{pid})"
     while Process.waitpid2(pid, ::Process::WNOHANG).nil?
       yield
       sleep 0.5

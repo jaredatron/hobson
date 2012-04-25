@@ -7,23 +7,24 @@ class Hobson::Project::TestRun::Job
     enqueued!
   end
 
+  def prepare_workspace!
+    return if abort?
+    checking_out_code!
+    workspace.checkout! test_run.sha
+    return if abort?
+    preparing!
+    workspace.prepare{ eval_hook :setup }
+  end
+
   def run_tests!
     return if test_run.aborted?
+    logger.info 'starting run tests action'
 
     self['hostname'] = Timeout::timeout(5){ # try the S3 public hostname api
       `curl -s http://169.254.169.254/latest/meta-data/public-hostname`.chomp
     } rescue `hostname`.chomp
 
-    unless abort?
-      checking_out_code!
-      workspace.checkout! test_run.sha
-    end
-
-    unless abort?
-      preparing!
-      workspace.prepare
-      eval_hook :setup
-    end
+    prepare_workspace!
 
     unless abort?
       running_tests!

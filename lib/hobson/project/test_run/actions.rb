@@ -19,8 +19,8 @@ class Hobson::Project::TestRun
     logger.info "checking out #{sha}"
     workspace.checkout! sha
 
-    logger.info "preparing workspace"
-    workspace.prepare
+    logger.info "bundle installing"
+    workspace.bundle_install!
 
     logger.info "detecting tests"
     tests.detect!

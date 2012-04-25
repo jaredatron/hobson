@@ -2,8 +2,9 @@ require 'spec_helper'
 
 describe Hobson::Project::TestRun::Tests do
 
-  subject{ Factory.tests }
-  alias_method :tests, :subject
+  let(:test_run){ Factory.test_run(Factory.project, 'origin/slow_app_boot_specs_and_features') }
+  let(:tests){ Factory.tests(test_run) }
+  subject{ tests }
 
   worker_context do
 
@@ -21,6 +22,7 @@ describe Hobson::Project::TestRun::Tests do
     context "after detecting" do
 
       before{
+        tests.test_run.workspace.checkout! tests.test_run.sha
         tests.test_run.workspace.prepare
         tests.detect!
       }

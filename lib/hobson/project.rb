@@ -85,15 +85,18 @@ class Hobson::Project
     @test_runs ||= test_run_ids.map{|id| TestRun.find(self, id) }.compact
   end
 
-  def run_tests! sha = current_sha, requestor=nil
-    test_run = TestRun.new(self)
-    test_run.requestor = requestor || current_requestor
-    test_run.sha = sha
-    test_run.save!
-    test_run.enqueue!
-    @test_run_ids << test_run.id if @test_run_ids.present?
-    @test_runs << test_run if @test_runs.present?
-    test_run
+  def create_test_run sha=current_sha, requestor=nil
+    TestRun.new(self).tap{|test_run|
+      test_run.requestor = requestor || current_requestor
+      test_run.sha = sha
+      test_run.save!
+      @test_run_ids << test_run.id if @test_run_ids.present?
+      @test_runs << test_run if @test_runs.present?
+    }
+  end
+
+  def run_tests! *args
+    create_test_run(*args).tap(&:enqueue!)
   end
 
   def new_record?

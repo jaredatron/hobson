@@ -3,6 +3,10 @@ require 'log4r'
 
 module Hobson
 
+  def reset_logger!
+    @log = @log_outputter = @logger = @temp_logfile = @temp_log = @logging_to_stdout = nil
+  end
+
   def log
     @log or begin
       @log = Pathname.new(ENV['HOBSON_LOG'] || config[:log] || root.join('log/hobson.log'))

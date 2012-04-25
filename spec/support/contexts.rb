@@ -9,6 +9,7 @@ module Contexts
       before{
         ClientWorkingDirectory.reset!
         Dir.chdir ClientWorkingDirectory.path
+        Hobson.logger.info "logging in the client context"
       }
       class_eval(&block)
     end
@@ -19,6 +20,7 @@ module Contexts
       before{
         WorkerWorkingDirectory.reset!
         Dir.chdir WorkerWorkingDirectory.path
+        Hobson.logger.info "logging in the worker context"
       }
       class_eval(&block)
     end

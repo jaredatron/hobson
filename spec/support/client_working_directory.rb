@@ -14,7 +14,6 @@ module ClientWorkingDirectory
   end
 
   def reset!
-    sh "git clone #{ExampleProject::ORIGIN} #{path}" unless path.exist?
     git("config --get remote.origin.url").chomp.should == ExampleProject::ORIGIN
     git "reset --hard origin/master"
     git "clean -df"
@@ -26,6 +25,7 @@ module ClientWorkingDirectory
   end
 
   def git cmd
+    sh "git clone #{ExampleProject::ORIGIN} #{path}" unless path.exist?
     sh %[cd "#{path}" && git --git-dir="#{path+'.git'}" #{cmd}]
   end
 

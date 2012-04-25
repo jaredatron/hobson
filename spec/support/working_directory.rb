@@ -39,7 +39,7 @@ module WorkingDirectory
   # end
 
   def sh cmd
-    output = `#{cmd}` or raise "failed to run #{cmd.inspect}"
+    output = `#{cmd} 2>/dev/null` or raise "failed to run #{cmd.inspect}"
   end
 
   def write_config! config

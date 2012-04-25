@@ -10,12 +10,8 @@ module Factory
     project.workspace
   end
 
-  def test_run project=self.project
-    test_run = Hobson::Project::TestRun.new(project)
-    test_run.created!
-    test_run.sha = ClientWorkingDirectory.current_sha
-    test_run.save!
-    test_run
+  def test_run project=self.project, sha=ClientWorkingDirectory.current_sha
+    project.create_test_run sha, 'the test environment'
   end
 
   def tests test_run=self.test_run

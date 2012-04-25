@@ -21,6 +21,8 @@ DEFAULT_CONFIG = {
   },
 }
 
+TMP.rmtree if TMP.exist?
+
 SPEC_ROOT.join('support').children.each{ |support| require support.to_s }
 
 # ClientWorkingDirectory.path.rmtree if ClientWorkingDirectory.path.exist?
@@ -36,6 +38,8 @@ RSpec.configure do |config|
   config.before :each do
     ENV['HOBSON_CONFIG'] = nil
     ENV['HOBSON_ROOT']   = nil
+
+    Hobson.reset_logger!
     Resque.reset!
     Redis.new.flushall
     Hobson.instance_variables.each{|i| Hobson.send :remove_instance_variable, i }

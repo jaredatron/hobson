@@ -47,6 +47,122 @@ describe Hobson::Project::TestRun::Tests do
 
     end
 
+
+    describe "#balance!" do
+
+      let(:test_run){
+        test_run = Factory.test_run
+        tests.each{|type, runtimes|
+          runtimes.each_with_index{|runtime, index|
+            test_run.tests.add("#{type}:#{index}")
+            test_run.tests.last.est_runtime = runtime.minutes unless runtime.nil?
+          }
+        }
+        test_run
+      }
+
+      def jobs
+        test_run.tests.map(&:job).uniq.map{|index|
+          Hobson::Project::TestRun::Job.new(test_run, index)
+        }
+      end
+
+      def test_groups
+        jobs.map{|job| job.tests.map(&:id) }
+      end
+
+      def job_est_runtimes
+        jobs.map(&:est_runtime).map(&:to_f)
+      end
+
+      context "when all tests have no estimated runtime" do
+        let(:tests){{
+          :spec    => 120.times.map{ nil },
+          :feature => 120.times.map{ nil },
+        }}
+
+        it "should balance" do
+          test_run.tests.balance! 1.minute
+          test_groups.should == [
+            ( 0...60 ).map{|i| "spec:#{i}"    },
+            (60...120).map{|i| "spec:#{i}"    },
+            ( 0...60 ).map{|i| "feature:#{i}" },
+            (60...120).map{|i| "feature:#{i}" },
+          ]
+          job_est_runtimes.should == [60.0,60.0,60.0,60.0]
+        end
+      end
+
+      context "when there are a a few long running tests" do
+        let(:tests){{
+          :spec    => [10,9,8,7,6,5,4,3,2,1],
+          :feature => [10,9,8,7,6,5,4,3,2,1],
+        }}
+
+        it "should balance" do
+          test_run.tests.balance!
+          test_groups.should == [
+            %w{spec:0             },
+            %w{spec:1             },
+            %w{spec:2             },
+            %w{spec:3             },
+            %w{spec:4             },
+            %w{spec:5             },
+            %w{spec:6    spec:9   },
+            %w{spec:7    spec:8   },
+            %w{feature:0          },
+            %w{feature:1          },
+            %w{feature:2          },
+            %w{feature:3          },
+            %w{feature:4          },
+            %w{feature:5          },
+            %w{feature:6 feature:9},
+            %w{feature:7 feature:8},
+          ]
+          job_est_runtimes.should == [600.0, 540.0, 480.0, 420.0, 360.0, 300.0, 300.0, 300.0, 600.0, 540.0, 480.0, 420.0, 360.0, 300.0, 300.0, 300.0]
+        end
+      end
+
+      context "when there are a lot of fast tests" do
+        let(:tests){{
+          :spec    => [0.01,0.02,0.03,0.04,0.05,0.06,0.07,0.08,0.09,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0],
+          :feature => [0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0,1.1,1.2,1.3,1.4,1.5,1.6,1.7,1.8,1.9,2.0],
+        }}
+
+        it "should balance" do
+          test_run.tests.balance!
+          test_groups.should == [
+            %w{spec:0     spec:1     spec:2     spec:3     spec:4    spec:5  spec:6  spec:7  spec:8 spec:10 spec:11},
+            %w{spec:9     spec:12    spec:13    spec:14    spec:15   spec:16 spec:17 spec:18                       },
+            %w{feature:0  feature:1  feature:2  feature:3                                                          },
+            %w{feature:4  feature:5  feature:7  feature:8  feature:9 feature:11                                    },
+            %w{feature:6  feature:12 feature:13 feature:15                                                         },
+            %w{feature:10 feature:18 feature:19                                                                    },
+            %w{feature:14 feature:16 feature:17                                                                    },
+          ]
+          job_est_runtimes.should == [57.0, 300.0, 60.0, 300.0, 300.0, 300.0, 300.0]
+        end
+      end
+
+      context "when there are fine grained estimated runtimes" do
+        let(:tests){{
+          :spec    => [0.0123,0.1234,0.2345,0.3456,0.4567,0.5678,0.6789],
+          :feature => [1.0123,1.1234,1.2345,1.3456,1.4567,1.5678,1.6789],
+        }}
+
+        it "should balance" do
+          test_run.tests.balance!
+          test_groups.should == [
+            %w{spec:0     spec:1     spec:2     spec:3     spec:4    spec:5  spec:6},
+            %w{feature:0  feature:1  feature:2  feature:3                          },
+            %w{feature:4  feature:5  feature:6                                     },
+          ]
+          job_est_runtimes.should == [145.152, 282.948, 282.20400000000006]
+        end
+      end
+
+    end
+
   end
 
   describe "balance_for!" do

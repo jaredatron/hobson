@@ -13,8 +13,6 @@ class Hobson::Project::TestRun
     return if aborted?
 
     started_building!
-    number_of_jobs = Resque.workers.length
-    number_of_jobs = 2 if number_of_jobs < 2 # TODO move to project setting
 
     logger.info "checking out #{sha}"
     workspace.checkout! sha
@@ -25,17 +23,21 @@ class Hobson::Project::TestRun
     logger.info "detecting tests"
     tests.detect!
 
+    raise "no tests found" if tests.size < 1
+
     logger.info "balancing tests"
-    tests.balance_for! number_of_jobs
+    tests.balance!
 
     tests_without_a_job = tests.find_all{|test| test.job.nil?}
     if tests_without_a_job.present?
       raise "FAILED to balance tests!\nThe following tests have no job: #{tests_without_a_job.map(&:name)*' '}"
     end
 
-    logger.info "enqueuing #{number_of_jobs} jobs to run #{tests.length} tests"
+    raise "no jobs to schedule" if tests.number_of_jobs < 1
+
+    logger.info "enqueuing #{tests.number_of_jobs} jobs to run #{tests.length} tests"
     # jobs.each(&:enqueue!)
-    (0...number_of_jobs).map{|index|
+    (0...tests.number_of_jobs).map{|index|
       job = Job.new(self, index)
       job.created!
       job.enqueue!

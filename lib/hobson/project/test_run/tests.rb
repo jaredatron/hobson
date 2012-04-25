@@ -1,3 +1,5 @@
+require 'active_support/core_ext/numeric/time'
+
 class Hobson::Project::TestRun::Tests
 
   autoload :Test, 'hobson/project/test_run/tests/test'
@@ -65,8 +67,6 @@ class Hobson::Project::TestRun::Tests
     # one job is easy
     return each{|test| test.job = 0 } if number_of_jobs == 1
 
-    calculate_estimated_runtimes!
-
     jobs = (0...number_of_jobs).map{|index| index}
 
     # group tests by their type
@@ -102,6 +102,24 @@ class Hobson::Project::TestRun::Tests
         test.job = job # assign this test to that job
       }
     }
+  end
+
+  def balance! runtime_target=5.minutes
+    raise "there are no tests" unless length > 0
+
+    each(&:calculate_estimated_runtime!)
+
+    jobs = group_by(&:type).map{|group, tests|
+      Hobson::StonePacker.pack(tests, runtime_target, &:est_runtime)
+    }.inject(&:+)
+
+    jobs.each_with_index{|job, index|
+      job.each{|test| test.job = index}
+    }
+  end
+
+  def number_of_jobs
+    map(&:job).compact.uniq.size
   end
 
   def inspect

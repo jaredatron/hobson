@@ -39,12 +39,7 @@ class Hobson::Project::TestRuntimes < Hobson::RedisHash
     end
 
     def average
-      @average ||= runtimes.size > 0.0 ? runtimes.sum / runtimes.size : 0.0
-    end
-    alias_method :to_f, :average
-
-    def to_i
-      to_f.to_i
+      @average ||= runtimes.sum / runtimes.size if runtimes.present?
     end
 
     def << runtime

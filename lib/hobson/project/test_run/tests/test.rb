@@ -66,14 +66,10 @@ class Hobson::Project::TestRun::Tests::Test
     name <=> other.name
   end
 
-  MINIMUM_EST_RUNTIME = 0.1
+  MINIMUM_EST_RUNTIME = 1.second
 
   def calculate_estimated_runtime!
-    self.est_runtime ||= begin
-      average_runtime = test_run.project.test_runtimes[id].average
-      average_runtime = MINIMUM_EST_RUNTIME if average_runtime < MINIMUM_EST_RUNTIME
-      average_runtime
-    end
+    self.est_runtime ||= test_run.project.test_runtimes[id].average || MINIMUM_EST_RUNTIME
   end
 
   def inspect

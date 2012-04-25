@@ -18,6 +18,7 @@ module Hobson
 
   extend self
 
+  autoload :StonePacker,  'hobson/stone_packer'
   autoload :RedisSlave,   'hobson/redis_slave'
   autoload :RedisHash,    'hobson/redis_hash'
   autoload :Bundler,      'hobson/bundler'

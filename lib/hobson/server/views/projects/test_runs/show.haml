@@ -28,20 +28,28 @@
     %dt Status
     %dd= test_run.status
 
-    %dt Est. Duration
-    %dd= distance_of_time_in_words(est_test_run_duration, 0, true) if est_test_run_duration.present?
+    -# %dt Est. Duration
+    -# %dd= distance_of_time_in_words(est_test_run_duration, 0, true) if est_test_run_duration.present?
 
     %dt Duration
-    %dd= distance_of_time_in_words(test_run_duration, 0, true) if test_run_duration.present?
+    %dd= distance_of_time_in_minutes(test_run_duration)
+    -# %dd= distance_of_time_in_words(test_run_duration, 0, true) if test_run_duration.present?
 
     - if test_run.running?
-      %dt Progress
-      %dd
-        - progress
+      -# %dt Progress
+      -# %dd
+      -#   - progress
 
       %dt Tests Completed
+      %dd.tests-completed
+        %div
+          = test_run.tests.find_all(&:complete?).count
+        %div
+          - tests_completed
+
+      %dt Tests Waiting
       %dd
-        - tests_completed
+        = test_run.tests.find_all(&:needs_run?).count
 
     %dt Test Retries
     %dd= test_run.tests.map{|t| t.tries < 1 ? 1 : t.tries}.sum - test_run.tests.count
@@ -53,7 +61,7 @@
         - test_run.jobs.each do |job|
           %li.job{:class => "status-#{classname(job.status)}"}
 
-            %dl.details
+            %dl.details{:style => 'display:none'}
               %a.name{:href => "ssh://#{job['hostname']}"}
                 %dt Job
                 %dd #{job.index}
@@ -68,11 +76,11 @@
 
               .est-runtime
                 %dt Est. Runtime
-                %dd= distance_of_time_in_words job.est_runtime
+                %dd= distance_of_time_in_minutes job.est_runtime
 
               .runtime
                 %dt Actual Runtime
-                %dd= distance_of_time_in_words job.runtime
+                %dd= distance_of_time_in_minutes job.runtime
 
               - if job.errored?
                 .error
@@ -92,7 +100,8 @@
     %section.tests
       %h2 Tests
       - if test_run.running?
-        - tests_completed
+        %div
+          - tests_completed
       %table
         %thead
           %tr

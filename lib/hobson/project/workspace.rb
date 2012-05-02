@@ -4,13 +4,10 @@ require 'childprocess'
 
 class Hobson::Project::Workspace
 
-  attr_reader :project, :test_run_index
-
-  delegate :logger, :to => :project
+  attr_reader :project
 
   def initialize project
     @project = project
-    @test_run_index = 0
   end
 
   def root
@@ -78,96 +75,28 @@ class Hobson::Project::Workspace
       bundle_install!
       yield if block_given?
       root.join('log').mkpath
+      # we need to add a gitkeep file to any empty directory that might have been created in setup
+      root.join('log/.gitkeep').open('w'){|f| f.write("")}
       root.join('.hobson_prepared').open('w'){|f| f.write("")}
       execute 'git add -Af && git stash && git stash apply'
     end
     execute 'git reset' # empty the git index
   end
 
-  def run_tests tests, &report_progress
-    @test_run_index += 1
-    logger.info "Running Tests #{@test_run_index}: #{tests.join(' ')}"
-
-    # split up tests by type
-    tests.group_by(&:type).each{|type, tests|
-      logger.info "Running #{tests.size} #{type} tests"
-      next if tests.empty?
-
-      command = "cd #{root.to_s.inspect} && "
-      command << "bundle exec " if bundler?
-      command << test_command(type, tests.map(&:name))
-      command << "; true" # we dont care about the exit status
-
-      status_file = root.join(hobson_status_file)
-      status_file.open('w'){|f|f.write('')} # touch & empty
-      status_file.open{|status|
-        begin
-          fork_and_execute(command) do
-            status.read.split("\n").each{|line|
-              if line =~ /^TEST:([^:]+):([^:]+):(START|COMPLETE):(\d+\.\d+)(?::(PASS|FAIL|PENDING))?$/
-                type, name, state, occured_at, result = $1, $2, $3.downcase.to_sym, Time.at($4.to_i), $5
-                yield type, name, state, occured_at, result
-              end
-            }
-          end
-        rescue ExecutionError => e
-          logger.error "error running tests:\n#{e}\n#{e.backtrace*"\n"}"
-          tests.each{|test| test.reset! if test.started_at && !test.completed_at}
-        end
-      }
-    }
-  end
-
-  def hobson_status_file
-    "log/hobson_status#{@test_run_index}"
-  end
-
-  def test_command type, tests
-    case type.to_sym
-    when :scenario
-      %W[
-        cucumber
-        --quiet
-        --require features
-        --require #{Hobson.lib.join('hobson/formatters/cucumber.rb')}
-        --format pretty --out log/feature_run#{@test_run_index}
-        --format Hobson::Formatters::Cucumber --out #{hobson_status_file}
-        #{tests.map{|name| '--name ' + "^#{Regexp.escape(name)}$".inspect }*' '}
-      ]
-    when :spec
-      %W[
-        rspec
-        --require #{Hobson.lib.join('hobson/formatters/rspec.rb')}
-        --format documentation --out log/spec_run#{@test_run_index}
-        --format Hobson::Formatters::Rspec --out #{hobson_status_file}
-        #{tests*' '}
-      ]
-    when :test_unit
-      %W[echo not yet supported && false]
-    else
-      raise "unknown test type #{type}"
-    end * ' '
-  end
-
   ExecutionError = Class.new(StandardError)
 
   def fork_and_execute command, &block
-    logger.debug "forking and executing command(#{command})"
     pid = Kernel.fork{
       logger.debug "fork(#{Process.pid}) executing command(#{command})";
       execute command
       logger.debug "fork(#{Process.pid}) exit(#{$?.exitstatus})"
-      exit! $?.exitstatus
+      exit!
     }
-    logger.debug "fork pid(#{pid})"
     while Process.waitpid2(pid, ::Process::WNOHANG).nil?
-      yield
+      yield pid
       sleep 0.5
     end
-    yield
-    begin Process.wait; rescue Errno::ECHILD; end
-    raise ExecutionError, "#{command.inspect} crashed with exit code #{$?.exitstatus}" unless $?.success?
-    $?
+    yield pid
   end
 
   def execute command
@@ -179,7 +108,7 @@ class Hobson::Project::Workspace
     command = "source #{rvm_source_file.inspect} && rvm rvmrc trust #{root.to_s.inspect} > /dev/null && #{command}" if rvm?
     command = "bash -lc #{command.inspect}"
 
-    logger.debug "actually executing: #{command}"
+    # logger.debug "actually executing: #{command}"
 
     Hobson::Bundler.with_clean_env{
       # TODO this should probably be somewhere better
@@ -200,10 +129,16 @@ class Hobson::Project::Workspace
     }
   end
 
-
   def inspect
     "#<#{self.class} project:#{project.name} root:#{root}>"
   end
   alias_method :to_s, :inspect
+
+  private
+
+  def logger
+    @logger ||= Log4r::Logger.new("Hobson::Project::Workspace")
+  end
+
 
 end

@@ -12,12 +12,12 @@
   %td
     - if test_run.created_at.present?
       %abbr{:class => "timeago", :title => test_run.created_at.iso8601}= test_run.created_at
-  %td= test_run.tests.find_all(&:waiting?).count
+  %td= test_run.tests.find_all(&:needs_run?).count
   %td= test_run.tests.map{|t| t.tries > 0 ? t.tries - 1 : 0}.sum
   %td= test_run.tests.find_all(&:fail?).count
   %td= test_run.tests.find_all(&:pass?).count
   %td= test_run.tests.find_all(&:pending?).count
   %td
     - max = test_run.tests.size
-    - value = test_run.aborted? ? max : test_run.tests.reject(&:waiting?).size
+    - value = test_run.aborted? ? max : test_run.tests.reject(&:needs_run?).size
     %progress{:value => value, :max => max}

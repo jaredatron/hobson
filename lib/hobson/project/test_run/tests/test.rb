@@ -2,6 +2,8 @@ class Hobson::Project::TestRun::Tests::Test
 
   attr_accessor :test_run, :id, :type, :name
 
+  MAX_TRIES = 3
+
   def initialize test_run, id
     @test_run, @id = test_run, id
     @type, @name = id.scan(/^(.+?):(.+)$/).first
@@ -20,13 +22,42 @@ class Hobson::Project::TestRun::Tests::Test
     RUBY
   end
 
+  def min_max_runtime
+    1.minute
+  end
 
-  %w{PASS FAIL PENDING}.each do |result|
+  def max_runtime
+    [est_runtime * 2, min_max_runtime].max
+  end
+
+  %w{PASS FAIL PENDING HUNG}.each do |result|
     class_eval <<-RUBY, __FILE__, __LINE__
       def #{result.downcase}?
         result == "#{result}"
       end
+      def #{result.downcase}!
+        self.result = "#{result}"
+      end
     RUBY
+  end
+
+  # overrides above general definition
+  def fail!
+    if needs_run?
+      reset!
+    else
+      self.result = "FAIL"
+    end
+  end
+
+  # overrides above general definition
+  def hung!
+    if needs_run?
+      reset!
+    else
+      self.result = "HUNG"
+      self.completed_at = Time.now
+    end
   end
 
   def trying!
@@ -40,12 +71,12 @@ class Hobson::Project::TestRun::Tests::Test
     self.result &&= nil
   end
 
-  def waiting?
-    started_at.blank?
+  def needs_run?
+    !pass? && !pending? && tries < MAX_TRIES
   end
 
   def running?
-    !waiting? && !complete?
+    started_at.present? && !complete?
   end
 
   def complete?
@@ -66,7 +97,7 @@ class Hobson::Project::TestRun::Tests::Test
     name <=> other.name
   end
 
-  MINIMUM_EST_RUNTIME = 1.second
+  MINIMUM_EST_RUNTIME = 10.seconds
 
   def calculate_estimated_runtime!
     self.est_runtime ||= test_run.project.test_runtimes[id].average || MINIMUM_EST_RUNTIME

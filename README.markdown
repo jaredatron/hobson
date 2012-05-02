@@ -1,3 +1,34 @@
+Make it feel faster
+- take prep time into account in ETA
+- don't show a text run ETA until all jobs are started
+
+
+Make it actually faster
+- detect not needing to re-prepare
+- drop rety from 3 to 2
+- dont rety OR only retry once for non-ci test runs
+
+
+Learn about intermitant failures
+- store fail/pass ratio for each test to get a sense of stability
+- in change_main exit the process upon first db_charmer error
+- buld a gem that allows test run output to files individual for each test
+- reserect the cucumber data dump upon failure
+
+
+
+
+failues
+- is mysql2 adapter in thread safe mode?
+- is redis in thread safe mode?
+
+
+bugfix
+- fix timeline bug
+
+
+
+
 # Hobson
 
 A distributed test run framework built on resque.

@@ -84,6 +84,10 @@ describe Hobson::Project::TestRun::Job do
 
     end
 
+    describe "#run_tests!" do
+
+    end
+
   end
 
 end

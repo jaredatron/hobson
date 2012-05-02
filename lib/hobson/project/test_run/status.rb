@@ -6,6 +6,7 @@ class Hobson::Project::TestRun
   def status
     errored?          ? 'errored'             :
     aborted?          ? 'aborted'             :
+    hung?             ? 'hung'                :
     failed?           ? 'failed'              :
     passed?           ? 'passed'              :
     complete?         ? 'complete'            :
@@ -21,8 +22,8 @@ class Hobson::Project::TestRun
   alias_method :started_at, :enqueued_jobs_at
 
   def aborted?
-    # bypass the cache and read from redis every time
-    redis_hash.get('aborted_at').present?
+    # bypass the redis_hash cache and read from redis every time
+    @aborted ||= redis_hash.get('aborted_at').present?
   end
 
   def running?
@@ -30,7 +31,7 @@ class Hobson::Project::TestRun
   end
 
   def errored?
-    jobs.any?(&:errored?)
+    @errored ||= jobs.any?(&:errored?)
   end
 
   def complete?
@@ -42,11 +43,15 @@ class Hobson::Project::TestRun
   end
 
   def passed?
-    complete? && tests.map(&:result).all?{|result| result == 'PASS'}
+    complete? && tests.all?(&:pass?)
   end
 
   def failed?
     complete? && !passed?
+  end
+
+  def hung?
+    complete? && tests.any?(&:hung?)
   end
 
 end

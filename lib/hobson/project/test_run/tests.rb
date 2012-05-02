@@ -1,5 +1,3 @@
-require 'active_support/core_ext/numeric/time'
-
 class Hobson::Project::TestRun::Tests
 
   autoload :Test, 'hobson/project/test_run/tests/test'

@@ -20,7 +20,8 @@ class Hobson::Project::TestRun::Job
   end
 
   def errored?
-    self['exception'].present?
+    # bypass the redis_hash cache and read from redis every time
+    test_run.redis_hash.get("job:#{index}:exception").present?
   end
 
   def complete?

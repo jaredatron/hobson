@@ -28,26 +28,12 @@ class Hobson::Project::TestRun::Job
 
     unless abort?
       running_tests!
-      test_runtimes = test_run.project.test_runtimes
-      while (tests = tests_needing_to_be_run).present?
+      while_tests_needing_to_be_run{|tests, index|
         break if abort?
         eval_hook :before_running_tests, :tests => tests
         break if abort?
-        tests.each(&:trying!)
-        logger.debug "running tests: #{tests.map(&:id).inspect}"
-        workspace.run_tests(tests){ |type, name, state, occured_at, result|
-          test = tests.find{|test| test.id == "#{type}:#{name}" }
-          test or raise "status update for unknown test #{name.inspect}"
-          case state
-          when :start
-            test.started_at   = occured_at
-          when :complete
-            test.completed_at = occured_at
-            test.result = result
-            test_runtimes[test.id] << test.runtime if test.pass?
-          end
-        }
-      end
+        TestExecutor.new(self, index, tests)
+      }
     end
 
     saving_artifacts!
@@ -79,7 +65,7 @@ class Hobson::Project::TestRun::Job
   end
 
   def abort?
-    return false if !running? || !test_run.aborted?
+    test_run.aborted? || test_run.errored?
   end
 
 end

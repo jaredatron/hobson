@@ -54,6 +54,10 @@ module Hobson::Server::Helpers
     "#{projects_path}/new"
   end
 
+  def distance_of_time_in_minutes seconds
+    "#{((seconds || 0) / 60).round(2)} minutes"
+  end
+
   # project_path(project)
   # project_path('project_name')
   def project_path project_name=self.project_name
@@ -161,18 +165,16 @@ module Hobson::Server::Helpers
   end
 
   def progress
-    value, max = @test_run.complete? ? [1,1] : [test_run_duration, est_test_run_duration]
-    title = "#{distance_of_time_in_words(value)} / #{distance_of_time_in_words(max)}"
+    # value, max = @test_run.complete? ? [1,1] : [test_run_duration, est_test_run_duration]
+    # title = "#{distance_of_time_in_words(value)} / #{distance_of_time_in_words(max)}"
     haml_tag '.progress' do
-      haml_tag :progress, :value => value, :max => max, :title => title
+      # haml_tag :progress, :value => value, :max => max, :title => title
     end
   end
 
   def tests_completed
     value, max = test_run.tests.find_all(&:complete?).count, test_run.tests.count
-    haml_tag '.tests-completed' do
-      haml_tag :progress, :value => value, :max => max, :title => "#{value}/#{max}"
-    end
+    haml_tag :progress, :value => value, :max => max, :title => "#{value}/#{max}", :class => 'tests-completed'
   end
 
   def job_timeline job
@@ -190,7 +192,7 @@ module Hobson::Server::Helpers
       right = ((((to - test_run.started_at) / test_run_duration) * 100) - 100) * -1
 
       html_options = {}
-      html_options[:title] = "#{landmark} for #{distance_of_time_in_words(duration.to_i)}"
+      html_options[:title] = "#{landmark} for #{distance_of_time_in_minutes(duration)}"
       html_options[:class] = "landmark-#{classname(landmark)}"
       html_options[:style] = "left: #{left}%; right: #{right}%;"
       haml_tag(:li, html_options[:title], html_options)

@@ -1,7 +1,9 @@
 class Hobson::Project::TestRun::Job
 
+  autoload :TestExecutor, 'hobson/project/test_run/job/test_executor'
+
   attr_reader :test_run, :index
-  delegate :logger, :workspace, :to => :test_run
+  delegate :workspace, :to => :test_run
 
   def initialize test_run, index
     @test_run, @index = test_run, index
@@ -13,7 +15,14 @@ class Hobson::Project::TestRun::Job
 
   def tests_needing_to_be_run
     return [] if test_run.aborted?
-    tests.find_all{|test| !test.pass? && test.tries <= 1}
+    tests.find_all{|test| test.needs_run? }
+  end
+
+  def while_tests_needing_to_be_run
+    index = 0
+    while (tests = tests_needing_to_be_run).present?
+      yield tests, index += 1
+    end
   end
 
   def tries

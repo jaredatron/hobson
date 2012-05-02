@@ -9,6 +9,7 @@ require 'active_support/core_ext/enumerable'
 require 'active_support/core_ext/module/delegation'
 require 'active_support/core_ext/object/try'
 require 'active_support/inflections'
+require 'active_support/core_ext/numeric/time'
 
 require 'pathname'
 require 'resque'

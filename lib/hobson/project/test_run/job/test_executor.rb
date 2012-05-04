@@ -69,7 +69,7 @@ class Hobson::Project::TestRun::Job::TestExecutor
   end
 
   def execution_idle_limit
-    20.minute
+    10.minute
   end
 
   def execution_hung?

@@ -2,7 +2,7 @@ class Hobson::Project::TestRun::Tests::Test
 
   attr_accessor :test_run, :id, :type, :name
 
-  MAX_TRIES = 3
+  MAX_TRIES = 2
 
   def initialize test_run, id
     @test_run, @id = test_run, id

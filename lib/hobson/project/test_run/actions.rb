@@ -26,7 +26,8 @@ class Hobson::Project::TestRun
     raise "no tests found" if tests.size < 1
 
     logger.info "balancing tests"
-    tests.balance!
+    # tests.balance!
+    tests.balance_for! Resque.workers.length
 
     tests_without_a_job = tests.find_all{|test| test.job.nil?}
     if tests_without_a_job.present?

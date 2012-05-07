@@ -232,15 +232,10 @@ Right now a 'test' is an individual feature or spec file. In the near future we'
 
 # TODO
 
-  * use redis index sets instead of using the keys command
   * add a test run post processing job to do things like compile SimpleCov reports
-  * add a requested-by tag to show what engineer created what test_run
-  * refactor feature tests to mean individual scenarios rather then .feature file
   * detect when a sha isn't on origin and error
-  * update balancing logic to be aware of 0 est runtimes rather then using 0.1 as a hack
   * find a fix for empty test files
     * when a test file is empty it's never updated by the hobson status formatter and the whole test run is hung
-  * improve the way Hobson uses redis. It's wicked slow atm.
   * add hobson & hobson project configuration options
     * min / max jobs per test_run
     * min / max tests per job

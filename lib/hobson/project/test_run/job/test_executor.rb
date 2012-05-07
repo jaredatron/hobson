@@ -127,6 +127,7 @@ class Hobson::Project::TestRun::Job::TestExecutor
     %W[
       cucumber
       --quiet
+      --strict
       --require features
       --require #{Hobson.lib.join('hobson/formatters/cucumber.rb')}
       --format pretty --out log/feature_run#{@index}

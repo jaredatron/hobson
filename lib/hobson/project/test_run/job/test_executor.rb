@@ -84,7 +84,7 @@ class Hobson::Project::TestRun::Job::TestExecutor
     sleep 1
     Process.kill('KILL', pid) rescue nil
     while descendants.present?
-      descendants.select!{|proc| Sys::ProcTable.ps(proc.pid) } # reduce
+      descendants.select!{|proc| Sys::ProcTable.ps(proc.pid) rescue nil } # reduce
       descendants.each{|proc| Process.kill('kill', proc.pid) rescue nil }
     end
   end

@@ -15,8 +15,8 @@ class Hobson::Project::TestRun::Job::TestExecutor
     touch @status_file_path
 
     # open test logfile and status file
-    @status_file      = @status_file_path.open
-    @testrun_log_file = @testrun_log_file_path.open
+    @status_file      = @status_file_path.open("r:UTF-8")
+    @testrun_log_file = @testrun_log_file_path.open("r:UTF-8")
 
     # ignore existing content
     @testrun_log_file.read
@@ -93,9 +93,13 @@ class Hobson::Project::TestRun::Job::TestExecutor
     10.minute
   end
 
+  def testrun_log_file_has_new_content?
+    @testrun_log_file.read.present? rescue false
+  end
+
   def execution_hung?
     @last_time_there_was_log_content ||= Time.now
-    @last_time_there_was_log_content   = Time.now if @testrun_log_file.read.present?
+    @last_time_there_was_log_content   = Time.now if testrun_log_file_has_new_content?
     Time.now - @last_time_there_was_log_content > execution_idle_limit
   end
 

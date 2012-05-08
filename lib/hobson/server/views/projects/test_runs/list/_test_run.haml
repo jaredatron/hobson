@@ -1,8 +1,9 @@
 %tr{:class => test_run.status.gsub(' ','-')}
   %td
-    %form{:id => "delete#{test_run.id}", :action => test_run_path(test_run), :method => 'post'}
-      %input{:type=>:hidden, :name=>'_method', :value=>'delete'}
-      %a{:href => "javascript: $('#delete#{test_run.id}').submit()"} X
+    - if test_run.complete?
+      %form{:id => "delete#{test_run.id}", :action => test_run_path(test_run), :method => 'post'}
+        %input{:type=>:hidden, :name=>'_method', :value=>'delete'}
+        %a{:href => "javascript: $('#delete#{test_run.id}').submit()"} X
   %td= test_run.status
   %td
     %a{:href => test_run_path(test_run)}= test_run.id

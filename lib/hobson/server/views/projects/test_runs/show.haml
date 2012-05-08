@@ -57,7 +57,7 @@
         - test_run.jobs.each do |job|
           %li.job{:class => "status-#{classname(job.status)}"}
             .icon
-            .index= job.index
+            %a.index{:href => "ssh://#{job['hostname']}"}= job.index
             %ol.timeline
               - job_timeline(job)
             - if job.errored?

@@ -1,3 +1,5 @@
+require 'sys/proctable'
+
 class Hobson::Project::TestRun::Job::TestExecutor
 
   delegate :workspace, :to => :@job
@@ -62,10 +64,29 @@ class Hobson::Project::TestRun::Job::TestExecutor
 
   def kill_process! pid
     logger.warn("killing test execution pid(#{pid})")
-    # TODO kill whole family
+
+    # kill the whole family
+    procs = Sys::ProcTable.ps
+
+    find_all_children = proc{|pid|
+      procs.find_all{|proc| proc.ppid == pid}
+    }
+
+    find_all_descendants = proc{|pid|
+      children = find_all_children.call(pid)
+      children + children.inject([]){|grand_children, proc|
+        grand_children + find_all_descendants.call(proc.pid)
+      }
+    }
+
+    descendants = find_all_descendants.call(pid)
     Process.kill('TERM', pid) rescue nil
     sleep 1
     Process.kill('KILL', pid) rescue nil
+    while descendants.present?
+      descendants.select!{|proc| Sys::ProcTable.ps(proc.pid) } # reduce
+      descendants.each{|proc| Process.kill('kill', proc.pid) rescue nil }
+    end
   end
 
   def execution_idle_limit

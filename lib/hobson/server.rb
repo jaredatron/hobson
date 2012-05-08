@@ -197,8 +197,7 @@ class Hobson::Server < Sinatra::Base
 
   # rerun
   post "/projects/:project_name/test_runs/:test_run_id/rerun" do
-    @test_run = project.run_tests!(test_run.sha)
-    redirect test_run_path(@test_run)
+    redirect test_run_path project.run_tests!(test_run.sha, test_run.requestor)
   end
 
   # abort

@@ -8,7 +8,7 @@
   %section.actions
     - if test_run.complete?
       - action_button 'Rerun', test_run_path+'/rerun'
-    - if test_run.running?
+    - if !test_run.complete?
       - action_button 'Abort', test_run_path+'/abort'
     - unless test_run.running?
       - action_button 'Delete', test_run_path, :delete

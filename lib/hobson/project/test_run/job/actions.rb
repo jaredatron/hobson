@@ -29,6 +29,7 @@ class Hobson::Project::TestRun::Job
     unless abort?
       running_tests!
       while_tests_needing_to_be_run{|tests, index|
+        raise "max test executions reached. something is very wrong with your code. Please see the logs." if index > 10
         break if abort?
         eval_hook :before_running_tests, :tests => tests
         break if abort?

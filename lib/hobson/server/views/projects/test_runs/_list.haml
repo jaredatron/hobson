@@ -18,6 +18,7 @@
       - tr = redis.get(cache_key)
       - if tr.nil? # if we have this test run tr cached in redis
         - test_run = project.test_runs(test_run_id)
+        - next if test_run.nil?
         - tr = partial :'projects/test_runs/list/test_run', :locals => {:test_run => test_run}
         - if test_run.complete?
           - redis.set(cache_key, tr)

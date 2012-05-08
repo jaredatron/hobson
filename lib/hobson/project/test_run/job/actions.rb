@@ -60,7 +60,9 @@ class Hobson::Project::TestRun::Job
   end
 
   def save_log_files!
-    workspace.root.join('log').children.each{|path| save_artifact path}
+    log_dir_path = workspace.root.join('log')
+    return unless log_dir_path.exist?
+    log_dir_path.children.each{|path| save_artifact path}
     save_artifact(Hobson.temp_logfile.tap(&:flush).path, :name => 'test_run.log') if Hobson.temp_logfile.present?
   end
 

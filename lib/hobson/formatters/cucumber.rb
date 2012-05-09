@@ -28,7 +28,7 @@ module Hobson
 
       def after_feature_element feature_element
         ended_at = Hobson::Formatters.now.to_f
-        status = feature_element.failed? ? 'FAIL' : 'PASS'
+        status = feature_element.status == :passed? ? 'PASS' : 'FAIL'
         @io.puts "TEST:scenario:#{@scenario_name}:COMPLETE:#{ended_at}:#{status}"
         @io.flush
         @scenario_name = @started_at = nil

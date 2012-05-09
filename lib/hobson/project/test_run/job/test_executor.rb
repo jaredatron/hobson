@@ -144,7 +144,7 @@ class Hobson::Project::TestRun::Job::TestExecutor
   def command
     @tests.group_by(&:type).map{ |type, tests|
       command_for_type = send(:"#{type}_command", tests)
-      workspace.bundler? ? "bundle exec #{command_for_type}" : command_for_type
+      workspace.bundler? ? "bundle exec #{command_for_type}; true" : command_for_type
     }.join('; ')
   end
 

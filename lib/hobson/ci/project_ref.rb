@@ -39,7 +39,7 @@ class Hobson::CI::ProjectRef
 
   def run_tests! sha=current_sha
     # dont start a new test run unless we have no running test runs or there is no new untested sha to test
-    return if test_runs.any(&:running?) || !current_sha_untested?
+    return if test_runs.any?(&:running?) || !current_sha_untested?
     test_run = project.run_tests!(sha, "CI:#{id}")
     redis.pipelined{ # single request
       redis.lpush(:shas,         sha)

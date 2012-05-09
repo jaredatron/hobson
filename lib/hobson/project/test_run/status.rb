@@ -4,17 +4,17 @@ class Hobson::Project::TestRun
   landmark :created, :enqueued_build, :started_building, :enqueued_jobs, :aborted
 
   def status
-    errored?          ? 'errored'             :
-    aborted?          ? 'aborted'             :
-    hung?             ? 'hung'                :
-    failed?           ? 'failed'              :
-    passed?           ? 'passed'              :
-    complete?         ? 'complete'            :
-    running?          ? 'running tests'       :
-    enqueued_jobs?    ? 'waiting to be run'   :
-    started_building? ? 'building'            :
-    enqueued_build?   ? 'waiting to be built' :
-    'waiting...'
+    errored?             ? 'errored'             :
+    aborted?             ? 'aborted'             :
+    hung?                ? 'hung'                :
+    failed?              ? 'failed'              :
+    passed?              ? 'passed'              :
+    complete?            ? 'complete'            :
+    running?             ? 'running tests'       :
+    enqueued_jobs?       ? 'waiting to be run'   :
+    started_building?    ? 'building'            :
+    enqueued_build?      ? 'waiting to be built' :
+    'unknown'
   end
 
   alias_method :abort!, :aborted!
@@ -27,7 +27,7 @@ class Hobson::Project::TestRun
   end
 
   def running?
-    jobs.present? && jobs.any?(&:running?) && !complete? && !aborted?
+    !complete? && jobs.present? && jobs.any?(&:running?)
   end
 
   def errored?
@@ -35,7 +35,7 @@ class Hobson::Project::TestRun
   end
 
   def complete?
-    aborted? || (jobs.present? && jobs.all?(&:complete?))
+    aborted? || errored? || (jobs.present? && jobs.all?(&:complete?))
   end
 
   def complete_at

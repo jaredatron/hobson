@@ -112,7 +112,7 @@ class Hobson::Server < Sinatra::Base
     response = {:success => true, :seconds_since_last_check => seconds_since_last_check, :checked => false}
     if seconds_since_last_check >= MAX_CHECK_FOR_CHANGES_INTERVAL
       @@last_time_we_checked_for_changes = now
-      project_refs.each(&:check_for_new_sha!)
+      project_refs.each(&:run_tests!)
       response[:checked] = true
     end
     response.to_json

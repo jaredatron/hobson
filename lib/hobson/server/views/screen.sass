@@ -247,62 +247,73 @@ table.test-runs tbody tr
 
     > .status
       > .job
-        display: -webkit-box
-        box-align: strech
-        > *
-          display: block
-        > .icon
-          height: 16px
-          width: 16px
-          background: white url(/spinner-onwhite.gif) no-repeat scroll top right
-        > .index
-          margin-right: 1em
-          width: 2em
-          text-align: right
-        > .timeline
-          -webkit-box-flex: 1
-          //display: block
-          position: relative
-          margin: 0
-          padding: 0
-          min-height: 1em
-          // border: 1px dotted #B4B4B4
-          background-color: rgba(211, 211, 211, 0.4)
-          overflow: hidden
-          cursor: default
-
-          &, > *
-            line-height: 10px
-            height: 20px
-          > *
-            // float: left
-            position: absolute
-            top: 0
-            bottom: 0
-            overflow: hidden
-            margin: 0
-            padding: 0.5em 0
-            text-indent: 0.5em
-            white-space: nowrap
-            font-size: 90%
-            background-color: rgb(68, 35, 255)
-
-            &.landmark-enqueued
-              background-color: lighten(#F00, 20%)
-            &.landmark-checking-out-code
-              background-color: lighten(#FFA500, 20%)
-            &.landmark-preparing
-              background-color: lighten(#00F, 20%)
-            &.landmark-running-tests
-              background-color: lighten(#800080, 40%)
-            &.landmark-saving-artifacts
-              background-color: lighten(#A52A2A, 20%)
-            &.landmark-tearing-down
-              background-color: lighten(#000, 20%)
 
         &.status-waiting-to-be-run, &.status-complete, &.status-errored, &.status-aborted
-          .icon
+          > .timeline-wrapper > .icon
             background-image: none
+
+        > .timeline-wrapper
+          display: -webkit-box
+
+          > .icon
+            background: white url(/spinner-onwhite.gif) no-repeat scroll top right
+
+          > *
+            display: block
+          > .icon
+            height: 16px
+            width: 16px
+
+          > .index
+            margin-right: 1em
+            width: 2em
+            text-align: right
+          > .timeline
+            -webkit-box-flex: 1
+            //display: block
+            position: relative
+            margin: 0
+            padding: 0
+            min-height: 1em
+            // border: 1px dotted #B4B4B4
+            background-color: rgba(211, 211, 211, 0.4)
+            overflow: hidden
+            cursor: default
+
+            &, > *
+              line-height: 10px
+              height: 20px
+            > *
+              // float: left
+              position: absolute
+              top: 0
+              bottom: 0
+              overflow: hidden
+              margin: 0
+              padding: 0.5em 0
+              text-indent: 0.5em
+              white-space: nowrap
+              font-size: 90%
+              background-color: rgb(68, 35, 255)
+
+              &.landmark-enqueued
+                background-color: lighten(#F00, 20%)
+              &.landmark-checking-out-code
+                background-color: lighten(#FFA500, 20%)
+              &.landmark-preparing
+                background-color: lighten(#00F, 20%)
+              &.landmark-running-tests
+                background-color: lighten(#800080, 40%)
+              &.landmark-saving-artifacts
+                background-color: lighten(#A52A2A, 20%)
+              &.landmark-tearing-down
+                background-color: lighten(#000, 20%)
+
+        > .error
+          display: block
+          margin-left: 4em
+          color: red
+
 
   section.tests
     .tests-completed

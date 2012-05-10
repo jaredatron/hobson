@@ -14,10 +14,10 @@ class Hobson::Project::TestRun
     enqueued_jobs?       ? 'waiting to be run'   :
     started_building?    ? 'building'            :
     enqueued_build?      ? 'waiting to be built' :
-    'unknown'
+    'waiting...'
   end
 
-  alias_method :abort!, :aborted!
+  alias_method :abort!,     :aborted!
   alias_method :started?,   :enqueued_jobs?
   alias_method :started_at, :enqueued_jobs_at
 
@@ -52,6 +52,10 @@ class Hobson::Project::TestRun
 
   def hung?
     complete? && tests.any?(&:hung?)
+  end
+
+  def requested_by_ci?
+    ci_project_ref.present?
   end
 
 end

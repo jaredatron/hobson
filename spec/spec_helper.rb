@@ -33,6 +33,7 @@ RSpec.configure do |config|
   config.color_enabled = true
   config.include Test::Unit::Assertions
   config.include ResqueUnit::Assertions
+  config.include GitSupport
   config.extend Contexts
 
   config.before :each do

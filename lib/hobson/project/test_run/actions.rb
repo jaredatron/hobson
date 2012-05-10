@@ -23,7 +23,7 @@ class Hobson::Project::TestRun
     logger.info "detecting tests"
     tests.detect!
 
-    raise "no tests found" if tests.size < 1
+    raise "no tests found" if tests.empty?
 
     logger.info "balancing tests"
     # tests.balance!
@@ -47,6 +47,14 @@ class Hobson::Project::TestRun
     enqueued_jobs! # done
 
     # TODO upload Hobson.temp_logfile as a test_run artifact
+  end
+
+  def rerun!
+    if ci_project_ref.present?
+      ci_project_ref.run_tests! sha
+    else
+      project.run_tests!(:sha => sha, :requestor => requestor)
+    end
   end
 
 end

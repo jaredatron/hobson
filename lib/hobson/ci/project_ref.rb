@@ -37,17 +37,31 @@ class Hobson::CI::ProjectRef
     current_sha.present? && shas.exclude?(current_sha)
   end
 
+  def running_tests?
+    test_runs.any?{|test_run| test_run && test_run.running? }
+  end
+
+  def need_test_run?
+    current_sha_untested?
+  end
+
   def run_tests! sha=current_sha
-    # dont start a new test run unless we have no running test runs or there is no new untested sha to test
-    return if test_runs.any?(&:running?) || !current_sha_untested?
-    test_run = project.run_tests!(sha, "CI:#{id}")
+    test_run = project.run_tests!(
+      :sha            => sha,
+      :requestor      => 'CI',
+      :ci_project_ref => self
+    )
+    index_test_run(test_run)
+    test_run
+  end
+
+  def index_test_run test_run
     redis.pipelined{ # single request
-      redis.lpush(:shas,         sha)
+      redis.lpush(:shas,         test_run.sha)
       redis.lpush(:test_run_ids, test_run.id)
       redis.ltrim(:shas,         0, HISTORY_LENGTH)
       redis.ltrim(:test_run_ids, 0, HISTORY_LENGTH)
     }
-    test_run
   end
 
   %w{shas test_run_ids}.each{|list|

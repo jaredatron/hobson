@@ -93,8 +93,7 @@ class Hobson::Server < Sinatra::Base
 
   # update
   get "/ci/project_refs/:project_name/:ref/run_tests" do
-    project_ref.run_tests!
-    redirect ci_path
+    redirect test_run_path project_ref.run_tests!
   end
 
   # delete
@@ -112,7 +111,8 @@ class Hobson::Server < Sinatra::Base
     response = {:success => true, :seconds_since_last_check => seconds_since_last_check, :checked => false}
     if seconds_since_last_check >= MAX_CHECK_FOR_CHANGES_INTERVAL
       @@last_time_we_checked_for_changes = now
-      project_refs.each(&:run_tests!)
+      # start a new test run if we're not already running tests and there is a new sha that hasnt been tested yet
+      project_refs.each(&:run_tests!) if !project_refs.running_tests? && project_refs.need_test_run?
       response[:checked] = true
     end
     response.to_json
@@ -197,7 +197,7 @@ class Hobson::Server < Sinatra::Base
 
   # rerun
   post "/projects/:project_name/test_runs/:test_run_id/rerun" do
-    redirect test_run_path project.run_tests!(test_run.sha, test_run.requestor)
+    redirect test_run_path test_run.rerun!
   end
 
   # abort

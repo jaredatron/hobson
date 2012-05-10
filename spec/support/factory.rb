@@ -11,7 +11,7 @@ module Factory
   end
 
   def test_run project=self.project, sha=ClientWorkingDirectory.current_sha
-    project.create_test_run sha, 'the test environment'
+    project.create_test_run :sha => sha, :requestor => 'the test environment'
   end
 
   def tests test_run=self.test_run

@@ -6,10 +6,11 @@ module Contexts
 
   def client_context &block
     context "when run from a client" do
+      let(:context){ ClientWorkingDirectory }
       before{
-        ClientWorkingDirectory.reset!
-        Dir.chdir ClientWorkingDirectory.path
-        Hobson.logger.info "logging in the client context"
+        context.reset!
+        Dir.chdir context.path
+        Hobson.logger.info "logging in the #{context} context"
       }
       class_eval(&block)
     end
@@ -17,10 +18,11 @@ module Contexts
 
   def worker_context &block
     context "when run from a worker" do
+      let(:context){ WorkerWorkingDirectory }
       before{
-        WorkerWorkingDirectory.reset!
-        Dir.chdir WorkerWorkingDirectory.path
-        Hobson.logger.info "logging in the worker context"
+        context.reset!
+        Dir.chdir context.path
+        Hobson.logger.info "logging in the #{context} context"
       }
       class_eval(&block)
     end

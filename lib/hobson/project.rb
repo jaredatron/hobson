@@ -85,18 +85,16 @@ class Hobson::Project
     @test_runs ||= test_run_ids.map{|id| TestRun.find(self, id) }.compact
   end
 
-  def create_test_run sha=current_sha, requestor=nil
-    TestRun.new(self).tap{|test_run|
-      test_run.requestor = requestor || current_requestor
-      test_run.sha = sha
-      test_run.save!
+  # create a test_run and then add it to our memoized attributes
+  def create_test_run options = {}
+    TestRun.create(self, options).tap{|test_run|
       @test_run_ids << test_run.id if @test_run_ids.present?
       @test_runs << test_run if @test_runs.present?
     }
   end
 
-  def run_tests! *args
-    create_test_run(*args).tap(&:enqueue!)
+  def run_tests! options = {}
+    create_test_run(options).tap(&:enqueue!)
   end
 
   def new_record?
@@ -126,19 +124,6 @@ class Hobson::Project
 
   def == other
     self.name == other.name
-  end
-
-  def current_sha
-    @current_sha ||= begin
-      `git rev-parse HEAD`.chomp or raise "unable to get current sha"
-      # TODO make sure the current sha is pushed to origin
-    end
-  end
-
-  def current_requestor
-    `git var -l | grep GIT_AUTHOR_IDENT`.split('=').last.split(' <').first
-  rescue
-    ""
   end
 
 end

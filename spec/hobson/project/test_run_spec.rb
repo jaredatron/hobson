@@ -3,7 +3,8 @@ require 'spec_helper'
 describe Hobson::Project::TestRun do
 
   let(:project){ Factory.project }
-  let(:test_run){ Factory.test_run(project, 'origin/testing_test_detection') }
+  let(:sha){ git_rev_parse('origin/testing_test_detection') }
+  let(:test_run){ Factory.test_run(project, sha) }
   subject{ test_run }
 
   either_context do

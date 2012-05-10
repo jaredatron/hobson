@@ -2,14 +2,15 @@ require 'spec_helper'
 
 describe "undefined scenarios should fail spec" do
 
-  let(:project) { Factory.project }
-
   worker_context do
+
+    let(:sha){ git_rev_parse('origin/testing_missing_step_definition') }
+    let(:project) { Factory.project }
 
     context "when running a scenario with an undefined step" do
       it "should fail" do
         Resque.stub(:workers).and_return(stub(:length => 2))
-        test_run = project.run_tests!('origin/testing_missing_step_definition', 'rspec')
+        test_run = project.run_tests!(:sha => sha, :requestor => 'The TestEnvironment')
         Resque.run!
         Resque.run!
         tests = project.test_runs.last.tests

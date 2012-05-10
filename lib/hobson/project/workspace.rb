@@ -23,7 +23,8 @@ class Hobson::Project::Workspace
     sha_for 'HEAD'
   end
 
-  def checkout! sha
+  # this catches the origin server hanging up execpectedly and retries up to 3 times
+  def checkout! sha, tries=0
     logger.info "checking out #{sha}"
     sha = sha_for(sha)
     logger.debug "#{current_sha} current sha"
@@ -32,6 +33,14 @@ class Hobson::Project::Workspace
       execute "git fetch --all && git checkout --quiet --force #{sha} -- && git stash clear"
     end
     execute "git clean -dfx"
+  rescue ExecutionError => e
+    if e.message.include?('The remote end hung up unexpectedly') && tries < 2
+      logger.error("failed to checkout code\n#{e}\n#{e.backtrace*"\n"}")
+      sleep 1
+      checkout! sha, tries+1
+    else
+      raise
+    end
   end
 
   def exists?

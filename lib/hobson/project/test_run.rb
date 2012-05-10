@@ -4,10 +4,9 @@ class Hobson::Project::TestRun
 
   VALID_GIT_SHA = /\b[0-9a-f]{5,40}\b/
 
-  autoload :Builder, 'hobson/project/test_run/builder'
-  autoload :Runner,  'hobson/project/test_run/runner'
-  autoload :Tests,   'hobson/project/test_run/tests'
-  autoload :Job,     'hobson/project/test_run/job'
+  autoload :Builder,  'hobson/project/test_run/builder'
+  autoload :Tests,    'hobson/project/test_run/tests'
+  autoload :Job,      'hobson/project/test_run/job'
 
   class << self
 

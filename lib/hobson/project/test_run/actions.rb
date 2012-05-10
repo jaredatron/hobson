@@ -41,7 +41,7 @@ class Hobson::Project::TestRun
     (0...tests.number_of_jobs).map{|index|
       job = Job.new(self, index)
       job.created!
-      job.enqueue!
+      job.enqueue! fast_lane?
     }
 
     enqueued_jobs! # done

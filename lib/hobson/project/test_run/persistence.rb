@@ -33,7 +33,7 @@ class Hobson::Project::TestRun
     redis_hash.to_hash
   end
 
-  %w{sha requestor ci_project_ref_id}.each do |attribute|
+  %w{sha requestor ci_project_ref_id fast_lane}.each do |attribute|
     class_eval <<-RUBY, __FILE__, __LINE__
       def #{attribute}
         self[:#{attribute}]
@@ -44,6 +44,8 @@ class Hobson::Project::TestRun
       end
     RUBY
   end
+
+  alias_method :fast_lane?, :fast_lane
 
   def ci_project_ref
     @ci_project_ref ||= Hobson::CI::ProjectRef.find(ci_project_ref_id) if ci_project_ref_id.present?

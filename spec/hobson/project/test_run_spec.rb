@@ -114,9 +114,9 @@ describe Hobson::Project::TestRun do
           Resque.stub(:workers).and_return(stub(:length => 2))
         end
 
-        it "should schedule schedule 2 jobs" do
-          Resque.should_receive(:enqueue).with(Hobson::Project::TestRun::Runner, test_run.project.name, test_run.id, 0).once
-          Resque.should_receive(:enqueue).with(Hobson::Project::TestRun::Runner, test_run.project.name, test_run.id, 1).once
+        it "should schedule 2 jobs" do
+          Resque.should_receive(:enqueue).with(Hobson::Project::TestRun::Job::Runner, test_run.project.name, test_run.id, 0).once
+          Resque.should_receive(:enqueue).with(Hobson::Project::TestRun::Job::Runner, test_run.project.name, test_run.id, 1).once
           test_run.build!
           test_run.jobs.length.should == 2
         end

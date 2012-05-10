@@ -1,4 +1,4 @@
-module Hobson::Project::TestRun::Runner
+class Hobson::Project::TestRun::Job::Runner
 
   @queue = :hobson
 

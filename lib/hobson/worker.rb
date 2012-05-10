@@ -32,7 +32,7 @@ class Hobson::Worker < Resque::Worker
 
   def initialize
     @parent_pid = $$
-    super '*'
+    super('hobson_fast_lane', 'hobson')
   end
 
   def parent?

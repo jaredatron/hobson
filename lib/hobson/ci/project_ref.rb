@@ -38,7 +38,7 @@ class Hobson::CI::ProjectRef
   end
 
   def running_tests?
-    test_runs.any?{|test_run| test_run && test_run.running? }
+    test_runs.any?{|test_run| test_run.present? && test_run.running? }
   end
 
   def need_test_run?

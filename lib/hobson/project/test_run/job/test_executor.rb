@@ -108,7 +108,7 @@ class Hobson::Project::TestRun::Job::TestExecutor
     # look for updates in the status file
     @status_file.read.split("\n").each{|update| # for each update
       logger.debug "UPDATE -> #{update.inspect}"
-      if update =~ /^TEST:([^:]+):([^:]+):(START|COMPLETE):(\d+\.\d+)(?::(PASS|FAIL|PENDING))?$/
+      if update =~ /^TEST:([^:]+):([^:]+):(START|COMPLETE):(\d+\.\d+)(?::(PASS|FAIL|PENDING|ERROR))?$/
         type, name, state, occured_at, result = $1, $2, $3.downcase.to_sym, Time.at($4.to_i), $5
         test_id = "#{type}:#{name}" # this is a lame duplication of logic
       else

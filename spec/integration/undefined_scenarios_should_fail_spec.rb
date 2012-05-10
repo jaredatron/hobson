@@ -15,10 +15,13 @@ describe "undefined scenarios should fail spec" do
         Resque.run!
         tests = project.test_runs.last.tests
         tests.map{|t| [t.name,t.result] }.to_set.should == Set[
-          ["This schenario should pass", "PASS"],
-          ["This schenario should fail because it has a missing step definition", "FAIL"],
-          ["As an admin I should be able to create a post and delete it", "PASS"],
+          ["This scenario outline should fail because it has an example that fails", "FAIL"],
+          ["This scenario should pass", "PASS"],
+          ["This scenario should fail because it has a missing step definition", "FAIL"],
+          ["This scenario outline should fail because it has a missing step definition", "FAIL"],
+          ["This scenario outline should pass because it doesnt have a missing step definition", "PASS"],
           ["As an admin I should be able to create a post", "PASS"],
+          ["As an admin I should be able to create a post and delete it", "PASS"],
         ]
       end
     end

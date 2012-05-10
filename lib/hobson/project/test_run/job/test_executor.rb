@@ -48,7 +48,11 @@ class Hobson::Project::TestRun::Job::TestExecutor
     logger.error "error running tests:\n#{e}\n#{e.backtrace*"\n"}"
   ensure
     # reset_incomplete_tests!
-    tests.find_all(&:running?).each(&:reset!)
+    unfinished_tests = tests.find_all(&:running?)
+    if unfinished_tests.present?
+      logger.error("The following tests started but never finished\n#{unfinished_tests.map(&:id)*"\n"}")
+      unfinished_tests.each(&:reset!)
+    end
     @testrun_log_file.try(:close)
     @status_file.try(:close)
   end

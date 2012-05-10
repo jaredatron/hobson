@@ -53,7 +53,12 @@ class Hobson::Project::TestRun
     if ci_project_ref.present?
       ci_project_ref.run_tests! sha
     else
-      project.run_tests!(:sha => sha, :requestor => requestor)
+      project.run_tests!(
+        :sha => sha,
+        :requestor => requestor,
+        :requestor => requestor,
+        :fast_lane => fast_lane
+      )
     end
   end
 

@@ -49,6 +49,7 @@ class Hobson::CI::ProjectRef
     test_run = project.run_tests!(
       :sha            => sha,
       :requestor      => 'CI',
+      :fast_lane      => true,
       :ci_project_ref => self
     )
     index_test_run(test_run)

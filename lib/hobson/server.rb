@@ -180,7 +180,10 @@ class Hobson::Server < Sinatra::Base
   # create
   post "/projects/:project_name/test_runs" do
     test_run = params['test_run']
-    @test_run = project.run_tests!(test_run['sha'], test_run['requestor'])
+    @test_run = project.run_tests!(
+      :sha => test_run['sha'],
+      :requestor => test_run['requestor']
+    )
     redirect test_run_path(@test_run)
   end
 

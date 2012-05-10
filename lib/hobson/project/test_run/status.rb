@@ -4,12 +4,13 @@ class Hobson::Project::TestRun
   landmark :created, :enqueued_build, :started_building, :enqueued_jobs, :aborted
 
   def status
-    errored?             ? 'errored'             :
-    aborted?             ? 'aborted'             :
-    hung?                ? 'hung'                :
-    failed?              ? 'failed'              :
-    passed?              ? 'passed'              :
-    complete?            ? 'complete'            :
+    complete? ?
+      errored?           ? 'errored'             :
+      aborted?           ? 'aborted'             :
+      hung?              ? 'hung'                :
+      failed?            ? 'failed'              :
+      passed?            ? 'passed'              :
+    'complete' :
     running?             ? 'running tests'       :
     enqueued_jobs?       ? 'waiting to be run'   :
     started_building?    ? 'building'            :
@@ -42,16 +43,20 @@ class Hobson::Project::TestRun
     jobs.map(&:complete_at).compact.sort.last if complete?
   end
 
+  def done_running_tests?
+    tests.none?(&:needs_run?)
+  end
+
   def passed?
-    complete? && tests.all?(&:pass?)
+    done_running_tests? && tests.all?(&:pass?)
   end
 
   def failed?
-    complete? && !passed?
+    done_running_tests? && tests.any?{|t| !t.pass? }
   end
 
   def hung?
-    complete? && tests.any?(&:hung?)
+    done_running_tests? && tests.any?(&:hung?)
   end
 
   def requested_by_ci?

@@ -111,8 +111,10 @@ class Hobson::Server < Sinatra::Base
     response = {:success => true, :seconds_since_last_check => seconds_since_last_check, :checked => false}
     if seconds_since_last_check >= MAX_CHECK_FOR_CHANGES_INTERVAL
       @@last_time_we_checked_for_changes = now
-      # start a new test run if we're not already running tests and there is a new sha that hasnt been tested yet
-      project_refs.each(&:run_tests!) if !project_refs.running_tests? && project_refs.need_test_run?
+      project_refs.each{|project_ref|
+        # start a new test run if we're not already running tests and there is a new sha that hasnt been tested yet
+        project_ref.run_tests! if !project_ref.running_tests? && project_ref.need_test_run?
+      }
       response[:checked] = true
     end
     response.to_json

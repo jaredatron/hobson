@@ -4,7 +4,7 @@ describe Hobson::Project::TestRun do
 
   let(:project){ Factory.project }
   let(:sha){ git_rev_parse('origin/testing_test_detection') }
-  let(:test_run){ Factory.test_run(project, sha) }
+  let(:test_run){ Factory.test_run(sha, project) }
   subject{ test_run }
 
   either_context do
@@ -54,8 +54,7 @@ describe Hobson::Project::TestRun do
     end
 
     it "should presist" do
-      test_run1 = Factory.test_run
-      test_run1[:sha] = '6841b60af66264906dc8c9fe0569aa1348e4bec2'
+      test_run1 = Factory.test_run('6841b60af66264906dc8c9fe0569aa1348e4bec2')
       test_run1.enqueued_build!
       test_run1.started_building!
       test_run1.enqueued_jobs!
@@ -70,7 +69,6 @@ describe Hobson::Project::TestRun do
 
     describe "enqueue!" do
       it "should enqueue a Hobson::Project::TestRun::Builder in resque" do
-        test_run.sha = "6841b60af66264906dc8c9fe0569aa1348e4bec2"
         Resque.should_receive(:enqueue).with(Hobson::Project::TestRun::Builder, test_run.project.name, test_run.id)
         test_run.enqueue!
       end

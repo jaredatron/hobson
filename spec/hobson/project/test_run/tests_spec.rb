@@ -3,7 +3,7 @@ require 'spec_helper'
 describe Hobson::Project::TestRun::Tests do
 
   let(:sha){ git_rev_parse('origin/slow_app_boot_specs_and_features') }
-  let(:test_run){ Factory.test_run(Factory.project, sha) }
+  let(:test_run){ Factory.test_run(sha) }
   let(:tests){ Factory.tests(test_run) }
   subject{ tests }
 

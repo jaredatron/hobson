@@ -122,11 +122,11 @@ describe Hobson::Project::Workspace do
       let(:workspace){ project.workspace }
       let(:test_run1){
         sha = git_rev_parse('origin/integration_setup_hook_creates_untracked1')
-        Factory.test_run(project, sha)
+        Factory.test_run(sha, project)
       }
       let(:test_run2){
         sha = git_rev_parse('origin/integration_setup_hook_creates_untracked2')
-        Factory.test_run(project, sha)
+        Factory.test_run(sha, project)
       }
       # manually creating jobs allows us to skip the slow test_run.build! process
       let(:test_run1_job){ Hobson::Project::TestRun::Job.new(test_run1, 0) }
@@ -179,8 +179,8 @@ describe Hobson::Project::Workspace do
       end
 
       it "prepares when it does need to" do
-        test_run1 = Factory.test_run(Factory.project, git_rev_parse('origin/integration_setup_hook_creates_untracked1'))
-        test_run2 = Factory.test_run(Factory.project, git_rev_parse('origin/integration_setup_hook_creates_untracked2'))
+        test_run1 = Factory.test_run(git_rev_parse('origin/integration_setup_hook_creates_untracked1'))
+        test_run2 = Factory.test_run(git_rev_parse('origin/integration_setup_hook_creates_untracked2'))
 
         # prepare test_run1
         prepare_test_run1!

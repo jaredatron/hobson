@@ -10,7 +10,7 @@ module Factory
     project.workspace
   end
 
-  def test_run project=self.project, sha=ClientWorkingDirectory.current_sha
+  def test_run sha='d6165a8f6387f14ec3a6fa2aa9dfac129072679b', project=self.project
     project.create_test_run :sha => sha, :requestor => 'the test environment'
   end
 

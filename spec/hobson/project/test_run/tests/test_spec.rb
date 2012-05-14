@@ -2,8 +2,8 @@ require 'spec_helper'
 
 describe Hobson::Project::TestRun::Tests::Test do
 
-  let(:project) { Factory.project }
-  let(:test_run){ Factory.test_run(project) }
+  let(:test_run){ Factory.test_run }
+  let(:project) { test_run.project }
   let(:tests) {
     3.times{|n|
       test_run.tests.add("scenario:#{n}.feature")

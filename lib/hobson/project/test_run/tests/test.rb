@@ -22,12 +22,12 @@ class Hobson::Project::TestRun::Tests::Test
     RUBY
   end
 
-  def min_max_runtime
+  def self.min_max_runtime
     1.minute
   end
 
   def max_runtime
-    [est_runtime * 2, min_max_runtime].max
+    [est_runtime * 2, self.class.min_max_runtime].max
   end
 
   %w{PASS FAIL PENDING HUNG}.each do |result|
@@ -97,10 +97,12 @@ class Hobson::Project::TestRun::Tests::Test
     name <=> other.name
   end
 
-  MINIMUM_EST_RUNTIME = 10.seconds
+  def self.minimum_est_runtime
+    10.seconds
+  end
 
   def calculate_estimated_runtime!
-    self.est_runtime ||= test_run.project.test_runtimes[id].average || MINIMUM_EST_RUNTIME
+    self.est_runtime ||= test_run.project.test_runtimes[id].average || self.class.minimum_est_runtime
   end
 
   def inspect

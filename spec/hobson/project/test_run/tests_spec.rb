@@ -77,20 +77,26 @@ describe Hobson::Project::TestRun::Tests do
       end
 
       context "when all tests have no estimated runtime" do
-        let(:tests){{
-          :spec    => 120.times.map{ nil },
-          :feature => 120.times.map{ nil },
-        }}
+        context "and the minimum est runtime is 1 second" do
+          before{
+            Hobson::Project::TestRun::Tests::Test.stub(:minimum_est_runtime).and_return{ 1.second }
+          }
 
-        it "should balance" do
-          test_run.tests.balance! 1.minute
-          test_groups.should == [
-            ( 0...60 ).map{|i| "spec:#{i}"    },
-            (60...120).map{|i| "spec:#{i}"    },
-            ( 0...60 ).map{|i| "feature:#{i}" },
-            (60...120).map{|i| "feature:#{i}" },
-          ]
-          job_est_runtimes.should == [60.0,60.0,60.0,60.0]
+          let(:tests){{
+            :spec    => 120.times.map{ nil },
+            :feature => 120.times.map{ nil },
+          }}
+
+          it "should balance" do
+            test_run.tests.balance! 1.minute
+              test_groups.should == [
+              ( 0...60 ).map{|i| "spec:#{i}"    },
+              (60...120).map{|i| "spec:#{i}"    },
+              ( 0...60 ).map{|i| "feature:#{i}" },
+              (60...120).map{|i| "feature:#{i}" },
+            ]
+            job_est_runtimes.should == [60.0,60.0,60.0,60.0]
+          end
         end
       end
 

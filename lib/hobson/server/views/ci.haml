@@ -8,9 +8,9 @@
   %ul.project-refs
     - project_refs.each do |project_ref|
       - project = project_ref.project
-      - test_runs = project_ref.test_runs.clone
-      - current_test_run = test_runs.shift
-      %li.project-ref{:class => test_run_status_classname(current_test_run.try(:status))}
+      - recently_complete_test_run = project_ref.test_runs.compact.find(&:complete?)
+      - current_test_run = project_ref.test_runs.first
+      %li.project-ref{:class => test_run_status_classname(recently_complete_test_run.try(:status))}
 
         %a.gear{:href => project_ref_path(project_ref)} ⚙
 
@@ -21,7 +21,7 @@
           = project_ref.ref
 
         .history
-          - test_runs.reverse.each do |test_run|
+          - project_ref.test_runs.reverse.each do |test_run|
             - if test_run.present?
               %a.test-run{:title => test_run.id, :href => test_run_path(test_run), :class => test_run_status_classname(test_run.status)}
             - else

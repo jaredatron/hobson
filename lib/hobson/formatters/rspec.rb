@@ -4,12 +4,13 @@
 #
 require 'rspec'
 require 'rspec/core/formatters/base_formatter'
+require 'pathname'
 require File.expand_path('../now', __FILE__)
 
 RSpec.configure do |config|
 
   get_spec = proc{ |this|
-    this.class.file_path.split(':').first.split("#{::RSpec::Core::RubyProject.root}/").last
+    Pathname.new(File.expand_path(this.class.file_path.split(':').first)).relative_path_from(::RSpec::Core::RubyProject.root)
   }
 
   started_at = nil

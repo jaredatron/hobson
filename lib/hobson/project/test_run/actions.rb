@@ -1,7 +1,8 @@
 class Hobson::Project::TestRun
 
-  def enqueue!
-    Hobson.resque.enqueue(Hobson::Project::TestRun::Builder, project.name, id)
+  def enqueue! fast_lane=false
+    worker = fast_lane ? Hobson::Project::TestRun::FastLaneBuilder : Hobson::Project::TestRun::Builder
+    Hobson.resque.enqueue(worker, project.name, id)
     enqueued_build!
   end
 

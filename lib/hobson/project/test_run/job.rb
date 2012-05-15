@@ -1,8 +1,8 @@
 class Hobson::Project::TestRun::Job
 
-  autoload :TestExecutor, 'hobson/project/test_run/job/test_executor'
-  autoload :Runner,       'hobson/project/test_run/job/runner'
-  autoload :Sprinter,     'hobson/project/test_run/job/sprinter'
+  autoload :TestExecutor,   'hobson/project/test_run/job/test_executor'
+  autoload :Runner,         'hobson/project/test_run/job/runner'
+  autoload :FastLaneRunner, 'hobson/project/test_run/job/fast_lane_runner'
 
   attr_reader :test_run, :index
   delegate :workspace, :to => :test_run

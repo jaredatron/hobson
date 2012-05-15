@@ -62,6 +62,9 @@ class Hobson::Project::TestRun::Tests
     raise "number of jobs must be an integer" unless number_of_jobs.is_a? Integer
     raise "there must be at least 1 job" if number_of_jobs < 1
 
+    # calculate estimates runtimes
+    each(&:calculate_estimated_runtime!)
+
     # one job is easy
     return each{|test| test.job = 0 } if number_of_jobs == 1
 
@@ -72,7 +75,7 @@ class Hobson::Project::TestRun::Tests
 
     # calculate the total runtime of each group
     groups.each{|type, group|
-      runtime = group.tests.each(&:calculate_estimated_runtime!).map(&:est_runtime).inject(&:+)
+      runtime = group.tests.map(&:est_runtime).inject(&:+)
       group.runtime = runtime
     }
 

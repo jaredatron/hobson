@@ -10,7 +10,7 @@ class Hobson::Project::TestRun
   # discover the tests that are needed to run
   # add a list of tests to the TestRun data
   # schedule N RunTests resque jobs for Y jobs (balancing is done in this step)
-  def build!
+  def build! number_of_jobs = Resque.workers.length
     return if aborted?
 
     started_building!
@@ -26,9 +26,11 @@ class Hobson::Project::TestRun
 
     raise "no tests found" if tests.empty?
 
-    logger.info "balancing tests"
+    number_of_jobs = 1 if number_of_jobs < 1
+
+    logger.info "balancing tests across #{number_of_jobs} jobs"
     # tests.balance!
-    tests.balance_for! Resque.workers.length
+    tests.balance_for!(number_of_jobs)
 
     tests_without_a_job = tests.find_all{|test| test.job.nil?}
     if tests_without_a_job.present?
@@ -38,8 +40,8 @@ class Hobson::Project::TestRun
     raise "no jobs to schedule" if tests.number_of_jobs < 1
 
     logger.info "enqueuing #{tests.number_of_jobs} jobs to run #{tests.length} tests"
-    # jobs.each(&:enqueue!)
-    (0...tests.number_of_jobs).map{|index|
+
+    tests.map(&:job).uniq.sort.each{|index|
       job = Job.new(self, index)
       job.created!
       job.enqueue! fast_lane?

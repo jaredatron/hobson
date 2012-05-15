@@ -50,6 +50,14 @@
       %dt Test Retries
       %dd= test_run.tests.map{|t| t.tries < 1 ? 1 : t.tries}.sum - test_run.tests.count
 
+  - if test_run.errored? && test_run['exception:class'].present?
+    .exception
+      %h2 Exception #{test_run['exception:class']}:
+      .exception= test_run['exception:message']
+      %h2 Backtrace:
+      .backtrace= test_run['exception:backtrace']
+
+
   - if test_run.jobs.present?
     %section.jobs
       %h2 Jobs

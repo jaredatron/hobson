@@ -1,7 +1,7 @@
 class Hobson::Project::TestRun
 
   extend Hobson::Landmarks
-  landmark :created, :enqueued_build, :started_building, :enqueued_jobs, :aborted
+  landmark :created, :enqueued_build, :started_building, :enqueued_jobs, :errored, :aborted
 
   def status
     complete? ?
@@ -32,7 +32,7 @@ class Hobson::Project::TestRun
   end
 
   def errored?
-    @errored ||= jobs.any?(&:errored?)
+    errored_at.present? || jobs.any?(&:errored?)
   end
 
   def complete?

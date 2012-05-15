@@ -11,9 +11,9 @@ class Hobson::Project::TestRun::Job
     :tearing_down,
     :complete
 
-  def abort!
-    aborting! unless complete?
-  end
+  # def abort!
+  #   aborting! unless complete?
+  # end
 
   def running?
     checking_out_code_at.present? && !complete?

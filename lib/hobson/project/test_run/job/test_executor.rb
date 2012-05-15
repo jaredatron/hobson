@@ -129,7 +129,7 @@ class Hobson::Project::TestRun::Job::TestExecutor
       case state
       when :start
         if @current_test.present? && @current_test.id != test.id
-          raise "#{test.id} started before #{@current_test.id} ever finished"
+          raise "#{test.id} started before #{@current_test.id} never finished"
         end
         @current_test = test.tap(&:trying!)
         test.started_at = occured_at

@@ -34,6 +34,7 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency "open4"
   s.add_runtime_dependency "uuid"
   s.add_runtime_dependency "thor", "~> 0.14.6"
+  s.add_runtime_dependency "simplecov"
 
   s.add_runtime_dependency "rack", "~> 1.3.5"
   s.add_runtime_dependency "vegas"

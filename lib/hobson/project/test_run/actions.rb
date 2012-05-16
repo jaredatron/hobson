@@ -50,6 +50,8 @@ class Hobson::Project::TestRun
       job.enqueue! fast_lane?
     }
 
+    redis.set(:number_of_incomplete_jobs, tests.number_of_jobs)
+
     enqueued_jobs! # done
 
   rescue Exception => e

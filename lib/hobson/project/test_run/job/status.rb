@@ -7,8 +7,9 @@ class Hobson::Project::TestRun::Job
     :checking_out_code,
     :preparing,
     :running_tests,
-    :saving_artifacts,
     :tearing_down,
+    :post_processing,
+    :saving_artifacts,
     :complete
 
   # def abort!

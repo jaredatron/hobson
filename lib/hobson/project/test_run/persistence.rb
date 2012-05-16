@@ -25,6 +25,13 @@ class Hobson::Project::TestRun
     true
   end
 
+  def reload!
+    project, id = @project, @id
+    instance_variables.each{|iv| instance_variable_set(iv, nil) }
+    @project, @id = project, id
+    self
+  end
+
   def new_record?
     redis.type(redis_key) == "none"
   end
@@ -33,7 +40,7 @@ class Hobson::Project::TestRun
     redis_hash.to_hash
   end
 
-  %w{sha requestor ci_project_ref_id fast_lane}.each do |attribute|
+  %w{sha requestor ci_project_ref_id fast_lane number_of_jobs}.each do |attribute|
     class_eval <<-RUBY, __FILE__, __LINE__
       def #{attribute}
         self[:#{attribute}]

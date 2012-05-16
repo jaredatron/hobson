@@ -45,20 +45,21 @@ class Hobson::Project::TestRun::Job
     tearing_down!
     eval_hook :teardown
 
+    if test_run.redis.decr(:number_of_incomplete_jobs) == 0
+      post_processing!
+      eval_hook :post_process
+    end
+
   rescue Object => e
     logger.info %(Exception:\n#{e}\n#{e.backtrace.join("\n")})
     self['exception'] = e.to_s
     self['exception:class'] = e.class.to_s
     self['exception:message'] = e.message.to_s
     self['exception:backtrace'] = e.backtrace.join("\n")
+    save_log_files! rescue nil
     raise # raise so resque shows this as a failed job and you can retry it
   ensure
     complete!
-    begin
-      save_log_files!
-    rescue Exception => e
-      logger.error "Error saving log files on error\n#{e}\n#{e.backtrace*"\n"}"
-    end
   end
 
   def save_log_files!

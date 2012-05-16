@@ -41,8 +41,11 @@ class Hobson::Project::TestRun
 
     logger.info "enqueuing #{tests.number_of_jobs} jobs to run #{tests.length} tests"
 
-    tests.map(&:job).uniq.sort.each{|index|
-      job = Job.new(self, index)
+    if jobs.any?{|job| job.tests.empty? }
+      raise "FAILED to balance tests!\nSome jobs do not have tests: #{jobs.map(&:tests).pretty_inspect}"
+    end
+
+    jobs.each{|job|
       job.created!
       job.enqueue! fast_lane?
     }

@@ -73,10 +73,7 @@ class Hobson::Project::TestRun
   end
 
   def jobs
-    @jobs ||= tests.map(&:job).compact.uniq.sort.inject([]){|jobs, index|
-      jobs[index] ||= Job.new(self, index)
-      jobs
-    }
+    @jobs ||= tests.number_of_jobs.times.map{|index| Job.new(self, index) }
   end
 
   def logger

@@ -12,7 +12,7 @@ class Hobson::Project::TestRun::Job
 
   def save_artifact path, options={}
     path = workspace.root.join(path.to_s)
-    name = options.delete(:name) || (path.relative? ? path.relative_path_from(workspace.root) : path.basename)
+    name = options.delete(:name) || (path.relative? ? path.basename : path.relative_path_from(workspace.root) )
     options[:key] = file_namespace.join(name).to_s[1..-1]
     options[:content_type] ||= 'text/plain'
     options[:body] ||= path.read

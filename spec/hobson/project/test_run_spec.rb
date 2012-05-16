@@ -77,7 +77,8 @@ describe Hobson::Project::TestRun do
     describe "status" do
       it "should accurately reflect the test run's status" do
         test_run = Factory.test_run
-        Factory.job(test_run, 0)
+        test_run.tests.add('spec:models/user_spec.rb')
+        test_run.tests.first.job = 0
 
         test_run.status.should == 'waiting...'
 

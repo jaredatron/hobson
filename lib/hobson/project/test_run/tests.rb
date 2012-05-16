@@ -65,6 +65,9 @@ class Hobson::Project::TestRun::Tests
     # calculate estimates runtimes
     each(&:calculate_estimated_runtime!)
 
+    # celing the number of jobs at the number of tests we have to run
+    number_of_jobs = self.size if number_of_jobs > self.size
+
     # one job is easy
     return each{|test| test.job = 0 } if number_of_jobs == 1
 

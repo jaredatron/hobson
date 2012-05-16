@@ -73,9 +73,10 @@ class Hobson::Project::TestRun
   end
 
   def jobs
-    @jobs ||= keys \
-      .inject([]){|indices, key| key =~ /^job:(\d+):.*/ and indices << $1.to_i; indices } \
-      .uniq.sort.map{|index| Job.new(self, index) }
+    @jobs ||= tests.map(&:job).uniq.sort.inject([]){|jobs, index|
+      jobs[index] ||= Job.new(self, index)
+      jobs
+    }
   end
 
   def logger

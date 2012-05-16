@@ -45,9 +45,11 @@ class Hobson::Project::TestRun::Job
     tearing_down!
     eval_hook :teardown
 
-    if test_run.redis.decr(:number_of_incomplete_jobs) == 0
+    if (incomplete_jobs = test_run.redis.decr(:number_of_incomplete_jobs)) == 0
       post_processing!
       eval_hook :post_process
+    else
+      logger.info "exiting with #{incomplete_jobs} job left. Not post processing."
     end
 
   rescue Object => e

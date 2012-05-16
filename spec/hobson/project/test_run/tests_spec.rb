@@ -187,7 +187,7 @@ describe Hobson::Project::TestRun::Tests do
           balance_for!([nil,nil,nil,nil,nil,nil,nil,nil,nil,nil], 1).should == [0,0,0,0,0,0,0,0,0,0]
           balance_for!([nil,nil,nil,nil,nil,nil,nil,nil,nil,nil], 2).should == [0,0,0,0,0,1,1,1,1,1]
           balance_for!([nil,nil,nil,nil,nil,nil,nil,nil,nil,nil], 3).should == [0,0,0,0,1,1,1,2,2,2]
-          balance_for!([nil,nil,nil,nil,nil,nil,nil,nil,nil,nil], 4).should == [0,0,0,1,1,2,2,3,3,3]
+          balance_for!([nil,nil,nil,nil,nil,nil,nil,nil,nil,nil], 4).should == [0,0,0,1,1,1,2,2,3,3]
         end
       end
 

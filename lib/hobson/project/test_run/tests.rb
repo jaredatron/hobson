@@ -87,23 +87,36 @@ class Hobson::Project::TestRun::Tests
 
     # calculate the number of jobs for each group
     groups.each{|type, group|
-      number_of_jobs = ((group.runtime / total_runtime) * number_of_jobs).to_i
       group.jobs = []
-      number_of_jobs.times{ group.jobs << jobs.shift }
+      jobs_for_this_group = ((group.runtime / total_runtime) * number_of_jobs).to_i
+      jobs_for_this_group = 1 if jobs_for_this_group < 1
+      jobs_for_this_group.times{ group.jobs << jobs.shift }
     }
 
-    # assign unalocated jobs to the group with the least jobs
-    groups.values.sort_by{|group| group.jobs.length}.first.jobs << jobs.shift while jobs.present?
+    # assign unalocated jobs any group that could use them
+    while jobs.present?
+      thirsty_group = groups.values \
+        # find all the jobs that could break up their tests more
+        .find_all{|group| group.jobs.size < group.tests.size } \
+        # find the thirstiest of the bunch
+        .sort_by{|group| group.jobs.size }.first
+      break if thirsty_group.nil?
+      thirsty_group.jobs << jobs.shift
+    end
 
     # balance tests across their given number of jobs
     groups.each{|type, group|
-      jobs = {}
-      group.jobs.each{|job| jobs[job] = 0}
+      # create a hash of job_index => total_est_runtime
+      jobs_for_this_group = group.jobs.inject({}){|hash, job_index|
+        hash.update job_index => 0.0
+      }
 
+      # for each test, biggest to smallest, add them to the lightest loaded worker
       group.tests.sort_by(&:est_runtime).reverse.each{|test|
-        job = jobs.sort_by(&:last).first.first # find the job with the smallest est runtime
-        jobs[job] += test.est_runtime # add this jobs runtime
-        test.job = job # assign this test to that job
+        # sort the jobs by est_runtime and index number and take the smallest-sized & lowest-indexed one
+        job_index = jobs_for_this_group.sort_by{|job,est_runtime| [est_runtime, job]}.first.first
+        jobs_for_this_group[job_index] += test.est_runtime # add this jobs runtime
+        test.job = job_index # assign this test to that job
       }
     }
   end

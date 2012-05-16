@@ -73,7 +73,7 @@ class Hobson::Project::TestRun
   end
 
   def jobs
-    @jobs ||= tests.map(&:job).uniq.sort.inject([]){|jobs, index|
+    @jobs ||= tests.map(&:job).compact.uniq.sort.inject([]){|jobs, index|
       jobs[index] ||= Job.new(self, index)
       jobs
     }

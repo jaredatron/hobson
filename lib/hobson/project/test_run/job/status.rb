@@ -12,10 +12,6 @@ class Hobson::Project::TestRun::Job
     :saving_artifacts,
     :complete
 
-  # def abort!
-  #   aborting! unless complete?
-  # end
-
   def running?
     checking_out_code_at.present? && !complete?
   end

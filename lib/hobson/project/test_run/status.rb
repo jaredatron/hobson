@@ -24,7 +24,7 @@ class Hobson::Project::TestRun
 
   def aborted?
     # bypass the redis_hash cache and read from redis every time
-    @aborted ||= redis_hash.get('aborted_at').present?
+    redis_hash.get('aborted_at').present?
   end
 
   def running?
@@ -32,7 +32,7 @@ class Hobson::Project::TestRun
   end
 
   def errored?
-    errored_at.present? || jobs.any?(&:errored?)
+    redis_hash.get("errored_at").present? || jobs.any?(&:errored?)
   end
 
   def complete?

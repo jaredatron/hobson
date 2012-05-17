@@ -51,7 +51,8 @@ describe Hobson::Project::TestRun::Job do
       context "when called with true" do
         it "should enqueue 1 Hobson::Project::TestRun::Job::FastLaneRunner resque job" do
           Resque.should_receive(:enqueue).with(Hobson::Project::TestRun::Job::FastLaneRunner, job.test_run.project.name, job.test_run.id, job.index).once
-          job.enqueue! true
+          job.test_run.fast_lane = true
+          job.enqueue!
         end
       end
     end

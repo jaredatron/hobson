@@ -1,7 +1,7 @@
 class Hobson::Project::TestRun
 
-  def enqueue! fast_lane=false
-    worker = fast_lane ? Hobson::Project::TestRun::FastLaneBuilder : Hobson::Project::TestRun::Builder
+  def enqueue!
+    worker = fast_lane? ? Hobson::Project::TestRun::FastLaneBuilder : Hobson::Project::TestRun::Builder
     Hobson.resque.enqueue(worker, project.name, id)
     enqueued_build!
   end
@@ -47,7 +47,7 @@ class Hobson::Project::TestRun
 
     jobs.each{|job|
       job.created!
-      job.enqueue! fast_lane?
+      job.enqueue!
     }
 
     redis.set(:number_of_incomplete_jobs, tests.number_of_jobs)

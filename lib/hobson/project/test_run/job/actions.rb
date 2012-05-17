@@ -2,8 +2,8 @@ require 'timeout'
 
 class Hobson::Project::TestRun::Job
 
-  def enqueue! fast_lane=false
-    worker = fast_lane ? Hobson::Project::TestRun::Job::FastLaneRunner : Hobson::Project::TestRun::Job::Runner
+  def enqueue!
+    worker = test_run.fast_lane ? Hobson::Project::TestRun::Job::FastLaneRunner : Hobson::Project::TestRun::Job::Runner
     Hobson.resque.enqueue(worker, test_run.project.name, test_run.id, index)
     enqueued!
   end

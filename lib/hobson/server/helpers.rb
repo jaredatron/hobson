@@ -1,3 +1,4 @@
+# encoding: UTF-8
 module Hobson::Server::Helpers
 
   include Rack::Utils
@@ -164,6 +165,11 @@ module Hobson::Server::Helpers
     @test_run_duration ||= 0
   end
 
+  def job_timeline_duration
+    @job_timeline_duration ||= (test_run.complete_at || now) - (test_run.jobs_created_at || now)
+    @job_timeline_duration ||= 0
+  end
+
   def progress
     # value, max = @test_run.complete? ? [1,1] : [test_run_duration, est_test_run_duration]
     # title = "#{distance_of_time_in_words(value)} / #{distance_of_time_in_words(max)}"
@@ -179,24 +185,31 @@ module Hobson::Server::Helpers
 
   def job_timeline job
     last_percentage = 0
-    job.landmarks.map do |landmark|
-      from = job.send(:"#{landmark}_at")
-      next unless from.present?
-      next_landmark = job.landmarks[job.landmarks.index(landmark)+1]
-      next unless next_landmark.present?
-      to = job.send(:"#{next_landmark}_at") || test_run.complete_at || now
 
+    # collect all the from times for each landmark and filter our any unused landmarks
+    # [[:created, 2012-05-16 18:29:24 -0700], [:enqueued, 2012-05-16 18:29:24 -0700], …]
+    events = job.landmarks.
+      map{|landmark| [landmark, job.send(:"#{landmark}_at")] }.
+      reject{|l| l.last.nil? }.sort_by(&:last)
+
+    # collect the to for each landmark from its following landmark
+    # [[:created, 2012-05-16 18:29:24 -0700, 2012-05-16 18:29:24 -0700], [:enqueued, 2012-05-16 18:29:24 -0700, 2012-05-16 18:29:33 -0700], …]
+    events.each_with_index{|event, index|
+      event << events[index+1].try(:[],1)
+    }
+
+    # inject some html
+    events.each{|(name, from, to)|
+      to ||= from
       duration = to - from
-      # percentage = (duration / test_run_duration) * 100
-      left  = ((from - test_run.started_at) / test_run_duration) * 100
-      right = ((((to - test_run.started_at) / test_run_duration) * 100) - 100) * -1
-
+      left  = ((from - test_run.jobs_created_at) / job_timeline_duration) * 100
+      right = ((((to - test_run.jobs_created_at) / job_timeline_duration) * 100) - 100) * -1
       html_options = {}
-      html_options[:title] = "#{landmark} for #{distance_of_time_in_minutes(duration)}"
-      html_options[:class] = "landmark-#{classname(landmark)}"
+      html_options[:title] = "#{name} for #{distance_of_time_in_minutes(duration)}"
+      html_options[:class] = "landmark-#{classname(name)}"
       html_options[:style] = "left: #{left}%; right: #{right}%;"
       haml_tag(:li, html_options[:title], html_options)
-    end
+    }
   end
 
   def action_button name, action, method = :post

@@ -40,7 +40,11 @@ class Hobson::Project::TestRun
   end
 
   def complete_at
-    jobs.map(&:complete_at).compact.sort.last if complete?
+    jobs.map(&:complete_at).compact.max if complete?
+  end
+
+  def jobs_created_at
+    @jobs_created_at ||= jobs.map(&:created_at).compact.min
   end
 
   def done_running_tests?

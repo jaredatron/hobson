@@ -129,8 +129,8 @@
                   - if job
                     - (1..test.tries).each do |try|
                       - artifact_name = case test.type
-                        - when "scenario" ; "feature_run#{try}"
-                        - when "spec"     ; "spec_run#{try}"
+                        - when "scenario" ; "log/feature_run#{try}"
+                        - when "spec"     ; "log/spec_run#{try}"
                       - if artifact_url = job.artifacts[artifact_name]
                         %a{:href => artifact_url} run#{try}
 

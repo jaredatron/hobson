@@ -38,10 +38,6 @@ class Hobson::Project::TestRun::Job
       }
     end
 
-    saving_artifacts!
-    save_log_files!
-    eval_hook :save_artifacts
-
     tearing_down!
     eval_hook :teardown
 
@@ -52,6 +48,10 @@ class Hobson::Project::TestRun::Job
     else
       logger.info "exiting with #{incomplete_jobs} job left. Not post processing."
     end
+
+    saving_artifacts!
+    save_log_files!
+    eval_hook :save_artifacts
 
   rescue Object => e
     test_run.errored!
@@ -69,8 +69,8 @@ class Hobson::Project::TestRun::Job
   def save_log_files!
     log_dir_path = workspace.root.join('log')
     return unless log_dir_path.exist?
-    log_dir_path.children.each{|path| save_artifact path}
     Hobson.logger.outputters.each{|o| o.try(:flush) } # flush all log output
+    log_dir_path.children.each{|path| save_artifact path}
     save_artifact(Hobson.temp_logfile.tap(&:flush).path, :name => 'test_run.log') if Hobson.temp_logfile.present?
   end
 

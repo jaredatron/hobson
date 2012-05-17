@@ -47,7 +47,7 @@ class Hobson::Project::TestRun::Job
 
     if (incomplete_jobs = test_run.redis.decr(:number_of_incomplete_jobs)) == 0
       post_processing!
-      reload! # reload the test_run so the post_process hook gets fresh data
+      test_run.reload! # reload the test_run so the post_process hook gets fresh data
       eval_hook :post_process
     else
       logger.info "exiting with #{incomplete_jobs} job left. Not post processing."

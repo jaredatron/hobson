@@ -50,7 +50,8 @@ class Hobson::Project::TestRun
       job.enqueue!
     }
 
-    redis.set(:number_of_incomplete_jobs, tests.number_of_jobs)
+    # this is used to count down to the last worker
+    self.redis.set("#{redis_key}:number_of_incomplete_jobs", number_of_jobs)
 
     enqueued_jobs! # done
 

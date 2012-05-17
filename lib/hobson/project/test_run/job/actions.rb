@@ -45,7 +45,7 @@ class Hobson::Project::TestRun::Job
     tearing_down!
     eval_hook :teardown
 
-    if (incomplete_jobs = test_run.redis.decr(:number_of_incomplete_jobs)) == 0
+    if (incomplete_jobs = test_run.redis.decr("#{test_run.redis_key}:number_of_incomplete_jobs")) == 0
       post_processing!
       test_run.reload! # reload the test_run so the post_process hook gets fresh data
       eval_hook :post_process

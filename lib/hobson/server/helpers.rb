@@ -200,10 +200,11 @@ module Hobson::Server::Helpers
 
     # inject some html
     events.each{|(name, from, to)|
-      to ||= from
+      next if name == job.landmarks.last
+      to ||= now
       duration = to - from
-      left  = ((from - test_run.jobs_created_at) / job_timeline_duration) * 100
-      right = ((((to - test_run.jobs_created_at) / job_timeline_duration) * 100) - 100) * -1
+      left  = ((from - test_run.enqueued_jobs_at) / job_timeline_duration) * 100
+      right = ((((to - test_run.enqueued_jobs_at) / job_timeline_duration) * 100) - 100) * -1
       html_options = {}
       html_options[:title] = "#{name} for #{distance_of_time_in_minutes(duration)}"
       html_options[:class] = "landmark-#{classname(name)}"

@@ -166,7 +166,7 @@ module Hobson::Server::Helpers
   end
 
   def job_timeline_duration
-    @job_timeline_duration ||= (test_run.complete_at || now) - (test_run.jobs_created_at || now)
+    @job_timeline_duration ||= (test_run.complete_at || now) - (test_run.enqueued_jobs_at || now)
     @job_timeline_duration ||= 0
   end
 

@@ -88,7 +88,7 @@ class Hobson::Project::TestRun::Tests
     # calculate the number of jobs for each group
     groups.each{|type, group|
       group.jobs = []
-      jobs_for_this_group = ((group.runtime / total_runtime) * number_of_jobs).to_i
+      jobs_for_this_group = ((group.runtime / total_runtime) * number_of_jobs).to_i rescue 1
       jobs_for_this_group = 1 if jobs_for_this_group < 1
       jobs_for_this_group = group.tests.size if jobs_for_this_group > group.tests.size
       jobs_for_this_group.times{ group.jobs << jobs.shift }

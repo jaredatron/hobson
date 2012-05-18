@@ -42,6 +42,30 @@ describe Hobson do
 
   either_context do
 
+    describe "#encoding" do
+
+      def test_encoding internal, external
+        Encoding.default_internal.to_s.should eql internal
+        Encoding.default_external.to_s.should eql external
+      end
+
+      after{
+        RSpec::Mocks.teardown
+        Hobson.reset_encoding!
+      }
+
+      it 'should have default encodings of utf-8' do
+        test_encoding "UTF-8", "UTF-8"
+      end
+
+      it 'should set the encoding from the config file' do
+        Hobson.stub(:config).and_return encoding: { internal: 'US-ASCII', external: 'ASCII-8BIT' }
+        Hobson.reset_encoding!
+        test_encoding 'US-ASCII', 'ASCII-8BIT'
+      end
+
+    end
+
     describe "#redis" do
       subject{ Hobson.redis }
       it { should be_a Redis::Namespace }

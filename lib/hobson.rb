@@ -81,6 +81,5 @@ module Hobson
 
 end
 
-require 'hobson/version'
 require 'hobson/logger'
 require 'hobson/redis'

@@ -6,7 +6,7 @@
         %a{:href => "javascript: $('#delete#{test_run.id}').submit()"} X
   %td= test_run.status
   %td
-    %a{:href => test_run_path(test_run)}= test_run.id
+    %a{:href => test_run_path(test_run)}= test_run.id.to_s[0..7]
   %td
     %a{:href => sha_url(test_run.project.origin, test_run.sha)}= test_run.sha.to_s[0..7]
   %td= test_run.requestor || 'unknown'

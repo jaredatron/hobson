@@ -24,4 +24,5 @@ group :development, :test do
   gem 'rake'
   gem 'rspec'
   gem 'resque_unit'
+  gem 'thin'
 end

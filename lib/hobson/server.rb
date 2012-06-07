@@ -20,7 +20,7 @@ class Hobson::Server < Sinatra::Base
   class Runner < Vegas::Runner
     def check_for_running path=nil
       super
-      Hobson.use_redis_slave! unless ENV['HOBSON_REDIS_SLAVE'] == 'false'
+      Hobson.use_redis_slave!
     end
   end
 

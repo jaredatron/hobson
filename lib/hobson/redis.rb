@@ -62,6 +62,7 @@ module Hobson
   end
 
   def use_redis_slave!
+    return if ENV['HOBSON_REDIS_SLAVE'] == 'false'
     begin
       redis_slave.balancer.keys
     rescue Errno::ECONNREFUSED, RuntimeError
@@ -95,6 +96,10 @@ module Hobson
   def enable_redis_benchmarker!
     @redis = RedisBenchmarker.new(@redis) unless @redis.is_a? RedisBenchmarker
     @redis
+  end
+
+  def log_redis!
+    root_redis.client.logger = Hobson.logger
   end
 
 end

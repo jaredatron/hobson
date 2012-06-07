@@ -11,7 +11,7 @@ class Hobson::Project::TestRun
   # add a list of tests to the TestRun data
   # schedule N RunTests resque jobs for Y jobs (balancing is done in this step)
   def build! number_of_jobs = Resque.workers.length
-    return if aborted?
+    return if should_abort?
 
     started_building!
 

@@ -22,9 +22,14 @@ class Hobson::Project::TestRun
   alias_method :started?,   :enqueued_jobs?
   alias_method :started_at, :enqueued_jobs_at
 
+  def should_abort?
+    # bypass the redis_hash cache and check if we've been aborted
+    # or if anything errored anywhere
+    redis_hash.get('aborted_at').present? || redis_hash.get('errored_at').present?
+  end
+
   def aborted?
-    # bypass the redis_hash cache and read from redis every time
-    redis_hash.get('aborted_at').present?
+    aborted_at.present?
   end
 
   def running?
@@ -32,7 +37,7 @@ class Hobson::Project::TestRun
   end
 
   def errored?
-    redis_hash.get("errored_at").present? || jobs.any?(&:errored?)
+    errored_at.present? || jobs.any?(&:errored?)
   end
 
   def complete?

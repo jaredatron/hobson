@@ -25,7 +25,7 @@ class Hobson::Project::TestRun::Job::TestExecutor
     workspace.fork_and_execute(command){ |pid|
       # every 0.5 seconds while our tests are executing
 
-      if @job.abort?
+      if @job.should_abort?
         kill_process!(pid)
         break
       end

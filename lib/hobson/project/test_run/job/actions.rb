@@ -9,10 +9,10 @@ class Hobson::Project::TestRun::Job
   end
 
   def prepare_workspace!
-    return if abort?
+    return if should_abort?
     checking_out_code!
     workspace.checkout! test_run.sha
-    return if abort?
+    return if should_abort?
     preparing!
     workspace.prepare{ eval_hook :setup }
   end
@@ -27,13 +27,13 @@ class Hobson::Project::TestRun::Job
 
     prepare_workspace!
 
-    unless abort?
+    unless should_abort?
       running_tests!
       while_tests_needing_to_be_run{|tests, index|
         raise "max test executions reached. something is very wrong with your code. Please see the logs." if index > 10
-        break if abort?
+        break if should_abort?
         eval_hook :before_running_tests, :tests => tests
-        break if abort?
+        break if should_abort?
         TestExecutor.new(self, index, tests)
       }
     end
@@ -72,10 +72,6 @@ class Hobson::Project::TestRun::Job
     Hobson.logger.outputters.each{|o| o.try(:flush) } # flush all log output
     log_dir_path.children.each{|path| save_artifact path}
     save_artifact(Hobson.temp_logfile.tap(&:flush).path, :name => 'test_run.log') if Hobson.temp_logfile.present?
-  end
-
-  def abort?
-    test_run.aborted? || test_run.errored?
   end
 
 end

@@ -16,9 +16,10 @@ class Hobson::Project::TestRun::Job
     checking_out_code_at.present? && !complete?
   end
 
+  delegate :should_abort?, :to => :test_run
+
   def errored?
-    # bypass the redis_hash cache and read from redis every time
-    test_run.redis_hash.get("job:#{index}:exception").present?
+    self['exception'].present?
   end
 
   def complete?

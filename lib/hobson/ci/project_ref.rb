@@ -46,23 +46,29 @@ class Hobson::CI::ProjectRef
   end
 
   def run_tests! sha=current_sha
+
+    # find and delete test runs were about to trim off our index
+    redis.lrange(:test_run_ids, HISTORY_LENGTH - 1, -1).map{|id|
+      project.test_runs(id).try(:delete!)
+    }
+
+    # create a new test run
     test_run = project.run_tests!(
       :sha            => sha,
       :requestor      => 'CI',
       :fast_lane      => true,
       :ci_project_ref => self
     )
-    index_test_run(test_run)
-    test_run
-  end
 
-  def index_test_run test_run
+    # add the new test run to our index
     redis.pipelined{ # single request
       redis.lpush(:shas,         test_run.sha)
       redis.lpush(:test_run_ids, test_run.id)
       redis.ltrim(:shas,         0, HISTORY_LENGTH)
       redis.ltrim(:test_run_ids, 0, HISTORY_LENGTH)
     }
+
+    test_run
   end
 
   %w{shas test_run_ids}.each{|list|

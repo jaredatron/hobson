@@ -16,7 +16,7 @@ class Hobson::Project::TestRun
   def save!
     created!
     project.redis.zadd(:test_runs, created_at.to_f, id)
-    redis_hash.redis.expire(redis_hash.key, MAX_AGE)
+    redis_hash.redis.expire(redis_hash.key, MAX_AGE) unless requested_by_ci?
   end
 
   def delete!

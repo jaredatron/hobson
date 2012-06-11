@@ -30,6 +30,29 @@ describe Hobson::CI::ProjectRef do
       end
     end
 
+    describe "run_tests!" do
+      before{
+        Factory.project('git://github.com/rails/rails.git')
+        Hobson::CI::ProjectRef.create('rails', 'master')
+      }
+      define_method(:project_ref){
+        Hobson::CI::ProjectRef.find('rails:master')
+      }
+      let(:test_runs){ [] }
+      define_method(:assert_test_runs_are_equal!){
+        project_ref.test_runs.should == 10.times.map{|i| test_runs[i]}
+      }
+
+      it "should store an index of the last 10 test runs" do
+        assert_test_runs_are_equal!
+        20.times{
+          test_runs.unshift project_ref.run_tests!
+          assert_test_runs_are_equal!
+          # TODO assert test runs were deleted
+        }
+      end
+    end
+
     describe "find" do
       before{
         Factory.project('git://github.com/magic/donkies.git')

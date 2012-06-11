@@ -49,7 +49,7 @@ class Hobson::Project::TestRun
   end
 
   def done_running_tests?
-    tests.none?(&:needs_run?)
+    started? && tests.none?(&:needs_run?)
   end
 
   def passed?

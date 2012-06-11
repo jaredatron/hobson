@@ -1,5 +1,3 @@
-require 'hobson/version'
-
 require 'redis'
 require 'redis/slave'
 

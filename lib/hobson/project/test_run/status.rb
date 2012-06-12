@@ -33,7 +33,7 @@ class Hobson::Project::TestRun
   end
 
   def running?
-    !complete? && jobs.any?(&:running?) || jobs.any?(&:complete?)
+    started? && jobs.any?(&:running?) || jobs.any?(&:complete?)
   end
 
   def errored?
@@ -41,7 +41,7 @@ class Hobson::Project::TestRun
   end
 
   def complete?
-    aborted? || errored? || started? && jobs.all?(&:complete?)
+    started? && (aborted? || errored? || jobs.all?(&:complete?))
   end
 
   def complete_at

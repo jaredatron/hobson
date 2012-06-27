@@ -33,7 +33,7 @@ class Hobson::Project::TestRun
   end
 
   def running?
-    started? && jobs.any?(&:running?) || jobs.any?(&:complete?)
+    started? && (jobs.any?(&:running?) && !jobs.all?(&:complete?))
   end
 
   def errored?

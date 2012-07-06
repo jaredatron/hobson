@@ -10,7 +10,7 @@ module Hobson
 
   # set the root connection to redis preserving namespaces
   def root_redis= redis
-    if self.redis.nil? || self.redis.is_a?(Redis) || self.redis.is_a?(Redis::Slave::Balancer)
+    if self.redis.nil? || self.redis.is_a?(Redis)
       @redis = redis
 
     elsif self.redis.is_a?(Redis::Namespace) || self.redis.is_a?(RedisBenchmarker)
@@ -35,42 +35,6 @@ module Hobson
       enable_redis_benchmarker! if $DEBUG || ENV['DEBUG']
       @redis
     end
-  end
-
-  def redis_slave
-    @redis_slave ||= begin
-      @redis_slave = Redis::Slave.new(:master => Hobson.config[:redis])
-      @redis_slave.start!
-      raise "Failed to start Redis Slave" unless @redis_slave.process.alive?
-      puts "starting redis slave at #{@redis_slave.options[:slave].values_at(:host, :port).join(':')}"
-      print "waiting for local redis-slave to catch up"
-      missing, synced = [], false
-      until synced
-        begin
-          missing = @redis_slave.balancer.master.keys - @redis_slave.balancer.slave.keys
-        rescue Errno::ECONNREFUSED, RuntimeError
-          next
-        ensure
-          synced = missing.count == 0
-          print '.'
-          sleep 1
-        end
-      end
-      print "\n"
-      @redis_slave
-    end
-  end
-
-  def use_redis_slave!
-    return if ENV['HOBSON_REDIS_SLAVE'] == 'false'
-    begin
-      redis_slave.balancer.keys
-    rescue Errno::ECONNREFUSED, RuntimeError
-      puts "waiting for redis slave server to start and catch up..."
-      sleep 1
-      retry
-    end
-    Hobson.root_redis = redis_slave.balancer
   end
 
   require 'benchmark'

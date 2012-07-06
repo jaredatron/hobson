@@ -1,8 +1,6 @@
-source "http://rubygems.org"
+source :rubygems
 
 gemspec
-
-gem 'redis-slave', :git => "git://github.com/deadlyicon/redis-slave.git"
 
 group :development do
 

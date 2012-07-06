@@ -21,7 +21,6 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency "activesupport", "~> 3.1.3"
   s.add_runtime_dependency "actionpack", "~> 3.1.3"
   s.add_runtime_dependency "i18n"
-  s.add_runtime_dependency "redis-slave"
   s.add_runtime_dependency "redis-namespace", "~> 1.0.2"
   s.add_runtime_dependency "resque", "~> 1.19.0"
   s.add_runtime_dependency "fog"

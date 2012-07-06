@@ -1,5 +1,4 @@
 require 'redis'
-require 'redis/slave'
 
 require 'active_support'
 require 'active_support/core_ext/array'
@@ -18,7 +17,6 @@ module Hobson
   extend self
 
   autoload :StonePacker,  'hobson/stone_packer'
-  autoload :RedisSlave,   'hobson/redis_slave'
   autoload :RedisHash,    'hobson/redis_hash'
   autoload :Bundler,      'hobson/bundler'
   autoload :Landmarks,    'hobson/landmarks'

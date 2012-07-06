@@ -15,17 +15,8 @@ I18n.load_path << $:.map{|path| File.join(path,'action_view/locale/en.yml') }.fi
 
 class Hobson::Server < Sinatra::Base
 
-  # patch Vegas::Runner to start a redis slave if the server needs to be started
-  # but before it forks
-  class Runner < Vegas::Runner
-    def check_for_running path=nil
-      super
-      Hobson.use_redis_slave!
-    end
-  end
-
   def self.start! options={}
-    Runner.new(self, 'hobson', options)
+    Vegas::Runner.new(self, 'hobson', options)
   end
 
   root = Pathname.new(File.expand_path('..', __FILE__)) + 'server'

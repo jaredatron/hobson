@@ -1,0 +1,67 @@
+#!/usr/bin/env ruby
+
+require 'rubygems'
+require 'bundler/setup'
+
+require 'thor'
+require 'faraday'
+
+class HobsonCli < Thor
+
+  desc "build [OPTIONS] [SHA]", "Run a build on Hobson."
+  method_option :open, :aliases => "-o", :desc => "Attempt to open the Hobson URL in a web browser after submitting.", :default => true, :type => :boolean
+  method_option :tunnel, :aliases => "-t", :desc => "Assumes you're tunneling and makes request to localhost", :default => false, :type => :boolean
+  def build sha=current_sha
+    conn = Faraday.new(:url => hobson_base(options[:tunnel]))
+    response = conn.post 'projects/change_production/test_runs' do |req|
+      req.body = {'test_run[requestor]' => current_requestor, 'test_run[sha]' => sha}
+      # req.headers['Accept'] = 'application/json'
+    end
+
+    if response.status != 303
+      raise "Didn't get expected redirect from Hobson (got #{response.status})."
+    end
+
+    if options[:open]
+      `open #{response['location']}` if RUBY_PLATFORM =~ /darwin/
+    end
+  end
+
+  desc "tunnel", "Starts a tunnel to hobson web."
+  method_option :identity, :aliases => "-i", desc: "SSH key file"
+  def tunnel
+    identity_cmd = options[:identity] ? "-i #{options[:identity]}" : ""
+    # -f forces ssh to run in background
+    # -N indicates no command to be executed
+    puts `ssh #{identity_cmd} -f -N -L 5678:localhost:5678 hobson.changeeng.org > /dev/null 2>&1 &`
+    `open #{hobson_base(true)}` if RUBY_PLATFORM =~ /darwin/
+  end
+
+
+  private
+
+  # Get the current git SHA of the project
+  def current_sha
+    @current_sha ||= `git rev-parse HEAD`.chomp
+  end
+
+  # Derive the requestor from the git environment
+  def current_requestor
+    @current_requestor ||= `git var -l | grep GIT_AUTHOR_IDENT`.split('=').last.split(' <').first rescue "(Unknown)"
+  end
+
+  def hobson_base(tunnel = false)
+    host = tunnel ? 'localhost' : hobson_config[:web][:host]
+    "http://#{host}:#{hobson_config[:web][:port]}/"
+  end
+
+  def hobson_config
+    @hobson_config ||= begin
+      config_file = File.expand_path(File.dirname(__FILE__) + "/../config/hobson.yml")
+      raise "Unable to find hobson config file at #{config_file}" File.exists?(config_path)
+      YAML.load_file(config_path)
+    end
+  end
+end
+
+HobsonCli.start

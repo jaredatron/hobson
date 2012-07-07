@@ -1,6 +1,7 @@
 source :rubygems
 
-gemspec
+gemspec :name => 'hobson'
+gemspec :name => 'hobson-cli'
 
 group :development do
 

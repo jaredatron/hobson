@@ -13,9 +13,9 @@ Gem::Specification.new do |s|
 
   s.rubyforge_project = "hobson"
 
-  s.files         = `git ls-files`.split("\n")
+  s.files         = `git ls-files`.split("\n") - ["bin/hobson-cli"]
   s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
-  s.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
+  s.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) } - ["hobson-cli"]
   s.require_paths = ["lib"]
 
   s.add_runtime_dependency "activesupport", "~> 3.1.3"

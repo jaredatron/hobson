@@ -39,6 +39,7 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency "rack", "~> 1.3.5"
   s.add_runtime_dependency "vegas"
   s.add_runtime_dependency "sinatra"
+  s.add_runtime_dependency "sinatra-partial"
   s.add_runtime_dependency "haml"
   s.add_runtime_dependency "sass"
 end

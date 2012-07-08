@@ -1,6 +1,7 @@
 require 'time'
 
 require 'sinatra/base'
+require 'sinatra/partial'
 require 'vegas'
 require 'haml'
 require 'sass'
@@ -14,6 +15,7 @@ require 'action_view/helpers/date_helper'
 I18n.load_path << $:.map{|path| File.join(path,'action_view/locale/en.yml') }.find{|path| File.exist?(path) }
 
 class Hobson::Server < Sinatra::Base
+  register Sinatra::Partial
 
   # patch Vegas::Runner to start a redis slave if the server needs to be started
   # but before it forks
@@ -36,6 +38,7 @@ class Hobson::Server < Sinatra::Base
   set :views,         root + "views"
   set :public_folder, root + "public"
   set :static,        true
+  set :partial_underscores, true
 
   require 'hobson/server/helpers'
   helpers Hobson::Server::Helpers

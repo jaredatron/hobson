@@ -44,7 +44,7 @@
       %dd
         = test_run.tests.find_all(&:needs_run?).count
 
-      %dt Hungs Tests
+      %dt Hung Tests
       %dd= test_run.tests.find_all(&:hung?).count
 
       %dt Test Retries

@@ -8,4 +8,4 @@ pkg/*
 tmp/*
 log
 *.app
-
+.idea

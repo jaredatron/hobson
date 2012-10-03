@@ -28,3 +28,5 @@ group :development, :test do
   gem 'resque_unit'
   gem 'thin'
 end
+
+gem 'unicorn'

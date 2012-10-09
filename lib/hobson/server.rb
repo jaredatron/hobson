@@ -193,8 +193,25 @@ class Hobson::Server < Sinatra::Base
   end
 
   # show
+
+  TEST_RUN_SHOW_PAGE_CACHE_PREFIX = "test_run_show_page_"
   get "/projects/:project_name/test_runs/:test_run_id" do
-    haml :'projects/test_runs/show'
+    if test_run.complete?
+      show_page_key = TEST_RUN_SHOW_PAGE_CACHE_PREFIX + test_run.id
+
+      if redis.exists(show_page_key)
+        puts "EXISTS"
+        redis.get(show_page_key)
+      else
+        puts "CREATING"
+        show_page = haml :'projects/test_runs/show'
+        redis.set(show_page_key, show_page)
+        show_page
+      end
+    else
+      puts "NOT DONE"
+      haml :'projects/test_runs/show'
+    end
   end
 
   # delete

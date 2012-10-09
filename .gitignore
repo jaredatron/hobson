@@ -9,3 +9,4 @@ tmp/*
 log
 *.app
 .idea
+projects

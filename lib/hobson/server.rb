@@ -200,17 +200,14 @@ class Hobson::Server < Sinatra::Base
       show_page_key = TEST_RUN_SHOW_PAGE_CACHE_PREFIX + test_run.id
 
       if redis.exists(show_page_key)
-        puts "EXISTS"
         redis.get(show_page_key)
       else
-        puts "CREATING"
         show_page = haml :'projects/test_runs/show'
         redis.set(show_page_key, show_page)
         redis.expire(show_page_key, Hobson::Project::TestRun::MAX_AGE)
         show_page
       end
     else
-      puts "NOT DONE"
       haml :'projects/test_runs/show'
     end
   end

@@ -206,6 +206,7 @@ class Hobson::Server < Sinatra::Base
         puts "CREATING"
         show_page = haml :'projects/test_runs/show'
         redis.set(show_page_key, show_page)
+        redis.expire(show_page_key, Hobson::Project::TestRun::MAX_AGE)
         show_page
       end
     else

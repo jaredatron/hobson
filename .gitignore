@@ -10,3 +10,4 @@ log
 *.app
 .idea
 projects
+config.yml

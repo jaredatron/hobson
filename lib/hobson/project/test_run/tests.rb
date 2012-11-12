@@ -45,7 +45,7 @@ class Hobson::Project::TestRun::Tests
   # executes a cucumber command to list all scenarios by name
   def detect_scenarios!
     test_run.workspace.execute %W[
-      cucumber --quiet --dry-run --no-profile
+      bundle exec cucumber --quiet --dry-run --no-profile
       --require #{Hobson.lib.join('hobson/formatters/scenarios.rb')}
       --format Hobson::Formatters::Scenarios --out hobson_scenarios_list
     ]*' '

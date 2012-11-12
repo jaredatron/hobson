@@ -1,6 +1,5 @@
 require 'pathname'
 require 'popen4'
-require 'childprocess'
 
 class Hobson::Project::Workspace
 
@@ -70,7 +69,7 @@ class Hobson::Project::Workspace
   end
 
   def bundle_install!
-    execute 'gem install bundler && bundle check || bundle install' if bundler?
+    execute 'bundle check || bundle install' if bundler?
   end
 
   def prepare &block

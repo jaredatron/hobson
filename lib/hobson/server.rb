@@ -1,5 +1,3 @@
-require 'time'
-
 require 'sinatra/base'
 require 'sinatra/partial'
 require 'vegas'

@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe "undefined scenarios should fail spec" do
+describe "test runs requested by ci" do
 
   worker_context do
 

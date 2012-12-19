@@ -18,8 +18,8 @@ class Hobson::Project::TestRun::Job
     options[:body] ||= path.read
     options[:public] = true unless options.has_key?(:public)
     file = Hobson.files.create(options)
-    public_url = if file.public_url.present?
-      CGI::unescape(file.public_url)
+    public_url = if Hobson.config[:storage][:provider] =~ /\Aaws\z/i
+      CGI::unescape(public_url_from_file(file))
     else
       'file://' + File.join(
         Hobson.files.directory.connection.local_root,
@@ -40,6 +40,18 @@ class Hobson::Project::TestRun::Job
 
   def key_from_name name
     File.join(file_namespace,name).to_s[1..-1]
+  end
+
+  # Avoid hitting AWS for public_url
+  # There are intermittent problems with requesting the public_url immediately after creating the file
+  def public_url_from_file file
+    directory_key = Hobson.files.directory.key
+    file_key = file.key
+    if directory_key.to_s =~ /^(?:[a-z]|\d(?!\d{0,2}(?:\.\d{1,3}){3}$))(?:[a-z0-9]|\.(?![\.\-])|\-(?![\.])){1,61}[a-z0-9]$/
+      "https://#{directory_key}.s3.amazonaws.com/#{Fog::AWS.escape(file_key)}"
+    else
+      "https://s3.amazonaws.com/#{directory_key}/#{Fog::AWS.escape(file_key)}"
+    end
   end
 
 end

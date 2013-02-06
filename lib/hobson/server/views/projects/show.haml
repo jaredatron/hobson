@@ -20,8 +20,12 @@
     - action_button 'Edit', edit_project_path, :get
     - action_button 'Delete', project_path, :delete
 
+  %h2
+    %a{:href => test_runs_path} Test Runs
+
+  %h2 Metrics
   %ol.links
     %li
-      %a{:href => test_runs_path} Test Runs
-    %li
       %a{:href => test_runtimes_path} Test Runtimes
+    %li
+      %a{:href => flaky_tests_path} Flaky Tests

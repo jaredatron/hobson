@@ -1,0 +1,17 @@
+- page_title "Flaky Tests"
+
+%h2= "Report generated on #{@flaky_tests_last_run}"
+
+%table.sortable.flaky-tests
+  %thead
+    %tr
+      %th Name
+      %th{:class => :sorttable_numeric} Flakes
+      %th Last Flake
+  %tbody
+    - @flaky_tests.each do |test_id, flake_count, last_flake|
+      %tr
+        %td= test_id
+        %td.flake-count= flake_count
+        %td
+          %a{:href => test_run_path(last_flake)}= last_flake.to_s[0..7]

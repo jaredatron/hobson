@@ -89,6 +89,10 @@ module Hobson::Server::Helpers
     "#{project_path(project_name)}/test_runtimes"
   end
 
+  def flaky_tests_path project_name=self.project_name
+    "#{project_path(project_name)}/flaky_tests"
+  end
+
   def ci_path
     '/ci'
   end

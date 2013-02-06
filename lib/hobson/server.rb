@@ -237,4 +237,11 @@ class Hobson::Server < Sinatra::Base
     haml :'projects/test_runtimes'
   end
 
+  # flaky tests show
+  get "/projects/:project_name/flaky_tests" do |project_name|
+    @flaky_tests = JSON.parse(Hobson.redis["metrics:#{project_name}:flaky_tests"])
+    @flaky_tests_last_run = Hobson.redis["metrics:#{project_name}:flaky_tests:last_run"]
+    haml :'projects/flaky_tests' if @flaky_tests
+  end
+
 end

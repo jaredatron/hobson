@@ -6,6 +6,7 @@ module Hobson
     extend self
 
     def startup!(n)
+      n -= Hobson.resque.workers.count
       n.times do
         fog.servers.create(
           image_id: 'ami-0157c268',

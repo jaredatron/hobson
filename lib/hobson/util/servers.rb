@@ -31,8 +31,7 @@ module Hobson
       end
 
       print "Waiting for workers to finish..."
-      loop do
-        break if Hobson.resque.workers.count == n
+      until Hobson.resque.workers.count == n
         sleep 5
         print '.'
       end

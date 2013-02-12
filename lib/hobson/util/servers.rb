@@ -20,8 +20,9 @@ module Hobson
     end
 
     def shutdown!(n)
-      servers_and_workers_to_keep = servers_and_workers.sample(n)
-      abort "Not enough workers!" if servers_and_workers_to_keep.count < n
+      abort "Not enough workers!" if servers_and_workers.count < n
+
+      servers_and_workers_to_keep = servers_and_workers.sort_by{|s,w| s.created_at}.last(n)
       servers_and_workers_to_kill = servers_and_workers - servers_and_workers_to_keep
 
       puts "Sending quit to workers..."

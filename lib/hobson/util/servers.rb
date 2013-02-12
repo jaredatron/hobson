@@ -19,10 +19,29 @@ module Hobson
       end
     end
 
-    def shutdown!
-      stop_all_workers!
-      wait_for_workers_to_finish!
-      terminate_all_instances!
+    def shutdown!(n)
+      servers_and_workers_to_keep = servers_and_workers.sample(n)
+      abort "Not enough workers!" if servers_and_workers_to_keep.count < n
+      servers_and_workers_to_kill = servers_and_workers - servers_and_workers_to_keep
+
+      puts "Sending quit to workers..."
+      servers_and_workers_to_kill.each do |server, worker|
+        pid = worker.id.split(':')[1]
+        server.ssh("sudo monit unmonitor hobson && kill -s QUIT #{pid}")
+      end
+
+      print "Waiting for workers to finish..."
+      loop do
+        break if Hobson.resque.workers.count == n
+        sleep 5
+        print '.'
+      end
+      puts
+
+      puts "Terminating instances..."
+      servers_and_workers_to_kill.each do |server, worker|
+        server.destroy
+      end
     end
 
     def audit_workers!
@@ -67,29 +86,6 @@ module Hobson
     end
 
     private
-
-    def stop_all_workers!
-      puts "Sending quit to all workers..."
-      servers_and_workers.each do |server, worker|
-        pid = worker.id.split(':')[1]
-        server.ssh("sudo monit unmonitor hobson && kill -s QUIT #{pid}")
-      end
-    end
-
-    def wait_for_workers_to_finish!
-      print "Waiting for workers to finish..."
-      loop do
-        break if Hobson.resque.workers.empty?
-        sleep 5
-        print '.'
-      end
-      puts
-    end
-
-    def terminate_all_instances!
-      puts "Terminating all instances..."
-      hobson_servers.each(&:destroy)
-    end
 
     def fog
       @fog ||= Fog::Compute.new(

@@ -85,10 +85,10 @@ when 'kill-tests'
   end
 when 'tunnel'
   exec ssh_command("hobson.changeeng.org", nil, tunnel: [5678, 5679])
-when 'up'
+when 'servers:up'
   Hobson::Servers.startup!(ARGV.first.to_i) if ARGV.first
-when 'down'
-  Hobson::Servers.shutdown!
+when 'servers:down'
+  Hobson::Servers.shutdown!(ARGV.first.to_i) if ARGV.first
 when 'audit'
   Hobson::Servers.audit_workers!
 when 'metrics:flaky'

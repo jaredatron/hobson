@@ -9,7 +9,7 @@ module Hobson
       n -= Hobson.resque.workers.count
       n.times do
         fog.servers.create(
-          image_id: 'ami-0157c268',
+          image_id: 'ami-ee4bda87',
           flavor_id: 'm1.large',
           key_name: 'change',
           groups: ['change_ci'],
@@ -131,20 +131,11 @@ module Hobson
 
     STARTUP_SCRIPT = <<-EOF.gsub(/^\s+/, '')
       #!/bin/sh
-      mkdir -p /mnt/change/hobson_workspace
-      cat >/mnt/change/hobson_workspace/config.yml <<CONFIG
-      ---
-      :redis:
-        :host: master.hobson.changeeng.org
-      :storage:
-        :provider: AWS
-        :aws_secret_access_key: 1pbSY9LtrIApAxICfzRGzASDAAPSGn7tsKH9/orh
-        :aws_access_key_id: AKIAI6MGGNYJEPGAGD3Q
-        :region: us-west-1
-      CONFIG
+      mkdir /mnt/change
+      mv /home/change/hobson_workspace /mnt/change/hobson_workspace
       chown -R change:change /mnt/change
-      sed -i 's/ruby-1.9.3-p0/ruby-1.9.3-p374/' /etc/init.d/hobson
-      BUNDLE_GEMFILE=/home/change/hobson /home/change/.rvm/bin/rvm use ruby-1.9.3-p374 do bundle install
+      ln -sf /mnt/change/hobson_workspace /home/change/hobson_workspace
+      chown -R change:change /home/change/hobson_workspace
       monit start hobson
     EOF
 

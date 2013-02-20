@@ -1,4 +1,4 @@
-source :rubygems
+source "https://rubygems.org"
 
 gem "resque", "~> 1.19.0"
 gem "redis-namespace", "~> 1.0.2"

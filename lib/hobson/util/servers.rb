@@ -45,33 +45,33 @@ module Hobson
     end
 
     def audit_workers!
-      servers_and_workers.each do |server, worker_id|
-        pid = worker_id.split(':')[1]
+      servers_and_workers.each do |server, worker|
+        pid = worker.id.split(':')[1]
         unless server.ssh("kill -0 #{pid}").first.status == 0
-          print "Cleaning stale worker #{worker_id}..."
-          cleanup_old_worker! worker_id
+          print "Cleaning stale worker #{worker.id}..."
+          cleanup_old_worker! worker.id
           puts 'done!'
         end
       end
     end
 
     def pause!
-      servers_and_workers.each do |server, worker_id|
-        pid = worker_id.split(':')[1]
+      servers_and_workers.each do |server, worker|
+        pid = worker.id.split(':')[1]
         server.ssh("kill -s USR2 #{pid}")
       end
     end
 
     def quit!
-      servers_and_workers.each do |server, worker_id|
-        pid = worker_id.split(':')[1]
+      servers_and_workers.each do |server, worker|
+        pid = worker.id.split(':')[1]
         server.ssh("kill -s QUIT #{pid}")
       end
     end
 
     def continue!
-      servers_and_workers.each do |server, worker_id|
-        pid = worker_id.split(':')[1]
+      servers_and_workers.each do |server, worker|
+        pid = worker.id.split(':')[1]
         server.ssh("kill -s CONT #{pid}")
       end
     end

@@ -55,6 +55,7 @@ class Hobson::Project::TestRun::Job
 
   rescue Object => e
     test_run.errored!
+    eval_hook :on_error
     logger.info %(Exception:\n#{e}\n#{e.backtrace.join("\n")})
     self['exception'] = e.to_s
     self['exception:class'] = e.class.to_s

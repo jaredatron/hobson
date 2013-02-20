@@ -38,10 +38,13 @@ module Hobson
       end
       puts
 
+      extraneous_servers = hobson_servers - servers_and_workers.map(&:first)
+
       puts "Terminating instances..."
       servers_and_workers_to_kill.each do |server, worker|
         server.destroy
       end
+      extraneous_servers.each(&:destroy)
     end
 
     def audit_workers!
@@ -78,11 +81,18 @@ module Hobson
 
     def hobson_servers
       @hobson_servers ||= fog.servers.select { |s|
-          s.state == 'running' && (n = s.tags["Name"]) =~ /hobson/i && n !~ /master/i
+          s.state == 'running' && s.tags["Name"] == "Hobson Worker"
         }.each { |s|
           s.username = 'change'
           s.private_key = PRIVATE_KEY
         }
+    end
+
+    def servers_and_workers
+      @servers_and_workers ||= Hobson.resque.workers.inject([]) do |result, worker|
+        hostname = worker.id.split(':').first
+        result << [hobson_servers.select { |s| s.private_dns_name =~ /#{hostname}/ }.first, worker]
+      end
     end
 
     private
@@ -93,13 +103,6 @@ module Hobson
           aws_access_key_id: 'AKIAI6MGGNYJEPGAGD3Q',
           aws_secret_access_key: '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',
         )
-    end
-
-    def servers_and_workers
-      @servers_and_workers ||= Hobson.resque.workers.inject([]) do |result, worker|
-        hostname = worker.id.split(':').first
-        result << [hobson_servers.select { |s| s.private_dns_name =~ /#{hostname}/ }.first, worker]
-      end
     end
 
     # Removes redis keys for a nonexistent worker

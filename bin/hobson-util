@@ -29,7 +29,7 @@ end
 
 def ssh_command hostname, cmd = nil, options = {}
   ssh = "ssh -o StrictHostKeyChecking=no"
-  ssh << ' -T' if options[:tty]
+  ssh << ' -T' unless options[:tty]
   (options[:tunnel] || []).each do |port|
     ssh << " -L #{port}:localhost:#{port}"
   end

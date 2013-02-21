@@ -20,31 +20,23 @@ module Hobson
     end
 
     def shutdown!(n)
-      abort "Not enough workers!" if servers_and_workers.count < n
-
-      servers_and_workers_to_keep = servers_and_workers.sort_by{|s,w| s.created_at}.last(n)
-      servers_and_workers_to_kill = servers_and_workers - servers_and_workers_to_keep
-
       puts "Sending quit to workers..."
-      servers_and_workers_to_kill.each do |server, worker|
+      servers_and_workers.each do |server, worker|
         pid = worker.id.split(':')[1]
         server.ssh("sudo monit unmonitor hobson && kill -s QUIT #{pid}")
       end
 
       print "Waiting for workers to finish..."
-      until Hobson.resque.workers.count == n
+      until Hobson.resque.workers.count == 0
         sleep 5
         print '.'
       end
       puts
 
-      extraneous_servers = hobson_servers - servers_and_workers.map(&:first)
-
       puts "Terminating instances..."
-      servers_and_workers_to_kill.each do |server, worker|
-        server.destroy
-      end
-      extraneous_servers.each(&:destroy)
+      hobson_servers.each(&:destroy)
+
+      startup!(n)
     end
 
     def audit_workers!

@@ -76,7 +76,6 @@ module Hobson
           s.state == 'running' && s.tags["Name"] == "Hobson Worker"
         }.each { |s|
           s.username = 'change'
-          s.private_key = PRIVATE_KEY
         }
     end
 
@@ -92,8 +91,8 @@ module Hobson
     def fog
       @fog ||= Fog::Compute.new(
           provider: 'AWS',
-          aws_access_key_id: 'AKIAI6MGGNYJEPGAGD3Q',
-          aws_secret_access_key: '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',
+          aws_access_key_id: Hobson.config[:storage][:aws_access_key_id],
+          aws_secret_access_key: Hobson.config[:storage][:aws_secret_access_key],
         )
     end
 
@@ -105,24 +104,6 @@ module Hobson
       Hobson.resque.redis.del "stat:failed:#{worker_id}"
       Hobson.resque.redis.srem 'workers', worker_id
     end
-
-    PRIVATE_KEY = <<-EOF.gsub(/^\s+/, '')
-      -----BEGIN RSA PRIVATE KEY-----
-      MIICXgIBAAKBgQC9LBPMOtIGTTMNtgiz93gZ9b5dCjWpEaKPFHIjNSnOLGr0OVr3
-      /HP1R/3t23/k3U0RUcwUp242ogdH8L7CAgjw4heoCEnwugzl6T18/65c6aU1BSBO
-      HDkDkNULRQowuLvjnSdEIKZBBFGTQDrU2sgR5Nczv45cqtk35Lb2F/ipsQIDAQAB
-      AoGBALgkGblpYFvF9fZYxav5Li2G6qDCeW1zvxsrudbPvzv0PMAyvHw8f9u5ElLg
-      oWP0jzpWtyM7v6rqmc/LZsSPGodD/cqWVvyEOEBOztK6k8rc55NTpGXvJoDhGhwd
-      ++zcHwCIPY8k09IgYJjAFWgJ8B7+plRDVq56OzyPOu3U+1HhAkEA3YRM/GjTfg7Y
-      Y6O0uwhHe3M7wjOQkbrs7v8JZDu7RClZEe8het5qAumAZ8LG0UuXItG9eoJ5Ek1x
-      7jY7SD8VNQJBANqezmKXmBjUANxjNV+tfFvlAUhJgTJRqEMzC8HwX2JWmgVKtae8
-      LKwlLHxCcRgya+IH9FEW5KjfJochYvgS/g0CQEhEsm0iseUNaNFRBlSChfejh5p7
-      Ai5ZIpVyRRkbV6QMLU/piS2xxDpA/bBcXkrH833bmYqPaHptI79ImByg4AUCQQDA
-      ux/Xay17NetMX2m+X4MywEDRKXvskHB2TZof73kniJFf+O0MYqg/WsZNBYYOfuT8
-      72ZD1prfBVtB5f0KFjRBAkEA1eP3qW8qaZi5/DUTOpxSUjE2ECtgw2E/BfLfJLQ9
-      AD4I53WNUVeDyGaIVWIB5yHQfC2rZqGBwflGQG7o77+opQ==
-      -----END RSA PRIVATE KEY-----
-    EOF
 
     STARTUP_SCRIPT = <<-EOF.gsub(/^\s+/, '')
       #!/bin/sh

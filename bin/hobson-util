@@ -6,18 +6,6 @@ require 'hobson/util/servers'
 require 'hobson/util/metrics'
 require 'open3'
 
-Hobson.instance_variable_set(:@config, {
-  redis: {
-    host: 'master.hobson.changeeng.org'
-  },
-  storage: {
-    provider: 'AWS',
-    aws_secret_access_key: '1pbSY9LtrIApAxICfzRGzASDAAPSGn7tsKH9/orh',
-    aws_access_key_id: 'AKIAI6MGGNYJEPGAGD3Q',
-    region: 'us-west-1',
-  }
-})
-
 TEST_PROCESSES_LIST = 'PID=$(pgrep -f [H]obson\ Worker); ps -o pgid= -p $PID | xargs pgrep -g | grep -v $PID'
 TEST_PROCESSES_SHOW = "#{TEST_PROCESSES_LIST} | xargs ps -fp 2>/dev/null"
 TEST_PROCESSES_KILL = "#{TEST_PROCESSES_LIST} | xargs kill -9 2>/dev/null"

@@ -9,7 +9,7 @@ module Hobson
       n -= Hobson.resque.workers.count
       n.times do
         fog.servers.create(
-          image_id: 'ami-ee4bda87',
+          image_id: 'ami-fc74e795',
           flavor_id: 'm1.large',
           key_name: 'change',
           groups: ['change_ci'],

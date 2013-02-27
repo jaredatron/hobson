@@ -92,7 +92,7 @@ describe Hobson::Project::Workspace do
           workspace.should_receive(:execute).once.with('git stash apply'){
             raise Hobson::Project::Workspace::ExecutionError, 'pretending this command failed'
           }
-          workspace.should_receive(:execute).once.with("gem install bundler && bundle check || bundle install")
+          workspace.should_receive(:execute).once.with("bundle check || bundle install")
           workspace.should_receive(:execute).once.with('git add -Af && git stash && git stash apply')
 
           yielded = false
@@ -106,7 +106,7 @@ describe Hobson::Project::Workspace do
           workspace.should_receive(:execute).with('git stash apply'){ true }.once
         }
         it "should not prepare the workspace again" do
-          workspace.should_not_receive(:execute).with("gem install bundler && bundle check || bundle install")
+          workspace.should_not_receive(:execute).with("bundle check || bundle install")
           workspace.should_not_receive(:execute).with('git add -Af && git stash && git stash apply')
 
           yielded = false

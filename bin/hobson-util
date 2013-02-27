@@ -1,0 +1,87 @@
+#!/usr/bin/env ruby
+
+$LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
+
+require 'hobson/util/servers'
+require 'hobson/util/metrics'
+require 'open3'
+
+TEST_PROCESSES_LIST = 'PID=$(pgrep -f [H]obson\ Worker); ps -o pgid= -p $PID | xargs pgrep -g | grep -v $PID'
+TEST_PROCESSES_SHOW = "#{TEST_PROCESSES_LIST} | xargs ps -fp 2>/dev/null"
+TEST_PROCESSES_KILL = "#{TEST_PROCESSES_LIST} | xargs kill -9 2>/dev/null"
+VNC = '/usr/bin/x11vnc -safer -display :1 -forever -rfbauth /etc/vncpasswd >/dev/null 2>&1 &'
+
+def private_to_public name
+  Hobson::Servers.hobson_servers.select { |s| s.private_dns_name =~ /#{name}/ }.first.public_ip_address
+end
+
+def ssh_command hostname, cmd = nil, options = {}
+  ssh = "ssh -o StrictHostKeyChecking=no"
+  ssh << ' -T' unless options[:tty]
+  (options[:tunnel] || []).each do |port|
+    ssh << " -L #{port}:localhost:#{port}"
+  end
+  ssh << " change@#{hostname}"
+  ssh << " '#{cmd}'" if cmd
+  ssh
+end
+
+# Forks a process for each of cmds and waits for all of them to finish
+def run_commands_asynchronously! cmds
+  pids_to_ios = {}
+
+  # start all commands
+  cmds.each do |cmd|
+    stdin, stdouterr, wait_thr = Open3.popen2e(cmd)
+    stdin.close
+    pids_to_ios[wait_thr.pid] = stdouterr
+  end
+
+  # wait for all commands to finish and print their output synchronously
+  i = 0
+  pids_to_ios.each_pair do |pid, stdouterr|
+    begin
+      Process.wait pid
+    rescue Errno::ECHILD # Open3 detaches the spawned process, so it may not be in proctable
+    ensure
+      puts cmds[i]
+      i += 1
+      puts stdouterr.read
+      stdouterr.close
+    end
+  end
+
+  true
+end
+
+def execute_on_every_worker! cmd
+  cmds = []
+  Hobson::Servers.hobson_servers.each do |server|
+    cmds << ssh_command(server.public_ip_address, cmd)
+  end
+  run_commands_asynchronously! cmds
+end
+
+case ARGV.shift
+when 'ssh'
+  exec ssh_command(private_to_public(ARGV.first), nil, tty: true) if ARGV.first
+when 'exec'
+  execute_on_every_worker!(ARGV.first) if ARGV.first
+when 'kill-tests'
+  ARGV.each do |arg|
+    system ssh_command(private_to_public(arg), TEST_PROCESSES_KILL)
+  end
+when 'tunnel'
+  exec ssh_command("hobson.changeeng.org", nil, tunnel: [5678, 5679])
+when 'servers:up'
+  Hobson::Servers.startup!(ARGV.first.to_i) if ARGV.first
+when 'servers:down'
+  Hobson::Servers.shutdown!(ARGV.first.to_i) if ARGV.first
+when 'audit'
+  Hobson::Servers.audit_workers!
+when 'metrics:flaky'
+  Hobson::Metrics::FlakyTests.report!(ARGV.first) if ARGV.first
+else
+  require 'irb'
+  IRB.start
+end

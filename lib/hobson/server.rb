@@ -1,5 +1,3 @@
-require 'time'
-
 require 'sinatra/base'
 require 'sinatra/partial'
 require 'vegas'
@@ -17,17 +15,8 @@ I18n.load_path << $:.map{|path| File.join(path,'action_view/locale/en.yml') }.fi
 class Hobson::Server < Sinatra::Base
   register Sinatra::Partial
 
-  # patch Vegas::Runner to start a redis slave if the server needs to be started
-  # but before it forks
-  class Runner < Vegas::Runner
-    def check_for_running path=nil
-      super
-      Hobson.use_redis_slave!
-    end
-  end
-
   def self.start! options={}
-    Runner.new(self, 'hobson', options)
+    Vegas::Runner.new(self, 'hobson', options)
   end
 
   root = Pathname.new(File.expand_path('..', __FILE__)) + 'server'
@@ -193,8 +182,23 @@ class Hobson::Server < Sinatra::Base
   end
 
   # show
+
+  TEST_RUN_SHOW_PAGE_CACHE_PREFIX = "test_run_show_page_"
   get "/projects/:project_name/test_runs/:test_run_id" do
-    haml :'projects/test_runs/show'
+    if test_run.complete?
+      show_page_key = TEST_RUN_SHOW_PAGE_CACHE_PREFIX + test_run.id
+
+      if redis.exists(show_page_key)
+        redis.get(show_page_key)
+      else
+        show_page = haml :'projects/test_runs/show'
+        redis.set(show_page_key, show_page)
+        redis.expire(show_page_key, Hobson::Project::TestRun::MAX_AGE)
+        show_page
+      end
+    else
+      haml :'projects/test_runs/show'
+    end
   end
 
   # delete
@@ -220,6 +224,13 @@ class Hobson::Server < Sinatra::Base
   get "/projects/:project_name/test_runtimes" do |project_name|
     @test_runtimes = project.test_runtimes
     haml :'projects/test_runtimes'
+  end
+
+  # flaky tests show
+  get "/projects/:project_name/flaky_tests" do |project_name|
+    @flaky_tests = JSON.parse(Hobson.redis["metrics:#{project_name}:flaky_tests"])
+    @flaky_tests_last_run = Hobson.redis["metrics:#{project_name}:flaky_tests:last_run"]
+    haml :'projects/flaky_tests' if @flaky_tests
   end
 
 end

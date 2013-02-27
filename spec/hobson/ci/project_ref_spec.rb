@@ -70,10 +70,21 @@ describe Hobson::CI::ProjectRef do
       end
     end
 
-    %w{shas test_run_ids}.each{|attr|
-      describe "#{attr}" do
-        pending "it should return an #{Hobson::CI::ProjectRef::HISTORY_LENGTH} slot array"
-        pending "it should memoize and only hit redis once"
+    %w{shas test_run_ids}.each{|attribute|
+      describe "#{attribute}" do
+        let(:project_ref) { Factory.project_ref }
+
+        it "should return a #{Hobson::CI::ProjectRef::HISTORY_LENGTH} slot array" do
+          result = project_ref.public_send(attribute.to_sym)
+          result.should be_a Array
+          result.length.should == Hobson::CI::ProjectRef::HISTORY_LENGTH
+        end
+
+        it "should memoize and only hit redis once" do
+          project_ref.should_receive(:redis).once.and_return(stub(:lrange => []))
+          project_ref.public_send(attribute.to_sym)
+          project_ref.public_send(attribute.to_sym)
+        end
       end
     }
 

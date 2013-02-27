@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe "undefined scenarios should fail spec" do
+describe "post process hook" do
   worker_context do
 
     let(:project){ Factory.project }

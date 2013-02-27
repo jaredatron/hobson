@@ -1,5 +1,4 @@
 - page_title "Test Run #{test_run.id}"
-- auto_refresh!
 
 - if test_run.complete?
   #stamp{:class => test_run.status}= test_run.status
@@ -44,7 +43,7 @@
       %dd
         = test_run.tests.find_all(&:needs_run?).count
 
-      %dt Hungs Tests
+      %dt Hung Tests
       %dd= test_run.tests.find_all(&:hung?).count
 
       %dt Test Retries

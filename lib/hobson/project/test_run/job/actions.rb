@@ -55,12 +55,13 @@ class Hobson::Project::TestRun::Job
 
   rescue Object => e
     test_run.errored!
+    eval_hook :on_error
     logger.info %(Exception:\n#{e}\n#{e.backtrace.join("\n")})
     self['exception'] = e.to_s
     self['exception:class'] = e.class.to_s
     self['exception:message'] = e.message.to_s
     self['exception:backtrace'] = e.backtrace.join("\n")
-    save_log_files! rescue nil
+    save_log_files!
     raise # raise so resque shows this as a failed job and you can retry it
   ensure
     complete!

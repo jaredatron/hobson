@@ -1,6 +1,5 @@
 require 'pathname'
 require 'popen4'
-require 'childprocess'
 
 class Hobson::Project::Workspace
 
@@ -50,7 +49,7 @@ class Hobson::Project::Workspace
 
   def create!
     root.parent.mkpath
-    `git clone "#{project.origin}" "#{root}"` or raise "unable to create workspace"
+    `git clone -q "#{project.origin}" "#{root}"` or raise "unable to create workspace"
   end
 
   def rvm?
@@ -70,7 +69,7 @@ class Hobson::Project::Workspace
   end
 
   def bundle_install!
-    execute 'gem install bundler && bundle check || bundle install' if bundler?
+    execute 'bundle check || bundle install' if bundler?
   end
 
   def prepare &block

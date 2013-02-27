@@ -8,4 +8,5 @@ pkg/*
 tmp/*
 log
 *.app
-
+.idea
+config.yml

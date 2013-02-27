@@ -28,12 +28,8 @@ class Hobson::Project::TestRun
     redis_hash.get('aborted_at').present? || redis_hash.get('errored_at').present?
   end
 
-  def aborted?
-    aborted_at.present?
-  end
-
   def running?
-    started? && jobs.any?(&:running?) || jobs.any?(&:complete?)
+    started? && (jobs.any?(&:running?) && !jobs.all?(&:complete?))
   end
 
   def errored?
